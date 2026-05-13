@@ -1,0 +1,15 @@
+gradio
+transformers
+torch
+torchvision
+opencv-python
+Pillow
+numpy
+google-generativeai
+scikit-learn
+matplotlib
+plotly
+seaborn
+python-dotenv
+tqdm
+pandas
