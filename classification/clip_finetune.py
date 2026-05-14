@@ -1,8 +1,12 @@
 """
 Fine-tune OpenAI CLIP ViT-B/32 on folder-based image classification (Colab-friendly).
 
-Expected layout under --data_root (default /content/data/processed):
-  beach/, nature/, city/, food/, culture/
+Expected layout:
+  --train_dir (default /content/data/train): beach/, nature/, city/, food/, culture/
+  --val_dir   (default /content/data/val):   beach/, nature/, city/, food/, culture/
+
+Validation metrics and final evaluation (zero-shot, confusion matrix, test accuracy)
+use the val split; there is no separate test folder.
 """
 
 from __future__ import annotations
@@ -18,7 +22,6 @@ import torch
 import torch.nn as nn
 from PIL import Image
 from sklearn.metrics import ConfusionMatrixDisplay, accuracy_score, confusion_matrix
-from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader, Dataset
 from torchvision import transforms
 from transformers import CLIPModel, CLIPProcessor
@@ -248,10 +251,16 @@ def plot_confusion(
 def main() -> None:
     parser = argparse.ArgumentParser(description="Fine-tune CLIP on 5-class travel-style images.")
     parser.add_argument(
-        "--data_root",
+        "--train_dir",
         type=str,
-        default="/content/data/processed",
-        help="Root with subfolders beach, nature, city, food, culture",
+        default="/content/data/train",
+        help="Train root with subfolders beach, nature, city, food, culture",
+    )
+    parser.add_argument(
+        "--val_dir",
+        type=str,
+        default="/content/data/val",
+        help="Val root (same class subfolders); also used as the held-out eval / test set",
     )
     parser.add_argument("--output_dir", type=str, default="./clip_finetune_out")
     parser.add_argument("--epochs", type=int, default=10)
@@ -269,34 +278,16 @@ def main() -> None:
     torch.manual_seed(args.seed)
     np.random.seed(args.seed)
 
-    data_root = Path(args.data_root)
+    train_dir = Path(args.train_dir)
+    val_dir = Path(args.val_dir)
     out_dir = Path(args.output_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
 
     device = _device()
-    paths, labels = _collect_samples(data_root)
-    labels_arr = np.array(labels)
-
-    idx = np.arange(len(paths))
-    train_idx, temp_idx = train_test_split(
-        idx,
-        test_size=0.2,
-        stratify=labels_arr,
-        random_state=args.seed,
-    )
-    val_idx, test_idx = train_test_split(
-        temp_idx,
-        test_size=0.5,
-        stratify=labels_arr[temp_idx],
-        random_state=args.seed,
-    )
-
-    train_paths = [paths[i] for i in train_idx]
-    train_labels = [labels[i] for i in train_idx]
-    val_paths = [paths[i] for i in val_idx]
-    val_labels = [labels[i] for i in val_idx]
-    test_paths = [paths[i] for i in test_idx]
-    test_labels = [labels[i] for i in test_idx]
+    train_paths, train_labels = _collect_samples(train_dir)
+    val_paths, val_labels = _collect_samples(val_dir)
+    # No separate test split: reuse val paths/labels for zero-shot, fine-tuned eval, confusion matrix
+    test_paths, test_labels = val_paths, val_labels
 
     processor = CLIPProcessor.from_pretrained(MODEL_ID)
 
