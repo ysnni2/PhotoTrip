@@ -88,12 +88,15 @@ class PILDataset(Dataset):
 
 
 def _processor_shortest_edge(processor: CLIPProcessor) -> int:
-    s = processor.size
-    if isinstance(s, dict) and "shortest_edge" in s:
-        return int(s["shortest_edge"])
-    if isinstance(s, (list, tuple)) and len(s) >= 1:
-        return int(s[0])
-    return 224
+    try:
+        s = processor.image_processor.size
+        if isinstance(s, dict):
+            return int(s.get("shortest_edge", s.get("height", 224)))
+        if isinstance(s, (list, tuple)):
+            return int(s[0])
+        return int(s)
+    except Exception:
+        return 224
 
 
 class CLIPClassifier(nn.Module):
