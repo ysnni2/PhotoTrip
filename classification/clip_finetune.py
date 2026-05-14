@@ -35,7 +35,7 @@ except ImportError:  # pragma: no cover
 
 
 MODEL_ID = "openai/clip-vit-base-patch32"
-CLASS_NAMES = ["beach", "nature", "city", "cafe", "culture", "fashion"]
+CLASS_NAMES = ["beach", "nature", "city", "indoor", "culture", "fashion", "food"]
 ZERO_SHOT_TEMPLATES = [
     "a photo of {}",
     "a picture of {}",
