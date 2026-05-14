@@ -87,18 +87,6 @@ class PILDataset(Dataset):
         return img, self.labels[i]
 
 
-def _processor_shortest_edge(processor: CLIPProcessor) -> int:
-    try:
-        s = processor.image_processor.size
-        if isinstance(s, dict):
-            return int(s.get("shortest_edge", s.get("height", 224)))
-        if isinstance(s, (list, tuple)):
-            return int(s[0])
-        return int(s)
-    except Exception:
-        return 224
-
-
 class CLIPClassifier(nn.Module):
     """CLIP image tower + linear head on projection_dim."""
 
@@ -341,9 +329,9 @@ def main() -> None:
 
         return collate
 
-    size = _processor_shortest_edge(processor)
-    mean = processor.image_mean
-    std = processor.image_std
+    size = 224
+    mean = [0.48145466, 0.4578275, 0.40821073]
+    std = [0.26862954, 0.26130258, 0.27577711]
 
     train_ds = PILDataset(train_paths, train_labels, train_aug)
     val_ds = PILDataset(val_paths, val_labels, None)
