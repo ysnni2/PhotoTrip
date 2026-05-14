@@ -97,6 +97,8 @@ class CLIPClassifier(nn.Module):
 
     def forward(self, pixel_values: torch.Tensor) -> torch.Tensor:
         emb = self.clip.get_image_features(pixel_values=pixel_values)
+        if not isinstance(emb, torch.Tensor):
+            emb = emb.pooler_output
         return self.head(emb)
 
 
