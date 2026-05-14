@@ -101,46 +101,38 @@ class CLIPClassifier(nn.Module):
 
 
 @torch.inference_mode()
-def zero_shot_accuracy(
-    model: CLIPModel,
-    processor: CLIPProcessor,
-    loader: DataLoader,
-    device: torch.device,
-) -> Tuple[float, np.ndarray, np.ndarray]:
-    """Average over templates; returns accuracy, y_true, y_pred."""
+def zero_shot_accuracy(model, processor, loader, device):
     model.eval()
-    class_texts: List[str] = []
+    class_texts = []
     for c in CLASS_NAMES:
         for t in ZERO_SHOT_TEMPLATES:
             class_texts.append(t.format(c))
 
-    # Encode all class×template text embeddings, then average per class
-    text_batches = [
-        processor(text=class_texts[i : i + 32], return_tensors="pt", padding=True)
-        for i in range(0, len(class_texts), 32)
-    ]
     text_feats = []
-    for tb in text_batches:
+    for i in range(0, len(class_texts), 32):
+        tb = processor(text=class_texts[i : i + 32], return_tensors="pt", padding=True)
         tb = {k: v.to(device) for k, v in tb.items()}
         tf = model.get_text_features(**tb)
+        if not isinstance(tf, torch.Tensor):
+            tf = tf.pooler_output
         tf = tf / tf.norm(dim=-1, keepdim=True)
         text_feats.append(tf)
-    text_feats = torch.cat(text_feats, dim=0)  # (C*T, D)
+
+    text_feats = torch.cat(text_feats, dim=0)
     c, t = len(CLASS_NAMES), len(ZERO_SHOT_TEMPLATES)
     text_feats = text_feats.view(c, t, -1).mean(dim=1)
     text_feats = text_feats / text_feats.norm(dim=-1, keepdim=True)
 
-    ys: List[int] = []
-    ps: List[int] = []
-    for batch in loader:
-        px, y = batch
+    ys, ps = [], []
+    for px, y in loader:
         px = px.to(device)
-        y = y.numpy()
         imf = model.get_image_features(pixel_values=px)
+        if not isinstance(imf, torch.Tensor):
+            imf = imf.pooler_output
         imf = imf / imf.norm(dim=-1, keepdim=True)
         logits = imf @ text_feats.T * model.logit_scale.exp()
         pred = logits.argmax(dim=-1).cpu().numpy()
-        ys.extend(y.tolist())
+        ys.extend(y.numpy().tolist())
         ps.extend(pred.tolist())
 
     y_true = np.array(ys)
