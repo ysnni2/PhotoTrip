@@ -96,7 +96,10 @@ class CLIPClassifier(nn.Module):
     def __init__(self, clip: CLIPModel, num_classes: int):
         super().__init__()
         self.clip = clip
-        self.head = nn.Linear(clip.config.projection_dim, num_classes)
+        self.head = nn.Sequential(
+            nn.Dropout(p=0.3),
+            nn.Linear(clip.config.projection_dim, num_classes),
+        )
 
     def forward(self, pixel_values: torch.Tensor) -> torch.Tensor:
         emb = self.clip.get_image_features(pixel_values=pixel_values)
@@ -380,6 +383,8 @@ def main() -> None:
     }
     best_val = -1.0
     best_path = out_dir / "best_clip.pth"
+    patience = 3
+    epochs_without_improvement = 0
 
     for epoch in range(1, args.epochs + 1):
         tr_loss, tr_acc = train_one_epoch(
@@ -397,6 +402,7 @@ def main() -> None:
         )
         if va_acc > best_val:
             best_val = va_acc
+            epochs_without_improvement = 0
             torch.save(
                 {
                     "classifier_state": model.head.state_dict(),
@@ -407,6 +413,14 @@ def main() -> None:
                 },
                 best_path,
             )
+        else:
+            epochs_without_improvement += 1
+            if epochs_without_improvement >= patience:
+                print(
+                    f"Early stopping: val_acc did not improve for {patience} epochs "
+                    f"(best val_acc={best_val:.4f})."
+                )
+                break
 
     plot_curves(history, out_dir / "training_curves.png")
 
