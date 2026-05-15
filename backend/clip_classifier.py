@@ -31,10 +31,7 @@ class CLIPClassifier(nn.Module):
     def __init__(self, clip: CLIPModel, num_classes: int):
         super().__init__()
         self.clip = clip
-        self.head = nn.Sequential(
-            nn.Dropout(p=0.3),
-            nn.Linear(clip.config.projection_dim, num_classes),
-        )
+        self.head = nn.Linear(clip.config.projection_dim, num_classes)
 
     def forward(self, pixel_values: torch.Tensor) -> torch.Tensor:
         emb = self.clip.get_image_features(pixel_values=pixel_values)
