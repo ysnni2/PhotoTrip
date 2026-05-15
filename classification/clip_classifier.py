@@ -10,12 +10,15 @@ from transformers import CLIPModel, CLIPProcessor
 
 MODEL_ID = "openai/clip-vit-base-patch32"
 
-_CATEGORIES = ("Beach", "Nature", "City", "Indoor")
+_CATEGORIES = ("Beach", "Nature", "City", "Indoor", "Culture", "Fashion", "Food")
 _TEXT_PROMPTS = (
     "a photo of a beach",
     "a photo of nature",
     "a photo of a city",
     "a photo of an indoor scene",
+    "a photo of a cultural place",
+    "a photo of fashion and shopping",
+    "a photo of food",
 )
 
 _model: CLIPModel | None = None
@@ -37,7 +40,7 @@ def _load_model() -> tuple[CLIPModel, CLIPProcessor]:
 
 def classify(image: Image.Image) -> Dict[str, float]:
     """
-    Zero-shot classify a PIL image into Beach / Nature / City / Indoor.
+    Zero-shot classify a PIL image into seven scene categories.
 
     Returns a dict of category names to probabilities (softmax over CLIP logits).
     """

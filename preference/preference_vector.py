@@ -37,13 +37,8 @@ def generate(
     """
     Build a preference vector from CLIP scene probs, ADE segment ratios, and CV metrics.
 
-    - beach_affinity: soft-OR of CLIP Beach, water, sand
-    - nature_affinity: soft-OR of CLIP Nature and vegetation ratio
-    - urban_affinity: mean of CLIP City, building, road
-    - indoor_restaurant / indoor_museum: split CLIP Indoor mass
-    - warm_tone: from dominant RGB (R vs B on normalized axis)
-    - brightness / saturation: passed through from cv_result
-    - night_preference: higher when image is darker (1 - brightness)
+    - beach / nature / city / indoor / culture / fashion / food: primary theme scores for recommend()
+    - beach_affinity, nature_affinity, urban_affinity, …: legacy / detailed signals
     """
     beach = float(clip_result.get("Beach", 0.0))
     nature = float(clip_result.get("Nature", 0.0))
@@ -73,7 +68,21 @@ def generate(
 
     night_preference = float(np.clip(1.0 - brightness, 0.0, 1.0))
 
+    indoor_strength = float(
+        np.clip(indoor_restaurant_affinity + indoor_museum_affinity, 0.0, 1.0)
+    )
+    culture_clip = float(np.clip(clip_result.get("Culture", 0.0), 0.0, 1.0))
+    fashion_clip = float(np.clip(clip_result.get("Fashion", 0.0), 0.0, 1.0))
+    food_clip = float(np.clip(clip_result.get("Food", 0.0), 0.0, 1.0))
+
     return {
+        "beach": beach_affinity,
+        "nature": nature_affinity,
+        "city": urban_affinity,
+        "indoor": indoor_strength,
+        "culture": culture_clip,
+        "fashion": fashion_clip,
+        "food": food_clip,
         "beach_affinity": beach_affinity,
         "nature_affinity": nature_affinity,
         "urban_affinity": urban_affinity,

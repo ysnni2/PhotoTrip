@@ -7,39 +7,89 @@ from typing import Any, Dict, List, Mapping
 _TOP_K = 3
 
 
-def _get(pref: Mapping[str, float], key: str) -> float:
-    return float(pref.get(key, 0.0))
+def _get(pref: Mapping[str, float], key: str, *fallback_keys: str) -> float:
+    v = pref.get(key)
+    if v is not None:
+        return float(v)
+    for fk in fallback_keys:
+        if fk in pref and pref[fk] is not None:
+            return float(pref[fk])
+    return 0.0
 
 
 def recommend(preference_vector: Mapping[str, float]) -> List[Dict[str, Any]]:
     """
-    Score destinations from a preference vector and return the top 3 by score.
+    Score destinations from the 7 theme signals (beach…food) plus tone / urban cues,
+    then return the top 3 destinations by score.
     """
-    b = _get(preference_vector, "beach_affinity")
-    n = _get(preference_vector, "nature_affinity")
-    u = _get(preference_vector, "urban_affinity")
-    ir = _get(preference_vector, "indoor_restaurant_affinity")
-    im = _get(preference_vector, "indoor_museum_affinity")
+    beach = _get(preference_vector, "beach", "beach_affinity")
+    nature = _get(preference_vector, "nature", "nature_affinity")
+    city = _get(preference_vector, "city", "urban_affinity")
+    if "indoor" in preference_vector:
+        indoor = _get(preference_vector, "indoor")
+    else:
+        indoor = min(
+            1.0,
+            _get(preference_vector, "indoor_restaurant_affinity")
+            + _get(preference_vector, "indoor_museum_affinity"),
+        )
+    culture = _get(preference_vector, "culture")
+    fashion = _get(preference_vector, "fashion")
+    food = _get(preference_vector, "food")
+
     w = _get(preference_vector, "warm_tone")
     br = _get(preference_vector, "brightness")
     s = _get(preference_vector, "saturation")
     night = _get(preference_vector, "night_preference")
+    im = _get(preference_vector, "indoor_museum_affinity")
 
-    cold = 1.0 - w
+    cold = max(0.0, min(1.0, 1.0 - w))
+    luxury = 0.5 * w + 0.5 * s
+
+    def mix2(a: float, b: float) -> float:
+        return 0.5 * a + 0.5 * b
+
+    def mix3(a: float, b: float, c: float) -> float:
+        return (a + b + c) / 3.0
 
     destinations: Dict[str, float] = {
-        "Bali": b * 0.5 + w * 0.3 + s * 0.2,
-        "Maldives": b * 0.6 + w * 0.4,
-        "Jeju": b * 0.4 + n * 0.4 + br * 0.2,
-        "Swiss Alps": n * 0.6 + br * 0.2 + cold * 0.2,
-        "Patagonia": n * 0.5 + cold * 0.3 + br * 0.2,
-        "New Zealand": n * 0.5 + br * 0.3 + s * 0.2,
-        "Tokyo": u * 0.4 + night * 0.4 + s * 0.2,
-        "New York": u * 0.5 + night * 0.3 + br * 0.2,
-        "Paris": u * 0.4 + im * 0.4 + w * 0.2,
-        "Bangkok": ir * 0.5 + w * 0.3 + u * 0.2,
-        "Rome": ir * 0.4 + im * 0.3 + w * 0.3,
-        "Barcelona": ir * 0.4 + w * 0.3 + b * 0.3,
+        # beach
+        "Bali": mix2(beach, w),
+        "Maldives": mix2(beach, w),
+        "Jeju": mix2(beach, nature),
+        "Phuket": mix2(beach, w),
+        # nature
+        "Swiss Alps": mix2(nature, cold),
+        "Patagonia": mix2(nature, cold),
+        "New Zealand": mix2(nature, br),
+        "Hokkaido": mix2(nature, cold),
+        # city
+        "Tokyo": mix2(city, night),
+        "New York": mix2(city, br),
+        "Singapore": mix2(city, w),
+        "Hong Kong": mix2(city, night),
+        # indoor
+        "Paris cafe": mix2(indoor, w),
+        "Melbourne": mix2(indoor, br),
+        "Kyoto (indoor)": mix2(indoor, culture),
+        "Amsterdam": mix2(indoor, br),
+        # culture
+        "Paris": mix2(culture, im),
+        "Vatican": mix2(culture, im),
+        "Kyoto (culture)": mix2(culture, nature),
+        "Jerusalem": mix2(culture, night),
+        # fashion
+        "Milan": mix2(fashion, luxury),
+        "Paris (fashion)": mix2(fashion, luxury),
+        "Tokyo Harajuku": mix2(fashion, city),
+        "Seoul Dongdaemun": mix2(fashion, city),
+        "London": mix2(fashion, cold),
+        # food
+        "Tokyo (food)": mix2(food, city),
+        "Bangkok": mix2(food, w),
+        "Rome": mix2(food, w),
+        "Taiwan": mix2(food, s),
+        "New Orleans": mix3(food, br, s),
     }
 
     ranked = sorted(
