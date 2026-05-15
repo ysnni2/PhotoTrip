@@ -18,7 +18,14 @@ _SEMANTIC_KEYS = (
     ("food_ratio", "food"),
 )
 
-_VISUAL_KEYS = ("brightness", "saturation", "contrast", "warm_tone")
+_VISUAL_KEYS = (
+    "brightness",
+    "saturation",
+    "contrast",
+    "warm_tone",
+    "person_ratio",
+    "animal_ratio",
+)
 
 
 def _clip(value: float) -> float:
