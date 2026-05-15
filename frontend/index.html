@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PhotoTrip — 탑승권</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <!-- Screen 1: Main -->
+    <section id="screen-main" class="screen active" aria-label="메인">
+      <div class="stars" aria-hidden="true"></div>
+      <div class="ticket-wrap">
+        <article class="ticket" id="ticket-main">
+          <div class="ticket-map" aria-hidden="true"></div>
+          <div class="ticket-route">
+            <div>
+              <div class="airport-code">ICN</div>
+              <div class="airport-name">인천</div>
+            </div>
+            <div class="route-mid">
+              <span class="route-plane">✈</span>
+              <span class="route-time" data-flight-hours>12h 40m</span>
+            </div>
+            <div>
+              <div class="airport-code" data-to-code>???</div>
+              <div class="airport-name" data-to-name>목적지</div>
+            </div>
+          </div>
+          <dl class="ticket-meta">
+            <div><dt>Flight No.</dt><dd data-flight-no>PT 2026</dd></div>
+            <div><dt>Distance</dt><dd data-distance>—</dd></div>
+            <div><dt>Boarding</dt><dd data-boarding>Gate A12</dd></div>
+            <div><dt>Date</dt><dd data-date>—</dd></div>
+          </dl>
+          <div class="ticket-barcode" aria-hidden="true"></div>
+          <button type="button" class="ticket-fab" aria-label="비행기">✈</button>
+        </article>
+      </div>
+      <button type="button" class="btn-issue" id="btn-issue">탑승권 발급받기</button>
+    </section>
+
+    <!-- Screen 2: Upload -->
+    <section id="screen-upload" class="screen" aria-label="업로드">
+      <header class="upload-header">
+        <h2>PhotoTrip</h2>
+        <p>일상 사진 5~7장을 업로드하세요</p>
+      </header>
+      <label class="upload-drop" id="upload-drop">
+        <input type="file" id="file-input" accept="image/*" multiple />
+        <p><strong>탭하여 선택</strong> 또는 사진을 끌어다 놓으세요</p>
+        <p class="upload-count" id="upload-count">0 / 7장</p>
+      </label>
+      <div class="preview-grid" id="preview-grid"></div>
+      <button type="button" class="btn-analyze" id="btn-analyze" disabled>분석 시작</button>
+    </section>
+
+    <!-- Screen 3: Gesture -->
+    <section id="screen-gesture" class="screen" aria-label="제스처">
+      <div class="stars" aria-hidden="true"></div>
+      <p class="gesture-hint">✈ 비행기를 날려보세요!</p>
+      <div class="gesture-area" id="gesture-area">
+        <svg class="gesture-trail" id="gesture-trail" xmlns="http://www.w3.org/2000/svg">
+          <polyline id="gesture-poly" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" />
+        </svg>
+        <div class="gesture-plane" id="gesture-plane" role="img" aria-label="드래그하여 비행">✈</div>
+      </div>
+    </section>
+
+    <!-- Screen 3-B: Loading -->
+    <section id="screen-loading" class="screen" aria-label="분석 중">
+      <div class="stars" aria-hidden="true"></div>
+      <div class="loading-map">
+        <div class="loading-line" aria-hidden="true"></div>
+        <span class="loading-plane" aria-hidden="true">✈</span>
+      </div>
+      <p class="loading-title">AI가 취향을 분석하는 중...</p>
+      <p class="loading-sub" id="loading-sub">Distance: 9,742 km | Time remaining: 분석 중...</p>
+    </section>
+
+    <!-- Screen 4: Result -->
+    <section id="screen-result" class="screen" aria-label="결과">
+      <div class="result-scene">
+        <canvas id="scene-canvas"></canvas>
+      </div>
+      <div class="result-body">
+        <p id="gemini-text">분석 결과를 불러오는 중입니다.</p>
+        <div class="result-footer">
+          <div class="ticket-wrap">
+            <article class="ticket ticket--on-white" id="ticket-result">
+              <div class="ticket-map" aria-hidden="true"></div>
+              <div class="ticket-route">
+                <div>
+                  <div class="airport-code">ICN</div>
+                  <div class="airport-name">인천</div>
+                </div>
+                <div class="route-mid">
+                  <span class="route-plane">✈</span>
+                  <span class="route-time" id="result-flight-hours">—</span>
+                </div>
+                <div>
+                  <div class="airport-code" id="result-to-code">—</div>
+                  <div class="airport-name" id="result-to-name">—</div>
+                </div>
+              </div>
+              <dl class="ticket-meta">
+                <div><dt>Flight No.</dt><dd id="result-flight-no">—</dd></div>
+                <div><dt>Distance</dt><dd id="result-distance">—</dd></div>
+                <div><dt>Boarding</dt><dd id="result-boarding">—</dd></div>
+                <div><dt>Date</dt><dd id="result-date">—</dd></div>
+              </dl>
+              <div class="ticket-barcode" aria-hidden="true"></div>
+            </article>
+          </div>
+          <div class="dest-tabs" id="dest-tabs" role="tablist"></div>
+          <button type="button" class="btn-bucket" id="btn-bucket">🌱 버킷리스트 저장</button>
+        </div>
+      </div>
+    </section>
+
+    <script type="module">
+      import { initScene, updateScene } from "/static/three_scene.js";
+
+      const SCREENS = ["screen-main", "screen-upload", "screen-gesture", "screen-loading", "screen-result"];
+      const MIN_PHOTOS = 5;
+      const MAX_PHOTOS = 7;
+
+      const DEST_IATA = {
+        발리: "DPS",
+        몰디브: "MLE",
+        제주: "CJU",
+        세부: "CEB",
+        푸켓: "HKT",
+        "뉴질랜드 퀸스타운": "ZQN",
+        파타고니아: "PUQ",
+        설악산: "YNY",
+        요세미티: "MMH",
+        아이슬란드: "KEF",
+        도쿄: "NRT",
+        뉴욕: "JFK",
+        홍콩: "HKG",
+        싱가포르: "SIN",
+        파리: "CDG",
+        로마: "FCO",
+        교토: "UKY",
+        이스탄불: "IST",
+        "이스탄불 (미식)": "IST",
+        바르셀로나: "BCN",
+        앙코르와트: "REP",
+        밀라노: "MXP",
+        비엔나: "VIE",
+        리우데자네이루: "GIG",
+        에든버러: "EDI",
+        "뉴욕 브로드웨이": "JFK",
+        나폴리: "NAP",
+        방콕: "BKK",
+        오사카: "KIX",
+        멕시코시티: "MEX",
+        "이스탄불 (미식)": "IST",
+        "Kyoto (indoor)": "UKY",
+        "Kyoto (culture)": "UKY",
+      };
+
+      let uploadedFiles = [];
+      let analysisData = null;
+      let activeDestIndex = 0;
+
+      const gestureState = {
+        dragging: false,
+        startX: 0,
+        startY: 0,
+        points: [],
+      };
+
+      function showScreen(id) {
+        SCREENS.forEach((sid) => {
+          document.getElementById(sid).classList.toggle("active", sid === id);
+        });
+        if (id === "screen-result") {
+          initScene(document.getElementById("scene-canvas"));
+        }
+      }
+
+      function formatDate() {
+        const d = new Date();
+        return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, "0")}.${String(d.getDate()).padStart(2, "0")}`;
+      }
+
+      function iataFor(name) {
+        if (DEST_IATA[name]) return DEST_IATA[name];
+        const clean = name.replace(/[^\w가-힣]/g, "").slice(0, 3).toUpperCase();
+        return clean.padEnd(3, "?").slice(0, 3);
+      }
+
+      function setMainTicketPending() {
+        document.querySelector("#ticket-main [data-to-code]").textContent = "???";
+        document.querySelector("#ticket-main [data-to-name]").textContent = "목적지";
+        document.querySelector("#ticket-main [data-distance]").textContent = "—";
+        document.querySelector("#ticket-main [data-date]").textContent = formatDate();
+      }
+
+      function updateResultTicket(destName, score) {
+        const code = iataFor(destName);
+        document.getElementById("result-to-code").textContent = code;
+        document.getElementById("result-to-name").textContent = destName;
+        document.getElementById("result-flight-hours").textContent =
+          score > 0.85 ? "11h 20m" : "13h 05m";
+        document.getElementById("result-flight-no").textContent = `PT ${100 + activeDestIndex}`;
+        document.getElementById("result-distance").textContent =
+          `${Math.round(8200 + score * 2000).toLocaleString()} km`;
+        document.getElementById("result-boarding").textContent = `Gate ${String.fromCharCode(65 + activeDestIndex)}${10 + activeDestIndex}`;
+        document.getElementById("result-date").textContent = formatDate();
+      }
+
+      function buildGeminiText(pv, rec) {
+        const cat = rec.top_category || "travel";
+        const conf = (pv.confidence * 100).toFixed(0);
+        const scene = pv.scene || {};
+        const topScene = Object.entries(scene).sort((a, b) => b[1] - a[1])[0];
+        const sceneLabel = topScene ? `${topScene[0]}(${(topScene[1] * 100).toFixed(0)}%)` : cat;
+        const dests = (rec.destinations || []).join(", ");
+        const randomNote = rec.is_random
+          ? "사진에서 뚜렷한 단일 취향이 잡히지 않아 다양한 여행지를 제안했어요."
+          : `당신의 사진은 **${cat}** 취향이 ${conf}%로 가장 두드러집니다.`;
+
+        return (
+          `${randomNote}\n\n` +
+          `장면 분석상 ${sceneLabel} 요소가 강하고, 시각적으로는 밝기 ${(pv.visual?.brightness ?? 0).toFixed(2)}, ` +
+          `채도 ${(pv.visual?.saturation ?? 0).toFixed(2)}, 따뜻한 톤 ${(pv.visual?.warm_tone ?? 0).toFixed(2)}입니다. ` +
+          `추천 여행지 Top-3: **${dests}**. 마음에 드는 도시를 탭해 탑승권을 확인하고 버킷리스트에 저장해 보세요.`
+        );
+      }
+
+      function renderTabs(rec) {
+        const tabs = document.getElementById("dest-tabs");
+        const dests = rec.destinations || [];
+        tabs.innerHTML = dests
+          .map(
+            (name, i) =>
+              `<button type="button" class="dest-tab${i === activeDestIndex ? " active" : ""}" data-index="${i}" role="tab">${name}</button>`
+          )
+          .join("");
+
+        tabs.querySelectorAll(".dest-tab").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            activeDestIndex = Number(btn.dataset.index);
+            tabs.querySelectorAll(".dest-tab").forEach((b, j) =>
+              b.classList.toggle("active", j === activeDestIndex)
+            );
+            const name = dests[activeDestIndex];
+            const score = rec.scores?.[name] ?? 0.5;
+            updateResultTicket(name, score);
+            updateScene({ topCategory: rec.top_category, destinations: dests });
+            document.getElementById("btn-bucket").classList.remove("saved");
+            document.getElementById("btn-bucket").textContent = "🌱 버킷리스트 저장";
+          });
+        });
+      }
+
+      function showResult(data) {
+        analysisData = data;
+        const pv = data.preference_vector || {};
+        const rec = data.recommendation || {};
+        activeDestIndex = 0;
+
+        document.getElementById("gemini-text").innerHTML = buildGeminiText(pv, rec)
+          .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+          .replace(/\n/g, "<br />");
+
+        renderTabs(rec);
+        const first = rec.destinations?.[0] || "—";
+        const score = rec.scores?.[first] ?? 0.5;
+        updateResultTicket(first, score);
+        updateScene({ topCategory: rec.top_category, destinations: rec.destinations });
+        showScreen("screen-result");
+      }
+
+      async function runAnalysis() {
+        showScreen("screen-loading");
+        const formData = new FormData();
+        uploadedFiles.forEach((f) => formData.append("files", f));
+        if (uploadedFiles[0]) formData.append("file", uploadedFiles[0]);
+
+        try {
+          const res = await fetch("/api/analyze", { method: "POST", body: formData });
+          if (!res.ok) throw new Error(await res.text());
+          const data = await res.json();
+          showResult(data);
+        } catch (err) {
+          console.error(err);
+          document.getElementById("loading-sub").textContent =
+            "분석 실패 — 서버를 확인한 뒤 다시 시도해 주세요.";
+          setTimeout(() => showScreen("screen-upload"), 2500);
+        }
+      }
+
+      function validateGesture(endX, endY) {
+        const dx = endX - gestureState.startX;
+        const dy = gestureState.startY - endY;
+        return dx > 100 && dy > 100;
+      }
+
+      function drawTrail() {
+        const poly = document.getElementById("gesture-poly");
+        if (gestureState.points.length < 2) {
+          poly.setAttribute("points", "");
+          return;
+        }
+        poly.setAttribute("points", gestureState.points.map((p) => `${p.x},${p.y}`).join(" "));
+      }
+
+      function setupGesture() {
+        const area = document.getElementById("gesture-area");
+        const plane = document.getElementById("gesture-plane");
+        const rect = () => area.getBoundingClientRect();
+
+        const onStart = (clientX, clientY) => {
+          gestureState.dragging = true;
+          gestureState.startX = clientX;
+          gestureState.startY = clientY;
+          gestureState.points = [];
+          plane.classList.add("dragging");
+          const r = rect();
+          const x = clientX - r.left;
+          const y = clientY - r.top;
+          gestureState.points.push({ x, y });
+          plane.style.left = `${x - 24}px`;
+          plane.style.top = `${y - 24}px`;
+          plane.style.bottom = "auto";
+          drawTrail();
+        };
+
+        const onMove = (clientX, clientY) => {
+          if (!gestureState.dragging) return;
+          const r = rect();
+          const x = Math.max(0, Math.min(r.width, clientX - r.left));
+          const y = Math.max(0, Math.min(r.height, clientY - r.top));
+          gestureState.points.push({ x, y });
+          plane.style.left = `${x - 24}px`;
+          plane.style.top = `${y - 24}px`;
+          drawTrail();
+        };
+
+        const onEnd = (clientX, clientY) => {
+          if (!gestureState.dragging) return;
+          gestureState.dragging = false;
+          plane.classList.remove("dragging");
+          if (validateGesture(clientX, clientY)) {
+            runAnalysis();
+          }
+        };
+
+        plane.addEventListener("mousedown", (e) => {
+          e.preventDefault();
+          onStart(e.clientX, e.clientY);
+        });
+        window.addEventListener("mousemove", (e) => onMove(e.clientX, e.clientY));
+        window.addEventListener("mouseup", (e) => onEnd(e.clientX, e.clientY));
+
+        plane.addEventListener(
+          "touchstart",
+          (e) => {
+            const t = e.touches[0];
+            onStart(t.clientX, t.clientY);
+          },
+          { passive: true }
+        );
+        window.addEventListener(
+          "touchmove",
+          (e) => {
+            const t = e.touches[0];
+            onMove(t.clientX, t.clientY);
+          },
+          { passive: true }
+        );
+        window.addEventListener("touchend", (e) => {
+          const t = e.changedTouches[0];
+          onEnd(t.clientX, t.clientY);
+        });
+      }
+
+      function refreshPreviews() {
+        const grid = document.getElementById("preview-grid");
+        grid.innerHTML = "";
+        uploadedFiles.forEach((file) => {
+          const img = document.createElement("img");
+          img.src = URL.createObjectURL(file);
+          img.alt = file.name;
+          grid.appendChild(img);
+        });
+        document.getElementById("upload-count").textContent =
+          `${uploadedFiles.length} / ${MAX_PHOTOS}장`;
+        const ok = uploadedFiles.length >= MIN_PHOTOS && uploadedFiles.length <= MAX_PHOTOS;
+        document.getElementById("btn-analyze").disabled = !ok;
+      }
+
+      function addFiles(fileList) {
+        const incoming = Array.from(fileList).filter((f) => f.type.startsWith("image/"));
+        uploadedFiles = [...uploadedFiles, ...incoming].slice(0, MAX_PHOTOS);
+        refreshPreviews();
+      }
+
+      document.getElementById("btn-issue").addEventListener("click", () => showScreen("screen-upload"));
+
+      const fileInput = document.getElementById("file-input");
+      const uploadDrop = document.getElementById("upload-drop");
+
+      fileInput.addEventListener("change", (e) => addFiles(e.target.files));
+      uploadDrop.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        uploadDrop.style.borderColor = "#c4e5fb";
+      });
+      uploadDrop.addEventListener("dragleave", () => {
+        uploadDrop.style.borderColor = "";
+      });
+      uploadDrop.addEventListener("drop", (e) => {
+        e.preventDefault();
+        uploadDrop.style.borderColor = "";
+        addFiles(e.dataTransfer.files);
+      });
+
+      document.getElementById("btn-analyze").addEventListener("click", () => {
+        if (uploadedFiles.length < MIN_PHOTOS) return;
+        showScreen("screen-gesture");
+        const plane = document.getElementById("gesture-plane");
+        plane.style.left = "24px";
+        plane.style.top = "auto";
+        plane.style.bottom = "24px";
+        gestureState.points = [];
+        drawTrail();
+      });
+
+      document.getElementById("btn-bucket").addEventListener("click", (e) => {
+        const btn = e.currentTarget;
+        btn.classList.add("saved");
+        btn.textContent = "✓ 버킷리스트에 저장됨";
+      });
+
+      setMainTicketPending();
+      setupGesture();
+    </script>
+  </body>
+</html>

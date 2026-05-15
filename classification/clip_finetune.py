@@ -96,10 +96,7 @@ class CLIPClassifier(nn.Module):
     def __init__(self, clip: CLIPModel, num_classes: int):
         super().__init__()
         self.clip = clip
-        self.head = nn.Sequential(
-            nn.Dropout(p=0.3),
-            nn.Linear(clip.config.projection_dim, num_classes),
-        )
+        self.head = nn.Linear(clip.config.projection_dim, num_classes)
 
     def forward(self, pixel_values: torch.Tensor) -> torch.Tensor:
         emb = self.clip.get_image_features(pixel_values=pixel_values)
@@ -294,13 +291,13 @@ def main() -> None:
 
     processor = CLIPProcessor.from_pretrained(MODEL_ID)
 
-    train_aug = transforms.Compose(
-        [
-            transforms.RandomHorizontalFlip(),
-            transforms.RandomRotation(15),
-            transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.05),
-        ]
-    )
+    train_aug = transforms.Compose([
+        transforms.RandomHorizontalFlip(),
+        transforms.RandomRotation(20),
+        transforms.ColorJitter(brightness=0.3, contrast=0.3, saturation=0.3, hue=0.1),
+        transforms.RandomGrayscale(p=0.1),
+        transforms.RandomPerspective(distortion_scale=0.2, p=0.3),
+    ])
 
     def make_collate(size: int, mean: Sequence[float], std: Sequence[float]):
         resize = transforms.Resize((size, size))
@@ -383,8 +380,6 @@ def main() -> None:
     }
     best_val = -1.0
     best_path = out_dir / "best_clip.pth"
-    patience = 3
-    epochs_without_improvement = 0
 
     for epoch in range(1, args.epochs + 1):
         tr_loss, tr_acc = train_one_epoch(
@@ -402,7 +397,6 @@ def main() -> None:
         )
         if va_acc > best_val:
             best_val = va_acc
-            epochs_without_improvement = 0
             torch.save(
                 {
                     "classifier_state": model.head.state_dict(),
@@ -413,14 +407,6 @@ def main() -> None:
                 },
                 best_path,
             )
-        else:
-            epochs_without_improvement += 1
-            if epochs_without_improvement >= patience:
-                print(
-                    f"Early stopping: val_acc did not improve for {patience} epochs "
-                    f"(best val_acc={best_val:.4f})."
-                )
-                break
 
     plot_curves(history, out_dir / "training_curves.png")
 
