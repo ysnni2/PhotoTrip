@@ -410,7 +410,7 @@ def main() -> None:
         "val_acc": [],
     }
     best_val = -1.0
-    best_path = out_dir / "best_clip.pth"
+    best_path = out_dir / "best_siglip.pth"
 
     for epoch in range(1, args.epochs + 1):
         tr_loss, tr_acc = train_one_epoch(

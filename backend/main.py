@@ -21,7 +21,7 @@ _FRONTEND_DIR = _PROJECT_ROOT / "frontend"
 if str(_BACKEND_DIR) not in sys.path:
     sys.path.insert(0, str(_BACKEND_DIR))
 
-from clip_classifier import classify  # noqa: E402
+from siglip_classifier import classify  # noqa: E402
 from mask2former import segment  # noqa: E402
 from opencv_analyzer import analyze  # noqa: E402
 from preference_vector import SCENE_CATEGORIES, build_vector  # noqa: E402

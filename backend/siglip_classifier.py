@@ -11,7 +11,7 @@ import torch.nn as nn
 from PIL import Image
 from transformers import AutoModel, AutoProcessor
 
-DEFAULT_MODEL_PATH = Path(__file__).resolve().parent.parent / "models" / "best_clip.pth"
+DEFAULT_MODEL_PATH = Path(__file__).resolve().parent.parent / "models" / "best_siglip.pth"
 _FALLBACK_MODEL_ID = "google/siglip-large-patch16-256"
 
 _model: Optional["CLIPClassifier"] = None
@@ -32,7 +32,7 @@ def _image_features(model: nn.Module, pixel_values: torch.Tensor) -> torch.Tenso
 
 
 class CLIPClassifier(nn.Module):
-    """SigLIP image encoder + linear head (matches clip_finetune checkpoint)."""
+    """SigLIP image encoder + linear head (matches siglip_finetune checkpoint)."""
 
     def __init__(self, backbone: nn.Module, num_classes: int):
         super().__init__()
@@ -75,7 +75,7 @@ def _load_model() -> Tuple[CLIPClassifier, Any, List[str], torch.device]:
     if not ckpt_path.is_file():
         raise FileNotFoundError(
             f"SigLIP checkpoint not found: {ckpt_path}. "
-            "Set CLIP_MODEL_PATH or place weights at models/best_clip.pth"
+            "Set CLIP_MODEL_PATH or place weights at models/best_siglip.pth"
         )
 
     device = _get_device()
