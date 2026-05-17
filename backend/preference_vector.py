@@ -9,6 +9,7 @@ import numpy as np
 SCENE_CATEGORIES = ("beach", "nature", "city", "culture", "fashion", "food")
 
 _UNCERTAIN_THRESHOLD = 0.3
+_STYLE_UNCERTAIN_THRESHOLD = 0.25
 
 _SEMANTIC_KEYS = (
     ("water_ratio", "water"),
@@ -41,14 +42,19 @@ def _scene_scores(clip_result: Mapping[str, Any]) -> Dict[str, float]:
     return scene
 
 
+def _style_scores(style_result: Mapping[str, float]) -> Dict[str, float]:
+    return {key: _clip(float(value)) for key, value in style_result.items()}
+
+
 def build_vector(
     clip_result: Mapping[str, Any],
     segment_result: Mapping[str, float],
     opencv_result: Mapping[str, float],
+    style_result: Mapping[str, float],
 ) -> Dict[str, Any]:
     """
-    Merge CLIP classification, Mask2Former ratios, and OpenCV tone metrics
-    into a nested preference vector.
+    Merge SigLIP scene classification, style scores, Mask2Former ratios,
+    and OpenCV tone metrics into a nested preference vector.
     """
     scene = _scene_scores(clip_result)
 
@@ -62,17 +68,25 @@ def build_vector(
         for out_key, seg_key in _SEMANTIC_KEYS
     }
 
+    style = _style_scores(style_result)
+
     category = str(clip_result.get("category", "")).lower()
     if category not in SCENE_CATEGORIES and scene:
         category = max(scene, key=scene.get)
 
     confidence = _clip(float(clip_result.get("confidence", 0.0)))
+    max_style = max(style.values()) if style else 0.0
+    is_uncertain = (
+        confidence < _UNCERTAIN_THRESHOLD
+        or max_style < _STYLE_UNCERTAIN_THRESHOLD
+    )
 
     return {
         "scene": scene,
         "visual": visual,
         "semantic": semantic,
+        "style": style,
         "top_category": category,
         "confidence": confidence,
-        "is_uncertain": confidence < _UNCERTAIN_THRESHOLD,
+        "is_uncertain": is_uncertain,
     }
