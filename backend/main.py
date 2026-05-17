@@ -65,7 +65,7 @@ async def analyze_image(file: UploadFile = File(...)) -> Dict[str, Any]:
     clip_result = _clip_result_from_scores(clip_scores)
     segment_result = segment(image)
     opencv_result = analyze(image)
-    style_result = analyze_style(image)
+    style_result = analyze_style(image, opencv_result)
 
     preference_vector = build_vector(
         clip_result, segment_result, opencv_result, style_result

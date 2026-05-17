@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Mapping, Optional, Tuple
 
 import torch
 from PIL import Image
@@ -96,12 +96,7 @@ def _load() -> Tuple[Any, Any, torch.Tensor, torch.device]:
     return model, processor, text_features, device
 
 
-def analyze_style(image: Image.Image) -> Dict[str, float]:
-    """
-    Score a PIL image against six style prompts via SigLIP zero-shot.
-
-    Returns softmax probabilities, e.g. {"luxury": 0.12, "cozy": 0.35, ...}.
-    """
+def _siglip_style_scores(image: Image.Image) -> Dict[str, float]:
     if image.mode != "RGB":
         image = image.convert("RGB")
 
@@ -113,5 +108,46 @@ def analyze_style(image: Image.Image) -> Dict[str, float]:
         image_feats = _image_features(model, pixel_values)
         logits = _zeroshot_logits(model, image_feats, text_features)
         probs = logits.softmax(dim=-1)[0].cpu()
+
+    return {name: float(probs[i]) for i, name in enumerate(STYLE_NAMES)}
+
+
+def _rule_based_scores(opencv_result: Optional[Mapping[str, float]]) -> Dict[str, float]:
+    metrics = opencv_result or {}
+    brightness = float(metrics.get("brightness", 0.5))
+    saturation = float(metrics.get("saturation", 0.5))
+    warm_tone = float(metrics.get("warm_tone", 0.5))
+    contrast = float(metrics.get("contrast", 0.5))
+
+    return {
+        "vibrant": 1.0 if saturation > 0.6 and brightness > 0.6 else 0.1,
+        "cozy": 1.0 if warm_tone > 0.6 and brightness > 0.5 else 0.1,
+        "minimal": 1.0 if brightness > 0.7 and saturation < 0.4 else 0.1,
+        "romantic": 1.0 if warm_tone > 0.7 and saturation > 0.5 else 0.1,
+        "adventurous": 1.0 if contrast > 0.6 and saturation < 0.5 else 0.1,
+        "luxury": 0.3,
+    }
+
+
+def analyze_style(
+    image: Image.Image,
+    opencv_result: Optional[Mapping[str, float]] = None,
+) -> Dict[str, float]:
+    """
+    Score style via SigLIP zero-shot (60%) + OpenCV rules (40%), then softmax.
+
+    Returns probabilities, e.g. {"luxury": 0.12, "cozy": 0.35, ...}.
+    """
+    siglip_scores = _siglip_style_scores(image)
+    rule_scores = _rule_based_scores(opencv_result)
+
+    combined = torch.tensor(
+        [
+            siglip_scores[name] * 0.6 + rule_scores[name] * 0.4
+            for name in STYLE_NAMES
+        ],
+        dtype=torch.float32,
+    )
+    probs = torch.softmax(combined, dim=0)
 
     return {name: float(probs[i]) for i, name in enumerate(STYLE_NAMES)}
