@@ -11,12 +11,12 @@ from transformers import AutoModel, AutoProcessor
 MODEL_ID = "google/siglip-large-patch16-256"
 
 STYLE_PROMPTS: Dict[str, str] = {
-    "luxury": "a luxury elegant expensive high-end place",
-    "cozy": "a cozy warm comfortable intimate atmosphere",
-    "vibrant": "a vibrant colorful energetic lively scene",
-    "minimal": "a minimal clean simple modern space",
-    "romantic": "a romantic soft dreamy beautiful atmosphere",
-    "adventurous": "a adventurous wild outdoor rugged scene",
+    "luxury": "a photo of luxury five-star hotel resort with elegant interior expensive decoration",
+    "cozy": "a photo of cozy warm cafe interior with soft lighting comfortable chairs",
+    "vibrant": "a photo of vibrant colorful street market festival crowded energetic",
+    "minimal": "a photo of minimal white clean empty modern room simple design",
+    "romantic": "a photo of romantic sunset couple candlelight dinner beautiful scenery",
+    "adventurous": "a photo of adventurous mountain hiking rock climbing extreme outdoor activity",
 }
 
 STYLE_NAMES: List[str] = list(STYLE_PROMPTS.keys())

@@ -35,7 +35,7 @@ except ImportError:  # pragma: no cover
 
 
 MODEL_ID = "google/siglip-large-patch16-256"
-CLASS_NAMES = ["beach", "nature", "city", "culture", "fashion", "food"]
+CLASS_NAMES = ["beach", "nature", "city", "culture", "festival", "food"]
 ZERO_SHOT_TEMPLATES = [
     "a photo of {}",
     "a picture of {}",
@@ -289,13 +289,13 @@ def main() -> None:
         "--train_dir",
         type=str,
         default="/content/data/train",
-        help="Train root with subfolders beach, nature, city, culture, fashion, food",
+        help="Train root with subfolders beach, nature, city, culture, festival, food",
     )
     parser.add_argument(
         "--val_dir",
         type=str,
         default="/content/data/val",
-        help="Val root with subfolders beach, nature, city, culture, fashion, food",
+        help="Val root with subfolders beach, nature, city, culture, festival, food",
     )
     parser.add_argument("--output_dir", type=str, default="./clip_finetune_out")
     parser.add_argument("--epochs", type=int, default=10)

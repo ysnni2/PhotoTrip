@@ -6,7 +6,7 @@ from typing import Any, Dict, Mapping
 
 import numpy as np
 
-SCENE_CATEGORIES = ("beach", "nature", "city", "culture", "fashion", "food")
+SCENE_CATEGORIES = ("beach", "nature", "city", "culture", "festival", "food")
 
 _UNCERTAIN_THRESHOLD = 0.3
 _STYLE_UNCERTAIN_THRESHOLD = 0.25

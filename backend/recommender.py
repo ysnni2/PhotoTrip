@@ -7,7 +7,7 @@ from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple
 
 import numpy as np
 
-SCENE_CATEGORIES = ("beach", "nature", "city", "culture", "fashion", "food")
+SCENE_CATEGORIES = ("beach", "nature", "city", "culture", "festival", "food")
 
 _TOP_K = 3
 _UNCERTAIN_THRESHOLD = 0.3
@@ -134,14 +134,14 @@ _DESTINATION_PROFILES: Tuple[Dict[str, Any], ...] = (
     {
         "name": "도쿄",
         "category": "city",
-        "scene": _scene(city=0.95, fashion=0.2, food=0.15),
+        "scene": _scene(city=0.95, festival=0.2, food=0.15),
         "visual": _visual(0.55, 0.7, 0.65, 0.45),
         "semantic": _semantic(building=0.55, sky=0.2, food=0.1),
     },
     {
         "name": "뉴욕",
         "category": "city",
-        "scene": _scene(city=0.96, fashion=0.25, culture=0.15),
+        "scene": _scene(city=0.96, festival=0.25, culture=0.15),
         "visual": _visual(0.58, 0.68, 0.7, 0.4),
         "semantic": _semantic(building=0.6, sky=0.22, food=0.08),
     },
@@ -162,7 +162,7 @@ _DESTINATION_PROFILES: Tuple[Dict[str, Any], ...] = (
     {
         "name": "파리",
         "category": "city",
-        "scene": _scene(city=0.85, culture=0.35, fashion=0.3),
+        "scene": _scene(city=0.85, culture=0.35, festival=0.3),
         "visual": _visual(0.6, 0.65, 0.55, 0.5),
         "semantic": _semantic(building=0.45, sky=0.25, food=0.1),
     },
@@ -202,39 +202,39 @@ _DESTINATION_PROFILES: Tuple[Dict[str, Any], ...] = (
         "visual": _visual(0.68, 0.58, 0.5, 0.6),
         "semantic": _semantic(vegetation=0.45, building=0.4, sky=0.25),
     },
-    # fashion
+    # festival
     {
         "name": "밀라노",
-        "category": "fashion",
-        "scene": _scene(fashion=0.95, city=0.3, culture=0.2),
+        "category": "festival",
+        "scene": _scene(festival=0.95, city=0.3, culture=0.2),
         "visual": _visual(0.62, 0.78, 0.6, 0.55),
         "semantic": _semantic(building=0.45, sky=0.2),
     },
     {
         "name": "비엔나",
-        "category": "fashion",
-        "scene": _scene(fashion=0.9, culture=0.35),
+        "category": "festival",
+        "scene": _scene(festival=0.9, culture=0.35),
         "visual": _visual(0.65, 0.7, 0.55, 0.5),
         "semantic": _semantic(building=0.5, sky=0.25, vegetation=0.15),
     },
     {
         "name": "리우데자네이루",
-        "category": "fashion",
-        "scene": _scene(fashion=0.88, beach=0.2, culture=0.15),
+        "category": "festival",
+        "scene": _scene(festival=0.88, beach=0.2, culture=0.15),
         "visual": _visual(0.75, 0.85, 0.55, 0.8),
         "semantic": _semantic(water=0.3, sky=0.25, building=0.2),
     },
     {
         "name": "에든버러",
-        "category": "fashion",
-        "scene": _scene(fashion=0.85, culture=0.3),
+        "category": "festival",
+        "scene": _scene(festival=0.85, culture=0.3),
         "visual": _visual(0.55, 0.6, 0.62, 0.35),
         "semantic": _semantic(building=0.48, sky=0.35, vegetation=0.2),
     },
     {
         "name": "뉴욕 브로드웨이",
-        "category": "fashion",
-        "scene": _scene(fashion=0.92, city=0.5),
+        "category": "festival",
+        "scene": _scene(festival=0.92, city=0.5),
         "visual": _visual(0.5, 0.75, 0.72, 0.42),
         "semantic": _semantic(building=0.55, sky=0.15, food=0.08),
     },

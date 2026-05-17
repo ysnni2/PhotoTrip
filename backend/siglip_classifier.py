@@ -14,6 +14,8 @@ from transformers import AutoModel, AutoProcessor
 DEFAULT_MODEL_PATH = Path(__file__).resolve().parent.parent / "models" / "best_siglip.pth"
 _FALLBACK_MODEL_ID = "google/siglip-large-patch16-256"
 
+CLASS_NAMES = ["beach", "nature", "city", "culture", "festival", "food"]
+
 _model: Optional["CLIPClassifier"] = None
 _processor: Optional[Any] = None
 _class_names: Optional[List[str]] = None
