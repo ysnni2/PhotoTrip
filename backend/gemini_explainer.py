@@ -8,7 +8,7 @@ from typing import Any, Mapping
 
 from google import genai
 
-MODEL_NAME = "gemini-2.0-flash-lite"
+MODEL_NAME = "gemini-2.5-flash"
 
 _client: genai.Client | None = None
 
