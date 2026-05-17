@@ -389,8 +389,7 @@ def main() -> None:
     model = CLIPClassifier(base, num_classes=len(CLASS_NAMES)).to(device)
     for p in model.clip.text_model.parameters():
         p.requires_grad = False
-    for p in model.clip.text_projection.parameters():
-        p.requires_grad = False
+    # SigLIP은 text_projection 없음
 
     loss_fn = nn.CrossEntropyLoss()
     optimizer = torch.optim.AdamW(
