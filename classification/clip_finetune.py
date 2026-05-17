@@ -1,5 +1,5 @@
 """
-Fine-tune OpenAI CLIP ViT-B/32 on folder-based image classification (Colab-friendly).
+Fine-tune SigLIP on folder-based image classification (Colab-friendly).
 
 Expected layout:
   --train_dir (default /content/data/train): beach/, nature/, city/, food/, culture/
@@ -24,7 +24,7 @@ from PIL import Image
 from sklearn.metrics import ConfusionMatrixDisplay, accuracy_score, confusion_matrix
 from torch.utils.data import DataLoader, Dataset
 from torchvision import transforms
-from transformers import CLIPModel, CLIPProcessor
+from transformers import AutoModel, AutoProcessor
 
 try:
     from tqdm.auto import tqdm
@@ -34,7 +34,7 @@ except ImportError:  # pragma: no cover
         return x
 
 
-MODEL_ID = "openai/clip-vit-base-patch32"
+MODEL_ID = "google/siglip-large-patch16-256"
 CLASS_NAMES = ["beach", "nature", "city", "culture", "fashion", "food"]
 ZERO_SHOT_TEMPLATES = [
     "a photo of {}",
@@ -90,18 +90,55 @@ class PILDataset(Dataset):
         return img, self.labels[i]
 
 
-class CLIPClassifier(nn.Module):
-    """CLIP image tower + linear head on projection_dim."""
+def _normalize_features(feats: Any) -> torch.Tensor:
+    if not isinstance(feats, torch.Tensor):
+        feats = feats.pooler_output
+    return feats / feats.norm(dim=-1, keepdim=True)
 
-    def __init__(self, clip: CLIPModel, num_classes: int):
+
+def _image_features(model: nn.Module, pixel_values: torch.Tensor) -> torch.Tensor:
+    feats = model.get_image_features(pixel_values=pixel_values)
+    return _normalize_features(feats)
+
+
+def _text_features(model: nn.Module, text_batch: Dict[str, torch.Tensor]) -> torch.Tensor:
+    feats = model.get_text_features(**text_batch)
+    return _normalize_features(feats)
+
+
+def _zeroshot_logits(
+    model: nn.Module,
+    image_feats: torch.Tensor,
+    text_feats: torch.Tensor,
+) -> torch.Tensor:
+    logits = image_feats @ text_feats.T * model.logit_scale.exp()
+    if getattr(model, "logit_bias", None) is not None:
+        logits = logits + model.logit_bias
+    return logits
+
+
+def _image_processor_settings(processor: Any) -> Tuple[int, List[float], List[float]]:
+    ip = processor.image_processor
+    size_cfg = ip.size
+    if isinstance(size_cfg, dict):
+        size = int(size_cfg.get("height") or size_cfg.get("shortest_edge") or 256)
+    elif hasattr(size_cfg, "get"):
+        size = int(size_cfg.get("height") or size_cfg.get("shortest_edge") or 256)
+    else:
+        size = int(size_cfg)
+    return size, list(ip.image_mean), list(ip.image_std)
+
+
+class CLIPClassifier(nn.Module):
+    """SigLIP image tower + linear head on projection_dim."""
+
+    def __init__(self, backbone: nn.Module, num_classes: int):
         super().__init__()
-        self.clip = clip
-        self.head = nn.Linear(clip.config.projection_dim, num_classes)
+        self.clip = backbone
+        self.head = nn.Linear(backbone.config.projection_dim, num_classes)
 
     def forward(self, pixel_values: torch.Tensor) -> torch.Tensor:
-        emb = self.clip.get_image_features(pixel_values=pixel_values)
-        if not isinstance(emb, torch.Tensor):
-            emb = emb.pooler_output
+        emb = _image_features(self.clip, pixel_values)
         return self.head(emb)
 
 
@@ -117,11 +154,7 @@ def zero_shot_accuracy(model, processor, loader, device):
     for i in range(0, len(class_texts), 32):
         tb = processor(text=class_texts[i : i + 32], return_tensors="pt", padding=True)
         tb = {k: v.to(device) for k, v in tb.items()}
-        tf = model.get_text_features(**tb)
-        if not isinstance(tf, torch.Tensor):
-            tf = tf.pooler_output
-        tf = tf / tf.norm(dim=-1, keepdim=True)
-        text_feats.append(tf)
+        text_feats.append(_text_features(model, tb))
 
     text_feats = torch.cat(text_feats, dim=0)
     c, t = len(CLASS_NAMES), len(ZERO_SHOT_TEMPLATES)
@@ -131,11 +164,8 @@ def zero_shot_accuracy(model, processor, loader, device):
     ys, ps = [], []
     for px, y in loader:
         px = px.to(device)
-        imf = model.get_image_features(pixel_values=px)
-        if not isinstance(imf, torch.Tensor):
-            imf = imf.pooler_output
-        imf = imf / imf.norm(dim=-1, keepdim=True)
-        logits = imf @ text_feats.T * model.logit_scale.exp()
+        imf = _image_features(model, px)
+        logits = _zeroshot_logits(model, imf, text_feats)
         pred = logits.argmax(dim=-1).cpu().numpy()
         ys.extend(y.numpy().tolist())
         ps.extend(pred.tolist())
@@ -249,7 +279,7 @@ def plot_confusion(
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Fine-tune CLIP on 5-class travel-style images.")
+    parser = argparse.ArgumentParser(description="Fine-tune SigLIP on travel-style images.")
     parser.add_argument(
         "--train_dir",
         type=str,
@@ -289,7 +319,8 @@ def main() -> None:
     # No separate test split: reuse val paths/labels for zero-shot, fine-tuned eval, confusion matrix
     test_paths, test_labels = val_paths, val_labels
 
-    processor = CLIPProcessor.from_pretrained(MODEL_ID)
+    processor = AutoProcessor.from_pretrained(MODEL_ID)
+    size, mean, std = _image_processor_settings(processor)
 
     train_aug = transforms.Compose([
         transforms.RandomHorizontalFlip(),
@@ -313,10 +344,6 @@ def main() -> None:
             return px, torch.tensor(labs, dtype=torch.long)
 
         return collate
-
-    size = 224
-    mean = [0.48145466, 0.4578275, 0.40821073]
-    std = [0.26862954, 0.26130258, 0.27577711]
 
     train_ds = PILDataset(train_paths, train_labels, train_aug)
     val_ds = PILDataset(val_paths, val_labels, None)
@@ -350,7 +377,7 @@ def main() -> None:
         pin_memory=torch.cuda.is_available(),
     )
 
-    base = CLIPModel.from_pretrained(MODEL_ID).to(device)
+    base = AutoModel.from_pretrained(MODEL_ID).to(device)
     # Zero-shot on test using frozen pretrained weights (copy before fine-tune)
     zs_acc, zs_y_true, zs_y_pred = zero_shot_accuracy(base, processor, test_loader, device)
 
@@ -424,17 +451,17 @@ def main() -> None:
         zs_y_true,
         zs_y_pred,
         out_dir / "confusion_matrix_zeroshot.png",
-        title="Zero-shot CLIP — test set",
+        title="Zero-shot SigLIP — test set",
     )
     plot_confusion(
         y_true,
         y_pred,
         out_dir / "confusion_matrix_finetuned.png",
-        title="Fine-tuned CLIP — test set",
+        title="Fine-tuned SigLIP — test set",
     )
 
     ft_acc = float(accuracy_score(y_true, y_pred))
-    print("\n=== Zero-shot CLIP vs Fine-tuned CLIP (test set) ===")
+    print("\n=== Zero-shot SigLIP vs Fine-tuned SigLIP (test set) ===")
     print(f"Zero-shot accuracy:  {zs_acc:.4f}")
     print(f"Fine-tuned accuracy: {ft_acc:.4f}")
     print(f"Δ (fine-tuned - zero-shot): {ft_acc - zs_acc:+.4f}")
@@ -453,7 +480,7 @@ def main() -> None:
     ax.bar(["zero-shot", "fine-tuned"], [zs_acc, ft_acc], color=["steelblue", "darkorange"])
     ax.set_ylim(0, 1.05)
     ax.set_ylabel("accuracy (test)")
-    ax.set_title("CLIP: zero-shot vs fine-tuned")
+    ax.set_title("SigLIP: zero-shot vs fine-tuned")
     fig.tight_layout()
     fig.savefig(out_dir / "zeroshot_vs_finetuned.png", dpi=150)
     plt.close(fig)

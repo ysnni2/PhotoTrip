@@ -1,14 +1,14 @@
 fastapi
 uvicorn
 python-multipart
-gradio
 transformers
+sentencepiece
 torch
 torchvision
 opencv-python
 Pillow
 numpy
-google-generativeai
+google-genai
 scikit-learn
 matplotlib
 plotly

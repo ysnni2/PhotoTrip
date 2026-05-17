@@ -1,6 +1,8 @@
-"""FastAPI entrypoint: image upload → analysis pipeline → travel recommendations."""
-
 from __future__ import annotations
+
+from dotenv import load_dotenv
+
+load_dotenv()
 
 import io
 import sys
@@ -24,6 +26,7 @@ from mask2former import segment  # noqa: E402
 from opencv_analyzer import analyze  # noqa: E402
 from preference_vector import SCENE_CATEGORIES, build_vector  # noqa: E402
 from recommender import recommend  # noqa: E402
+from gemini_explainer import explain, random_explain  # noqa: E402
 
 app = FastAPI(title="PhotoTrip CV API")
 
@@ -65,9 +68,15 @@ async def analyze_image(file: UploadFile = File(...)) -> Dict[str, Any]:
     preference_vector = build_vector(clip_result, segment_result, opencv_result)
     recommendation = recommend(preference_vector)
 
+    if recommendation.get("is_random"):
+        gemini_text = random_explain()
+    else:
+        gemini_text = explain(preference_vector, recommendation)
+
     return {
         "preference_vector": preference_vector,
         "recommendation": recommendation,
+        "gemini_text": gemini_text,
     }
 
 
