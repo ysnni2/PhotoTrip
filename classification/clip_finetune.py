@@ -130,12 +130,17 @@ def _image_processor_settings(processor: Any) -> Tuple[int, List[float], List[fl
 
 
 class CLIPClassifier(nn.Module):
-    """SigLIP image tower + linear head on projection_dim."""
+    """SigLIP image tower + linear head on vision hidden_size."""
 
     def __init__(self, backbone: nn.Module, num_classes: int):
         super().__init__()
         self.clip = backbone
-        self.head = nn.Linear(backbone.config.projection_dim, num_classes)
+        hidden_size = (
+            backbone.config.vision_config.hidden_size
+            if hasattr(backbone.config, "vision_config")
+            else backbone.config.hidden_size
+        )
+        self.head = nn.Linear(hidden_size, num_classes)
 
     def forward(self, pixel_values: torch.Tensor) -> torch.Tensor:
         emb = _image_features(self.clip, pixel_values)
