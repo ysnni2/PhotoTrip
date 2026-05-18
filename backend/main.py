@@ -61,7 +61,7 @@ async def analyze_image(file: UploadFile = File(...)) -> Dict[str, Any]:
     raw = await file.read()
     image = Image.open(io.BytesIO(raw)).convert("RGB")
 
-    clip_scores = classify(image)
+    clip_scores = classify(image, use_tta=True, temperature=1.1)
     clip_result = _clip_result_from_scores(clip_scores)
     segment_result = segment(image)
     opencv_result = analyze(image)
@@ -70,10 +70,14 @@ async def analyze_image(file: UploadFile = File(...)) -> Dict[str, Any]:
     preference_vector = build_vector(
         clip_result, segment_result, opencv_result, style_result
     )
-    recommendation = recommend(preference_vector)
+    detected_objects = set(segment_result.keys())
+    recommendation = recommend(
+        preference_vector,
+        detected_objects=detected_objects,
+    )
 
     if recommendation.get("is_random"):
-        gemini_text = random_explain()
+        gemini_text = random_explain(recommendation.get("reason", "uncertain"))
     else:
         gemini_text = explain(preference_vector, recommendation)
 
