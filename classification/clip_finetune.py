@@ -419,9 +419,12 @@ def main() -> None:
         p.requires_grad = False
 
     loss_fn = nn.CrossEntropyLoss()
+    # Head: higher lr; backbone (vision): lower lr
     optimizer = torch.optim.AdamW(
-        [p for p in model.parameters() if p.requires_grad],
-        lr=args.lr,
+        [
+            {"params": [p for p in model.clip.parameters() if p.requires_grad], "lr": args.lr},
+            {"params": model.head.parameters(), "lr": args.lr * 10},
+        ],
         weight_decay=0.01,
     )
     steps_per_epoch = max(len(train_loader), 1)
