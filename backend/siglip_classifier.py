@@ -9,9 +9,10 @@ from typing import Any, Dict, List, Optional, Tuple
 import torch
 import torch.nn as nn
 from PIL import Image
+from torchvision import transforms as T
 from transformers import AutoModel, AutoProcessor
 
-DEFAULT_MODEL_PATH = Path(__file__).resolve().parent.parent / "models" / "best_siglip.pth"
+DEFAULT_MODEL_PATH = Path(__file__).resolve().parent.parent / "models" / "best_clip.pth"
 MODEL_ID = "openai/clip-vit-base-patch32"
 _FALLBACK_MODEL_ID = MODEL_ID
 
@@ -40,7 +41,13 @@ class CLIPClassifier(nn.Module):
     def __init__(self, backbone: nn.Module, num_classes: int):
         super().__init__()
         self.clip = backbone
-        hidden_size = backbone.config.projection_dim
+        hidden_size = (
+            backbone.config.projection_dim
+            if hasattr(backbone.config, "projection_dim")
+            else backbone.config.vision_config.hidden_size
+            if hasattr(backbone.config, "vision_config")
+            else backbone.config.hidden_size
+        )
         self.head = nn.Linear(hidden_size, num_classes)
 
     def forward(self, pixel_values: torch.Tensor) -> torch.Tensor:
@@ -122,7 +129,7 @@ def _load_model() -> Tuple[CLIPClassifier, Any, List[str], torch.device]:
     if not ckpt_path.is_file():
         raise FileNotFoundError(
             f"CLIP checkpoint not found: {ckpt_path}. "
-            "Set CLIP_MODEL_PATH or place weights at models/best_siglip.pth"
+            "Set CLIP_MODEL_PATH or place weights at models/best_clip.pth"
         )
 
     device = _get_device()
@@ -147,7 +154,10 @@ def _load_model() -> Tuple[CLIPClassifier, Any, List[str], torch.device]:
     if not class_names:
         raise ValueError("checkpoint class_names is empty")
 
-    processor = AutoProcessor.from_pretrained(model_id)
+    processor = AutoProcessor.from_pretrained(
+        model_id,
+        use_fast=False,
+    )
     backbone = AutoModel.from_pretrained(model_id)
     model = CLIPClassifier(backbone, num_classes=len(class_names))
 
@@ -167,46 +177,23 @@ def _load_model() -> Tuple[CLIPClassifier, Any, List[str], torch.device]:
     return model, processor, class_names, device
 
 
-def _probs_dict(logits: torch.Tensor, class_names: List[str]) -> Dict[str, float]:
-    probs = logits.softmax(dim=1)[0].cpu()
-    return {str(name).lower(): float(probs[i]) for i, name in enumerate(class_names)}
-
-
-def classify(
-    image: Image.Image,
-    *,
-    debug: Optional[bool] = None,
-) -> Dict[str, float]:
+def classify(image: Image.Image, *, debug=None) -> Dict[str, float]:
     model, processor, class_names, device = _load_model()
-
     if image.mode != "RGB":
         image = image.convert("RGB")
 
-    batch = processor(images=image, return_tensors="pt")
-    pixel_values = batch["pixel_values"].to(device)
+    # Same preprocessing as clip_finetune (CLIP defaults)
+    size = 224
+    mean = [0.48145466, 0.4578275, 0.40821073]
+    std = [0.26862954, 0.26130258, 0.27577711]
 
-    if debug is None:
-        debug = os.environ.get("SIGLIP_DEBUG_CLASSIFY", "").strip() in ("1", "true", "yes")
+    image = T.Resize((size, size))(image)
+    pixel_values = T.functional.to_tensor(image)
+    pixel_values = T.functional.normalize(pixel_values, mean=mean, std=std)
+    pixel_values = pixel_values.unsqueeze(0).to(device)
 
     with torch.inference_mode():
         logits = model(pixel_values)
-
-        if debug:
-            print("DEBUG pixel_values shape:", tuple(pixel_values.shape))
-            print("DEBUG logits:", logits)
-            print("DEBUG logits max:", logits.max().item())
-            print("DEBUG logits min:", logits.min().item())
-            print("DEBUG logits std:", logits.std().item())
-
-            probs_normal = _probs_dict(logits, class_names)
-            probs_temp = _probs_dict(logits * 5, class_names)
-            print("DEBUG probs (softmax):", probs_normal)
-            print("DEBUG probs (softmax, logits*5):", probs_temp)
-            top_n = max(probs_normal, key=probs_normal.get)
-            top_t = max(probs_temp, key=probs_temp.get)
-            print(f"DEBUG top normal: {top_n}={probs_normal[top_n]:.4f}")
-            print(f"DEBUG top temp*5: {top_t}={probs_temp[top_t]:.4f}")
-
         probs = logits.softmax(dim=1)[0].cpu()
 
     return {
