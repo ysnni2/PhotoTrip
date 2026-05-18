@@ -22,7 +22,7 @@ if str(_BACKEND_DIR) not in sys.path:
     sys.path.insert(0, str(_BACKEND_DIR))
 
 from siglip_classifier import classify  # noqa: E402
-from mask2former import segment  # noqa: E402
+from oneformer import segment  # noqa: E402
 from opencv_analyzer import analyze  # noqa: E402
 from preference_vector import SCENE_CATEGORIES, build_vector  # noqa: E402
 from recommender import recommend  # noqa: E402

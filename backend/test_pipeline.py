@@ -4,7 +4,7 @@ sys.path.insert(0, "backend")
 
 from PIL import Image
 
-from mask2former import segment
+from oneformer import segment
 from opencv_analyzer import analyze
 from preference_vector import SCENE_CATEGORIES, build_vector
 from recommender import recommend
