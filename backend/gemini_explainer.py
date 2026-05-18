@@ -75,11 +75,26 @@ def explain(
         )
 
 
-def random_explain() -> str:
+def random_explain(reason: str = "uncertain") -> str:
     """
     Playful Korean message when recommendations are random (is_random=True).
     """
-    prompt = """당신은 여행 추천 앱 PhotoTrip의 위트 있는 AI 가이드입니다.
+    if reason == "homebody":
+        prompt = """당신은 PhotoTrip AI 가이드입니다. 사용자가 주로 실내(소파, 침대, 음식 등) 사진을 올린 집순이입니다.
+집순이 캐릭터를 인정하면서도 여행을 부드럽게 권유하는 한국어 2문장을 작성하세요.
+이모지 없이 본문만 출력."""
+        fallback = (
+            "집에서 쉬는 것도 좋지만, 가끔은 낯선 곳에서 새로운 에너지를 충전해보세요."
+        )
+    elif reason == "unpredictable":
+        prompt = """당신은 PhotoTrip AI 가이드입니다. 사용자 취향이 너무 다양해서 예측이 불가능했고 랜덤 추천을 했습니다.
+'예측할 수 없는 탑승권' 컨셉으로, 운명적인 여행의 설렘을 표현하는 한국어 2문장을 작성하세요.
+이모지 없이 본문만 출력."""
+        fallback = (
+            "예측할 수 없는 탑승권이 발급되었습니다. 운명이 정한 여행지로 떠나볼까요?"
+        )
+    else:
+        prompt = """당신은 여행 추천 앱 PhotoTrip의 위트 있는 AI 가이드입니다.
 사용자의 사진 취향이 뚜렷하지 않아 **랜덤 여행지**를 추천한 상황입니다.
 
 아래 예시와 비슷한 느낌으로, **한국어 2문장** 짧은 멘트를 새로 작성하세요.
@@ -87,8 +102,9 @@ def random_explain() -> str:
 
 - 친근하고 유머러스하게
 - 이모지 없이 본문만 출력"""
+        fallback = _RANDOM_FALLBACK
 
     try:
         return _generate(prompt)
     except Exception:
-        return _RANDOM_FALLBACK
+        return fallback

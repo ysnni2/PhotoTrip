@@ -11,6 +11,20 @@ SCENE_CATEGORIES = ("beach", "nature", "city", "culture", "festival", "food")
 
 _TOP_K = 3
 _UNCERTAIN_THRESHOLD = 0.3
+_HOMEBODY_KEYWORDS = {
+    "sofa", "bed", "chair", "table", "desk", "monitor",
+    "cabinet", "shelf", "lamp", "curtain", "carpet",
+}
+_HOMEBODY_MESSAGES = [
+    "집순이 발견! 그래도 가끔은 나가봐요~",
+    "집이 제일 좋죠? 그래도 여행지 하나 추천해드릴게요!",
+    "완벽한 집순이 감지! 용기내서 떠나봐요!",
+]
+_UNPREDICTABLE_MESSAGES = [
+    "예측할 수 없는 탑승권이 발급되었습니다. 운명의 여행지로 떠나볼까요?",
+    "당신의 취향은 너무 다채로워요! 운명이 세 곳을 대신 골랐습니다.",
+    "다양한 매력의 소유자! 어디든 잘 맞을 것 같아 랜덤으로 골라봤어요.",
+]
 
 _VISUAL_KEYS = ("brightness", "saturation", "contrast", "warm_tone")
 _SEMANTIC_KEYS = (
@@ -327,37 +341,56 @@ def _categories_all_different(categories: Sequence[str]) -> bool:
 def _should_use_random(
     preference_vector: Mapping[str, Any],
     photo_top_categories: Optional[Sequence[str]] = None,
-) -> bool:
+    detected_objects: Optional[set] = None,
+) -> Tuple[bool, str]:
+    if detected_objects is not None:
+        if len(detected_objects & _HOMEBODY_KEYWORDS) >= 2:
+            return True, "homebody"
+
+    if photo_top_categories and _categories_all_different(photo_top_categories):
+        return True, "unpredictable"
+
     if bool(preference_vector.get("is_uncertain", False)):
-        return True
+        return True, "uncertain"
     if float(preference_vector.get("confidence", 0.0)) < _UNCERTAIN_THRESHOLD:
-        return True
+        return True, "uncertain"
     scene = preference_vector.get("scene", {})
     if isinstance(scene, Mapping) and _all_scene_below_threshold(scene, _UNCERTAIN_THRESHOLD):
-        return True
-    if photo_top_categories and _categories_all_different(photo_top_categories):
-        return True
-    return False
+        return True, "uncertain"
+
+    return False, ""
 
 
 def _random_recommendation(
     preference_vector: Mapping[str, Any],
+    reason: str = "uncertain",
 ) -> Dict[str, Any]:
     names = [str(p["name"]) for p in _DESTINATION_PROFILES]
     k = min(_TOP_K, len(names))
     chosen = random.sample(names, k=k)
     scores = {name: round(random.uniform(0.5, 0.85), 2) for name in chosen}
+
+    if reason == "homebody":
+        message = random.choice(_HOMEBODY_MESSAGES)
+    elif reason == "unpredictable":
+        message = random.choice(_UNPREDICTABLE_MESSAGES)
+    else:
+        message = "취향을 파악하기 어려워서 랜덤 추천드려요!"
+
     return {
         "destinations": chosen,
         "top_category": str(preference_vector.get("top_category", "")),
         "is_random": True,
         "scores": scores,
+        "reason": reason,
+        "message": message,
     }
 
 
 def recommend(
     preference_vector: Mapping[str, Any],
     photo_top_categories: Optional[Sequence[str]] = None,
+    detected_objects: Optional[set] = None,
 ) -> Dict[str, Any]:
     """
   Recommend Top-3 destinations via cosine similarity to hand-crafted destination profiles.
@@ -366,8 +399,11 @@ def recommend(
     """
     top_category = str(preference_vector.get("top_category", ""))
 
-    if _should_use_random(preference_vector, photo_top_categories):
-        return _random_recommendation(preference_vector)
+    use_random, reason = _should_use_random(
+        preference_vector, photo_top_categories, detected_objects
+    )
+    if use_random:
+        return _random_recommendation(preference_vector, reason=reason)
 
     user_vec = _preference_to_array(preference_vector)
     ranked: List[Tuple[str, float]] = []
@@ -389,4 +425,6 @@ def recommend(
         "top_category": top_category,
         "is_random": False,
         "scores": {name: round(score, 2) for name, score in top},
+        "reason": "",
+        "message": "",
     }
