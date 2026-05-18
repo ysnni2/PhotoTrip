@@ -14,5 +14,6 @@ matplotlib
 plotly
 seaborn
 python-dotenv
+requests
 tqdm
 pandas
