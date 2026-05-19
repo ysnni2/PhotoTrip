@@ -1,12 +1,80 @@
+<<<<<<< HEAD
 # 📸 PhotoTrip
 
 ## 프로젝트 소개
 
-오늘 찍은 커피 한 잔, 산책길 풍경, 친구와의 식사 —  
-평범한 일상 사진 속에 이미 나에게 어울리는 여행지가 숨어있습니다.
+오늘 찍은 커피 한 잔, 좋아하는 피규어 사진,
+친구와의 식사, 공연장 순간, 산책길의 풍경까지 —
+평범한 일상 사진 속에는 그 사람만의 라이프스타일과 여행 취향이 담겨 있습니다.
 
-**PhotoTrip**은 일상 사진을 AI로 분석해 숨겨진 여행 취향을 발견하고,  
-가상의 탑승권으로 나만의 여행지를 추천해주는 시스템입니다.
+**PhotoTrip**은 사용자의 일상 사진을 AI로 분석해
+취향, 분위기, 관심사, 공간 감성을 이해하고
+그 사람에게 어울리는 여행지와 공간 경험을 추천하는 AI 기반 여행 추천 시스템입니다.
 
-**일상 생활하며 평소에 찍은 사진**을 업로드하면,  
-AI가 취향을 분석해 목적지가 적힌 탑승권을 발급해드립니다. ✈️
+사용자가 사진을 업로드하면,
+AI는 이미지 속 분위기와 라이프스타일을 분석하여
+
+* 어떤 공간을 좋아하는지
+* 어떤 분위기를 좋아하는 지를 분석해 
+* 어떤 경험에 끌리는지를 추론합니다.
+
+이후 분석된 취향 벡터를 기반으로
+사용자에게 어울리는 여행 테마와 여행지를 추천하고,
+가상의 탑승권 형태로 특별한 여행 경험을 제공합니다. ✈️
+
+예를 들어,
+* 감성 카페 사진 → 교토 골목, 파리 카페거리
+* 스포츠 경기 사진 → 런던, 도쿄 스포츠 직관 여행
+* 애니 피규어 사진 → 아키하바라, 오사카 덴덴타운
+* 노을진 바다 사진 → 발리, 산토리니, 제주 애월
+처럼 사용자의 라이프스타일과 감성에 맞는 공간을 추천합니다.
+=======
+# PhotoTrip CV
+
+## Lifestyle analyzer CLI
+
+CLIP 기반 place / mood / interest 벡터를 추출해 `outputs/lifestyle_vectors.csv`에 저장합니다.
+
+### 실행 (프로젝트 루트 `cv_project/`)
+
+**권장 — 모듈 실행** (`backend`를 `PYTHONPATH`에 추가):
+
+```powershell
+# Windows PowerShell
+$env:PYTHONPATH = "backend"
+python -m analyzers.lifestyle_analyzer test_images/sample.jpg
+```
+
+```bash
+# Linux / macOS
+PYTHONPATH=backend python -m analyzers.lifestyle_analyzer test_images/sample.jpg
+```
+
+또는 editable 설치 후 어디서나 실행:
+
+```bash
+pip install -e .
+python -m analyzers.lifestyle_analyzer test_images/sample.jpg
+```
+
+**`backend/` 폴더에서 실행:**
+
+```bash
+cd backend
+python -m analyzers.lifestyle_analyzer ../test_images/sample.jpg
+```
+
+**스크립트 직접 실행:**
+
+```bash
+python backend/analyzers/lifestyle_analyzer.py test_images/sample.jpg
+```
+
+### API pipeline (기존)
+
+FastAPI 서버는 `style_analyzer.analyze_style` (OpenCV) + OneFormer 세그멘테이션을 그대로 사용합니다.
+
+```bash
+uvicorn backend.main:app --reload --port 8000
+```
+>>>>>>> ab5c90c (연결)

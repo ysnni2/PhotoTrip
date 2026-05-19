@@ -51,6 +51,7 @@ def build_vector(
     segment_result: Mapping[str, float],
     opencv_result: Mapping[str, float],
     style_result: Mapping[str, float],
+    lifestyle_result: Mapping[str, Any] = {},
 ) -> Dict[str, Any]:
     """
     Merge SigLIP scene classification, style scores, Mask2Former ratios,
@@ -86,6 +87,7 @@ def build_vector(
         "visual": visual,
         "semantic": semantic,
         "style": style,
+        "lifestyle": dict(lifestyle_result),
         "top_category": category,
         "confidence": confidence,
         "is_uncertain": is_uncertain,
