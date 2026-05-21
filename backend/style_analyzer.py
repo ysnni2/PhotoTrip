@@ -1,4 +1,4 @@
-"""Rule-based image style scoring from OpenCV metrics."""
+"""OpenCV rule-based style scores for the OneFormer / PhotoTrip API pipeline."""
 
 from __future__ import annotations
 
@@ -32,7 +32,7 @@ def analyze_style(
     image: Image.Image,
     opencv_result: Optional[Mapping[str, float]] = None,
 ) -> Dict[str, float]:
-    """Score style from OpenCV metrics only; returns softmax probabilities."""
+    """Score style from OpenCV metrics; returns softmax probabilities."""
     _ = image
     scores = _rule_based_scores(opencv_result)
     logits = torch.tensor([scores[name] for name in STYLE_NAMES], dtype=torch.float32)

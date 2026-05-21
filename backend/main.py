@@ -28,6 +28,7 @@ from preference_vector import SCENE_CATEGORIES, build_vector  # noqa: E402
 from recommender import recommend  # noqa: E402
 from gemini_explainer import explain, random_explain  # noqa: E402
 from style_analyzer import analyze_style  # noqa: E402
+from analyzers.lifestyle_analyzer import analyze_lifestyle  # noqa: E402
 
 app = FastAPI(title="PhotoTrip CV API")
 
@@ -66,9 +67,10 @@ async def analyze_image(file: UploadFile = File(...)) -> Dict[str, Any]:
     segment_result = segment(image)
     opencv_result = analyze(image)
     style_result = analyze_style(image, opencv_result)
+    lifestyle_result = analyze_lifestyle(image)
 
     preference_vector = build_vector(
-        clip_result, segment_result, opencv_result, style_result
+        clip_result, segment_result, opencv_result, style_result, lifestyle_result
     )
     detected_objects = set(segment_result.keys())
     recommendation = recommend(
@@ -83,6 +85,7 @@ async def analyze_image(file: UploadFile = File(...)) -> Dict[str, Any]:
 
     return {
         "preference_vector": preference_vector,
+        "lifestyle": lifestyle_result,
         "recommendation": recommendation,
         "gemini_text": gemini_text,
     }
