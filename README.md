@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 # 📸 PhotoTrip
 
 ## 프로젝트 소개
@@ -28,53 +28,4 @@ AI는 이미지 속 분위기와 라이프스타일을 분석하여
 * 애니 피규어 사진 → 아키하바라, 오사카 덴덴타운
 * 노을진 바다 사진 → 발리, 산토리니, 제주 애월
 처럼 사용자의 라이프스타일과 감성에 맞는 공간을 추천합니다.
-=======
-# PhotoTrip CV
 
-## Lifestyle analyzer CLI
-
-CLIP 기반 place / mood / interest 벡터를 추출해 `outputs/lifestyle_vectors.csv`에 저장합니다.
-
-### 실행 (프로젝트 루트 `cv_project/`)
-
-**권장 — 모듈 실행** (`backend`를 `PYTHONPATH`에 추가):
-
-```powershell
-# Windows PowerShell
-$env:PYTHONPATH = "backend"
-python -m analyzers.lifestyle_analyzer test_images/sample.jpg
-```
-
-```bash
-# Linux / macOS
-PYTHONPATH=backend python -m analyzers.lifestyle_analyzer test_images/sample.jpg
-```
-
-또는 editable 설치 후 어디서나 실행:
-
-```bash
-pip install -e .
-python -m analyzers.lifestyle_analyzer test_images/sample.jpg
-```
-
-**`backend/` 폴더에서 실행:**
-
-```bash
-cd backend
-python -m analyzers.lifestyle_analyzer ../test_images/sample.jpg
-```
-
-**스크립트 직접 실행:**
-
-```bash
-python backend/analyzers/lifestyle_analyzer.py test_images/sample.jpg
-```
-
-### API pipeline (기존)
-
-FastAPI 서버는 `style_analyzer.analyze_style` (OpenCV) + OneFormer 세그멘테이션을 그대로 사용합니다.
-
-```bash
-uvicorn backend.main:app --reload --port 8000
-```
->>>>>>> ab5c90c (연결)

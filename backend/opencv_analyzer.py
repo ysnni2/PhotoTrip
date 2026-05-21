@@ -94,6 +94,17 @@ def analyze(image: Image.Image) -> Dict[str, Any]:
     b = rgb[:, :, 2].astype(np.float32)
     warm = (r - b) / (r + g + b + 1e-6) / 2.0 + 0.5
     warm_tone = float(np.clip(warm.mean(), 0.0, 1.0))
+
+    saturated = hsv[:, :, 1] >= 40
+    total_sat = int(saturated.sum())
+    if total_sat > 0:
+        h = hsv[:, :, 0]
+        blue_tone = float(((saturated) & (h >= 90) & (h <= 140)).sum() / total_sat)
+        green_tone = float(((saturated) & (h >= 35) & (h <= 85)).sum() / total_sat)
+    else:
+        blue_tone = green_tone = 0.0
+    night_score = float(np.clip((1.0 - brightness) * contrast, 0.0, 1.0))
+
     person_ratio = _person_ratio_from_faces(rgb)
     cat_detected, animal_ratio = _cat_detection(rgb)
 
@@ -102,6 +113,9 @@ def analyze(image: Image.Image) -> Dict[str, Any]:
         "saturation": saturation,
         "contrast": contrast,
         "warm_tone": warm_tone,
+        "blue_tone": float(np.clip(blue_tone, 0.0, 1.0)),
+        "green_tone": float(np.clip(green_tone, 0.0, 1.0)),
+        "night_score": night_score,
         "person_ratio": person_ratio,
         "cat_detected": cat_detected,
         "animal_ratio": animal_ratio,

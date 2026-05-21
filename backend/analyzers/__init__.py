@@ -1,45 +1,23 @@
-"""CLIP-based lifestyle analyzers (place / mood / interest)."""
+"""PhotoTrip analyzers: evidence, MLP heads, ensemble scoring."""
 
-from __future__ import annotations
-
-from typing import TYPE_CHECKING, Any, List, Mapping, Union
-from pathlib import Path
-
-from .interest_analyzer import INTEREST_LABELS, analyze_interest
-from .mood_analyzer import MOOD_LABELS, analyze_mood
-from .place_analyzer import PLACE_LABELS, analyze_place
+from .labels import (
+    CULTURE_SUBTYPE_LABELS,
+    INTEREST_TAG_LABELS,
+    MOOD_LABELS,
+    PLACE_LABELS,
+    STYLE_LABELS,
+)
+from .pseudo_evidence import extract_visual_evidence
+from .ensemble_scorer import ensemble_multilabel, ensemble_place_scores, ensemble_mood_scores
 
 __all__ = [
     "PLACE_LABELS",
     "MOOD_LABELS",
-    "INTEREST_LABELS",
-    "analyze_place",
-    "analyze_mood",
-    "analyze_interest",
-    "analyze_lifestyle",
-    "analyze_lifestyle_path",
-    "save_lifestyle_csv",
+    "STYLE_LABELS",
+    "INTEREST_TAG_LABELS",
+    "CULTURE_SUBTYPE_LABELS",
+    "extract_visual_evidence",
+    "ensemble_multilabel",
+    "ensemble_place_scores",
+    "ensemble_mood_scores",
 ]
-
-
-def analyze_lifestyle(image: Any) -> dict:
-    from .lifestyle_analyzer import analyze_lifestyle as _fn
-
-    return _fn(image)
-
-
-def analyze_lifestyle_path(input_path: Union[str, Path]) -> List[dict]:
-    from .lifestyle_analyzer import analyze_lifestyle_path as _fn
-
-    return _fn(input_path)
-
-
-def save_lifestyle_csv(
-    rows: Any,
-    output_path: Union[str, Path] | None = None,
-) -> Path:
-    from .lifestyle_analyzer import save_lifestyle_csv as _fn
-
-    if output_path is None:
-        return _fn(rows)
-    return _fn(rows, output_path)

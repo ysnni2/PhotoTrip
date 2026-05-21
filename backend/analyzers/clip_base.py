@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict, Mapping, Optional, Sequence, Tuple
+from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple, Union
 
 import torch
 import torch.nn as nn
@@ -53,30 +53,39 @@ def load_clip() -> Tuple[nn.Module, Any]:
     return _clip_model, _clip_processor
 
 
+def _prompts_for_label(prompt_map: Mapping[str, Union[str, Sequence[str]]], label: str) -> List[str]:
+    raw = prompt_map[label]
+    return [raw] if isinstance(raw, str) else list(raw)
+
+
 def encode_text_bank(
     model: nn.Module,
     processor: Any,
     labels: Sequence[str],
-    prompts: Mapping[str, str],
+    prompts: Mapping[str, Union[str, Sequence[str]]],
     cache_key: str,
 ) -> torch.Tensor:
     if cache_key in _text_features_cache:
         return _text_features_cache[cache_key]
 
     device = next(model.parameters()).device
-    texts = [prompts[label] for label in labels]
-    batch = processor(text=texts, return_tensors="pt", padding=True)
-    batch = {k: v.to(device) for k, v in batch.items()}
-    with torch.inference_mode():
-        feats = _text_features(model, batch)
-    _text_features_cache[cache_key] = feats
-    return feats
+    rows: List[torch.Tensor] = []
+    for label in labels:
+        texts = _prompts_for_label(prompts, label)
+        batch = processor(text=texts, return_tensors="pt", padding=True)
+        batch = {k: v.to(device) for k, v in batch.items()}
+        with torch.inference_mode():
+            feats = _text_features(model, batch)
+        rows.append(feats.mean(dim=0, keepdim=True))
+    bank = torch.cat(rows, dim=0)
+    _text_features_cache[cache_key] = bank
+    return bank
 
 
 def clip_zero_shot_scores(
     image: Image.Image,
     labels: Sequence[str],
-    prompts: Mapping[str, str],
+    prompts: Mapping[str, Union[str, Sequence[str]]],
     cache_key: str,
 ) -> Dict[str, float]:
     """Return softmax probabilities over ``labels`` for one image."""
