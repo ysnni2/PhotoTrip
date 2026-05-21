@@ -2,11 +2,15 @@
 
 from __future__ import annotations
 
+import base64
+import io
 import json
 import os
-from typing import Any, Mapping
+import re
+from typing import Any, Dict, Mapping
 
 from google import genai
+from PIL import Image
 
 MODEL_NAME = "gemini-2.5-flash"
 
@@ -73,6 +77,77 @@ def explain(
             f"{names}처럼 그 분위기를 느낄 수 있는 곳을 골라봤어요. "
             "마음에 드는 도시를 골라 떠나보세요!"
         )
+
+
+def _pil_to_jpeg_b64(image: Image.Image) -> str:
+    buf = io.BytesIO()
+    image.convert("RGB").save(buf, format="JPEG", quality=88)
+    return base64.standard_b64encode(buf.getvalue()).decode("ascii")
+
+
+def _parse_json_object(text: str) -> Dict[str, Any]:
+    text = (text or "").strip()
+    fence = re.search(r"```(?:json)?\s*([\s\S]*?)```", text)
+    if fence:
+        text = fence.group(1).strip()
+    start, end = text.find("{"), text.rfind("}")
+    if start >= 0 and end > start:
+        text = text[start : end + 1]
+    return json.loads(text)
+
+
+def classify_festival_subtype(
+    image: Image.Image,
+    festival_evidence: Mapping[str, Any] | None = None,
+) -> Dict[str, Any]:
+    """Gemini Vision festival subtype with OpenCV evidence context."""
+    empty = {
+        "festival_subtype": "not_festival",
+        "festival_confidence": 0.0,
+        "gemini_fallback_used": False,
+    }
+    try:
+        client = _get_client()
+    except Exception:
+        return empty
+
+    prompt = f"""Classify this photo's event atmosphere.
+OpenCV evidence JSON:
+{json.dumps(dict(festival_evidence or {}), ensure_ascii=False)}
+
+Return JSON only:
+{{"festival_subtype": "festival", "festival_confidence": 0.7}}
+
+Labels: concert, festival, carnival, sports_event, nightlife_event, parade, not_festival"""
+
+    try:
+        response = client.models.generate_content(
+            model=MODEL_NAME,
+            contents=[
+                {
+                    "role": "user",
+                    "parts": [
+                        {"text": prompt},
+                        {
+                            "inline_data": {
+                                "mime_type": "image/jpeg",
+                                "data": _pil_to_jpeg_b64(image),
+                            }
+                        },
+                    ],
+                }
+            ],
+        )
+        raw = _parse_json_object(response.text or "")
+        subtype = str(raw.get("festival_subtype", "not_festival"))
+        conf = round(min(1.0, max(0.0, float(raw.get("festival_confidence", 0.0)))), 4)
+        return {
+            "festival_subtype": subtype,
+            "festival_confidence": conf,
+            "gemini_fallback_used": True,
+        }
+    except Exception:
+        return empty
 
 
 def random_explain(reason: str = "uncertain") -> str:

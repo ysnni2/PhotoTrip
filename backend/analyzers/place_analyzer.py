@@ -11,7 +11,9 @@ try:
 except ImportError:  # direct script / non-package run
     from analyzers.clip_base import clip_zero_shot_scores
 
-PLACE_LABELS = ["beach", "nature", "city", "food", "festival", "culture"]
+from .labels import PLACE_LABELS
+
+PLACE_LABELS = PLACE_LABELS
 
 PLACE_PROMPTS: Dict[str, str] = {
     "beach": (

@@ -11,7 +11,9 @@ try:
 except ImportError:
     from analyzers.clip_base import clip_zero_shot_scores
 
-MOOD_LABELS = ["calm", "cozy", "romantic", "energetic", "local", "aesthetic"]
+from .labels import MOOD_LABELS as _MOOD_LABELS
+
+MOOD_LABELS = _MOOD_LABELS
 
 MOOD_PROMPTS: Dict[str, str] = {
     "calm": "a photo of a slow restful and healing travel atmosphere",
