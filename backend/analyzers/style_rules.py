@@ -79,16 +79,14 @@ def collect_style_rule_hits(
         if style == "calm":
             calm_added = True
 
-    # Tag-driven (category-agnostic)
-    if "nightlife" in tags:
-        add("energetic", "tag_nightlife")
-    if "sports" in tags:
-        add("energetic", "tag_sports")
     if "history" in tags:
         add("local", "tag_history")
 
-    if t.get("saturation", 0.0) >= 0.60 and t.get("contrast", 0.0) >= 0.45:
-        add("energetic", "tone_high_sat_contrast")
+    if category in ("festival", "city"):
+        if "nightlife" in tags:
+            add("energetic", "tag_nightlife")
+        if "sports" in tags:
+            add("energetic", "tag_sports")
 
     if category == "food":
         if "cafe" in tags and t.get("warm_tone", 0.0) >= 0.50:
@@ -99,7 +97,7 @@ def collect_style_rule_hits(
             and t.get("contrast", 0.0) <= 0.45
         ):
             add("aesthetic", "food_cafe_aesthetic")
-        if "cafe" in tags and t.get("warm_tone", 0.0) >= 0.58:
+        if "cafe" in tags and t.get("warm_tone", 0.0) >= 0.52:
             add("romantic", "food_cafe_romantic")
         if "local_market" in tags:
             add("local", "food_local_market")
@@ -107,28 +105,28 @@ def collect_style_rule_hits(
 
     elif category == "beach":
         if _allow_calm(t) and (
-            t.get("brightness", 0.0) >= 0.55
-            and t.get("blue_tone", 0.0) >= 0.30
-            and t.get("saturation", 0.0) <= 0.55
-            and t.get("contrast", 0.0) <= 0.45
+            t.get("brightness", 0.0) >= 0.50
+            and t.get("blue_tone", 0.0) >= 0.25
         ):
             add("calm", "beach_calm_tone")
-        if t.get("warm_tone", 0.0) >= 0.52:
+        if t.get("warm_tone", 0.0) >= 0.48:
             add("romantic", "beach_warm")
         if t.get("saturation", 0.0) >= 0.55 and t.get("blue_tone", 0.0) >= 0.40:
             add("aesthetic", "beach_aesthetic")
 
     elif category == "nature":
         if _allow_calm(t) and (
-            t.get("green_tone", 0.0) >= 0.30
-            and segment_vegetation >= 0.25
-            and t.get("saturation", 0.0) <= 0.50
-            and t.get("contrast", 0.0) <= 0.40
+            (
+                t.get("green_tone", 0.0) >= 0.22
+                or segment_vegetation >= 0.20
+            )
+            and t.get("saturation", 0.0) <= 0.55
+            and t.get("contrast", 0.0) <= 0.45
         ):
             add("calm", "nature_calm_tone")
-        if t.get("contrast", 0.0) >= 0.45:
+        if t.get("contrast", 0.0) >= 0.50:
             add("energetic", "nature_contrast")
-        if t.get("warm_tone", 0.0) >= 0.55 and t.get("brightness", 0.0) >= 0.50:
+        if t.get("warm_tone", 0.0) >= 0.50 and t.get("brightness", 0.0) >= 0.45:
             add("romantic", "nature_warm_bright")
 
     elif category == "city":
@@ -136,7 +134,7 @@ def collect_style_rule_hits(
             add("energetic", "city_night")
         if t.get("night_score", 0.0) >= 0.25:
             add("aesthetic", "city_night_aesthetic")
-        if t.get("night_score", 0.0) >= 0.25 and t.get("warm_tone", 0.0) >= 0.50:
+        if t.get("night_score", 0.0) >= 0.20 and t.get("warm_tone", 0.0) >= 0.48:
             add("romantic", "city_night_warm")
         if "local_market" in tags:
             add("local", "city_local_market")
@@ -188,19 +186,17 @@ def _tone_matches(style: str, t: Mapping[str, float]) -> bool:
     if style == "calm":
         if t.get("person_ratio", 0.0) >= 0.1 or t.get("saturation", 0.0) >= 0.6:
             return False
-        return (
-            t.get("contrast", 0.0) <= 0.45
-            and t.get("saturation", 0.0) <= 0.55
-            and (
-                (t.get("blue_tone", 0.0) >= 0.30 and t.get("brightness", 0.0) >= 0.55)
-                or (
-                    t.get("green_tone", 0.0) >= 0.30
-                    and t.get("saturation", 0.0) <= 0.50
-                )
-            )
+        beach_calm = (
+            t.get("brightness", 0.0) >= 0.50 and t.get("blue_tone", 0.0) >= 0.25
         )
+        nature_calm = (
+            t.get("green_tone", 0.0) >= 0.22
+            and t.get("saturation", 0.0) <= 0.55
+            and t.get("contrast", 0.0) <= 0.45
+        )
+        return beach_calm or nature_calm
     if style == "romantic":
-        return t.get("warm_tone", 0.0) >= 0.50
+        return t.get("warm_tone", 0.0) >= 0.48
     if style == "energetic":
         return (
             t.get("contrast", 0.0) >= 0.38
