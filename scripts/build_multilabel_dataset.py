@@ -1,9 +1,9 @@
 """
-Build multi-label CLIP pooler dataset from pseudo_labels_refined.json.
+Build multi-label CLIP pooler dataset from pseudo_labels_refined_v3.json.
 
 Outputs:
-  multilabel_dataset.pt  — {X, y_place, y_mood, y_style, meta}
-  dataset_report.json
+  multilabel_dataset_v3.pt — train/val + y_style [calm, cozy, romantic, energetic, local, aesthetic]
+  dataset_report_v3.json — pos_weight (clamped max 10), style pos rates
 """
 
 from __future__ import annotations
@@ -26,6 +26,11 @@ if str(_BACKEND) not in sys.path:
 
 from analyzers.labels import MOOD_LABELS, PLACE_LABELS, STYLE_LABELS  # noqa: E402
 from analyzers.mlp_head import clip_pooler_features  # noqa: E402
+from analyzers.multilabel_utils import (  # noqa: E402
+    STYLE_TARGET_ORDER,
+    compute_pos_weight,
+    multilabel_style_pos_rates,
+)
 
 KAGGLE_WORKING = Path("/kaggle/working")
 
@@ -52,6 +57,7 @@ def build(
     seed: int = 42,
     only_usable: bool = True,
     precompute_pooler: bool = True,
+    use_training_subset: bool = False,
 ) -> Dict[str, Any]:
     rows = load_refined(refined_path)
     if only_usable:
@@ -85,10 +91,18 @@ def build(
                     "category": row.get("category"),
                     "refined_style_label": row.get("refined_style_label"),
                     "label_status": row.get("label_status"),
+                    "style_multihot": row.get("style_multihot"),
                 }
             )
+        n_style = len(STYLE_TARGET_ORDER)
         if not xs:
-            return {"X": torch.zeros(0, 768), "y_place": torch.zeros(0, 6), "y_mood": torch.zeros(0, 6), "y_style": torch.zeros(0, 6), "meta": []}
+            return {
+                "X": torch.zeros(0, 768),
+                "y_place": torch.zeros(0, len(PLACE_LABELS)),
+                "y_mood": torch.zeros(0, len(MOOD_LABELS)),
+                "y_style": torch.zeros(0, n_style),
+                "meta": [],
+            }
         return {
             "X": torch.stack(xs),
             "y_place": torch.tensor(yp, dtype=torch.float32),
@@ -97,13 +111,23 @@ def build(
             "meta": meta,
         }
 
+    train_pack = pack(train_rows)
+    val_pack = pack(val_rows)
+    pos_weight = compute_pos_weight(train_pack["y_style"])
+
     dataset = {
-        "train": pack(train_rows),
-        "val": pack(val_rows),
+        "train": train_pack,
+        "val": val_pack,
         "labels": {
             "place": PLACE_LABELS,
             "mood": MOOD_LABELS,
-            "style": STYLE_LABELS,
+            "style": STYLE_TARGET_ORDER,
+        },
+        "style_pos_weight": pos_weight,
+        "sampler_config": {
+            "cozy_mult": 4.0,
+            "romantic_calm_mult": 2.5,
+            "description": "cozy 3-5x; romantic/calm 2-3x via rare_label_sample_weights",
         },
     }
     output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -112,28 +136,59 @@ def build(
     report = {
         "train_size": int(dataset["train"]["X"].shape[0]),
         "val_size": int(dataset["val"]["X"].shape[0]),
-        "place_pos_rate": dataset["train"]["y_place"].mean(dim=0).tolist() if dataset["train"]["X"].numel() else [],
-        "mood_pos_rate": dataset["train"]["y_mood"].mean(dim=0).tolist() if dataset["train"]["X"].numel() else [],
+        "style_target_order": STYLE_TARGET_ORDER,
+        "style_pos_weight": pos_weight.tolist(),
+        "style_pos_rate_train": multilabel_style_pos_rates(train_pack["y_style"]),
+        "style_pos_rate_val": multilabel_style_pos_rates(val_pack["y_style"]),
+        "place_pos_rate": dataset["train"]["y_place"].mean(dim=0).tolist()
+        if dataset["train"]["X"].numel()
+        else [],
+        "mood_pos_rate": dataset["train"]["y_mood"].mean(dim=0).tolist()
+        if dataset["train"]["X"].numel()
+        else [],
+        "source": str(refined_path),
+        "use_training_subset": use_training_subset,
     }
-    report_path = output_path.with_name("dataset_report.json")
+    if "v3" in output_path.stem:
+        report_path = output_path.parent / "dataset_report_v3.json"
+    else:
+        report_path = output_path.parent / "dataset_report.json"
     report_path.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
     return {"dataset": output_path, "report": report_path, "stats": report}
 
 
 def main() -> None:
     p = argparse.ArgumentParser()
-    default_in = KAGGLE_WORKING / "pseudo_labels_refined.json"
+    default_in = KAGGLE_WORKING / "pseudo_labels_refined_v3.json"
     if not default_in.is_file():
-        default_in = _ROOT / "outputs" / "pseudo_labels" / "pseudo_labels_refined.json"
+        default_in = _ROOT / "outputs" / "pseudo_labels" / "pseudo_labels_refined_v3.json"
+    if not default_in.is_file():
+        default_in = _ROOT / "outputs" / "pseudo_labels" / "pseudo_labels_training_v3.json"
     p.add_argument("--input", type=str, default=str(default_in))
     p.add_argument(
         "--output",
         type=str,
-        default=str(KAGGLE_WORKING / "multilabel_dataset.pt" if KAGGLE_WORKING.is_dir() else _ROOT / "outputs" / "multilabel_dataset.pt"),
+        default=str(
+            KAGGLE_WORKING / "multilabel_dataset_v3.pt"
+            if KAGGLE_WORKING.is_dir()
+            else _ROOT / "outputs" / "multilabel_dataset_v3.pt"
+        ),
     )
     p.add_argument("--val-ratio", type=float, default=0.15)
+    p.add_argument(
+        "--training-subset",
+        action="store_true",
+        help="Use pseudo_labels_training_v3.json if present",
+    )
     args = p.parse_args()
-    out = build(Path(args.input), Path(args.output), val_ratio=args.val_ratio)
+
+    input_path = Path(args.input)
+    if args.training_subset:
+        alt = input_path.parent / "pseudo_labels_training_v3.json"
+        if alt.is_file():
+            input_path = alt
+
+    out = build(input_path, Path(args.output), use_training_subset=args.training_subset)
     print(json.dumps(out["stats"], indent=2))
     print(f"saved: {out['dataset']}")
 

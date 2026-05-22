@@ -1,18 +1,21 @@
 """
 Refined pseudo-label generator (Kaggle-ready).
 
-Input: pseudo_labels.json OR data/train scan
-Output: pseudo_labels_refined.json, pseudo_labels_balanced.json, label_distribution_report.json
+Default v3 outputs:
+  pseudo_labels_refined_v3.json
+  label_distribution_report_v3.json
+  pseudo_labels_balanced_v3.json (optional downsampled training subset)
 """
 
 from __future__ import annotations
 
 import argparse
 import json
+import random
 import sys
 from collections import Counter, defaultdict
 from pathlib import Path
-from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple
+from typing import Any, Dict, List, Mapping, Optional, Sequence, Set
 
 from PIL import Image
 
@@ -26,6 +29,14 @@ from analyzers.labels import MOOD_LABELS, PLACE_LABELS, STYLE_LABELS  # noqa: E4
 
 KAGGLE_WORKING = Path("/kaggle/working")
 _IMAGE_SUFFIXES = {".jpg", ".jpeg", ".png", ".webp", ".bmp"}
+
+RARE_STYLES = frozenset({"cozy", "romantic", "calm"})
+OVER_STYLES = frozenset({"energetic", "local", "aesthetic"})
+DEFAULT_OVER_CAPS = {
+    "energetic": 450,
+    "local": 550,
+    "aesthetic": 480,
+}
 
 
 def load_manifest(path: Path) -> List[Dict[str, Any]]:
@@ -69,6 +80,19 @@ def resolve_path(entry: Mapping[str, Any], train_dir: Optional[Path]) -> Optiona
     return None
 
 
+def _style_multihot_dict(record: Mapping[str, Any]) -> Dict[str, float]:
+    if isinstance(record.get("style_multihot"), dict):
+        return dict(record["style_multihot"])
+    y = record.get("y_style")
+    if isinstance(y, list) and len(y) == len(STYLE_LABELS):
+        return {lab: float(y[i]) for i, lab in enumerate(STYLE_LABELS)}
+    return {s: 0.0 for s in STYLE_LABELS}
+
+
+def _active_styles(multihot: Mapping[str, float]) -> Set[str]:
+    return {s for s in STYLE_LABELS if float(multihot.get(s, 0.0)) >= 0.5}
+
+
 def process_image(
     image_path: Path,
     entry: Mapping[str, Any],
@@ -109,12 +133,14 @@ def process_image(
         "festival_subtype": ev.get("festival_subtype"),
         "refined_style_label": ev.get("refined_style_label"),
         "style_candidates": ev.get("style_candidates"),
+        "style_multihot": ev.get("style_multihot"),
         "label_status": ev.get("label_status"),
         "discard_reason": ev.get("discard_reason"),
         "rule_hits": ev.get("rule_hits"),
         "y_place": y_place,
         "y_mood": y_mood,
         "y_style": y_style,
+        "style_target_order": list(STYLE_LABELS),
         "gemini_fallback_needed": ev.get("gemini_fallback_needed", False),
     }
 
@@ -135,18 +161,94 @@ def balanced_subset(records: Sequence[Mapping[str, Any]]) -> List[Dict[str, Any]
     for k in sorted(buckets):
         items = sorted(
             buckets[k],
-            key=lambda x: (0 if x.get("label_status") == "hard" else 1, -float(x.get("category_confidence", 0))),
+            key=lambda x: (
+                0 if x.get("label_status") == "hard" else 1,
+                -float(x.get("category_confidence", 0)),
+            ),
         )
         out.extend(items[:n])
     return out
 
 
+def downsample_overrepresented(
+    records: Sequence[Mapping[str, Any]],
+    *,
+    caps: Mapping[str, int],
+    seed: int = 42,
+) -> List[Dict[str, Any]]:
+    """
+    Keep all samples that activate any rare style; cap primary labels in OVER_STYLES.
+    """
+    rng = random.Random(seed)
+    usable = [
+        dict(r)
+        for r in records
+        if r.get("label_status") in ("hard", "weak")
+        and r.get("refined_style_label")
+        and _active_styles(_style_multihot_dict(r))
+    ]
+    rare_keep: List[Dict[str, Any]] = []
+    over_buckets: Dict[str, List[Dict[str, Any]]] = defaultdict(list)
+    other: List[Dict[str, Any]] = []
+
+    for r in usable:
+        active = _active_styles(_style_multihot_dict(r))
+        if active & RARE_STYLES:
+            rare_keep.append(r)
+            continue
+        primary = str(r.get("refined_style_label"))
+        if primary in OVER_STYLES:
+            over_buckets[primary].append(r)
+        else:
+            other.append(r)
+
+    kept_ids = {id(r) for r in rare_keep}
+    out = list(rare_keep)
+
+    for style, bucket in over_buckets.items():
+        cap = int(caps.get(style, len(bucket)))
+        ranked = sorted(
+            bucket,
+            key=lambda x: (
+                0 if x.get("label_status") == "hard" else 1,
+                -float(x.get("category_confidence", 0)),
+            ),
+        )
+        for r in ranked[:cap]:
+            if id(r) not in kept_ids:
+                out.append(r)
+                kept_ids.add(id(r))
+
+    for r in other:
+        if id(r) not in kept_ids:
+            out.append(r)
+            kept_ids.add(id(r))
+
+    rng.shuffle(out)
+    return out
+
+
 def report(records: Sequence[Mapping[str, Any]]) -> Dict[str, Any]:
+    primary = Counter(str(r.get("refined_style_label") or "none") for r in records)
+    multihot_counts = Counter()
+    for r in records:
+        for s in _active_styles(_style_multihot_dict(r)):
+            multihot_counts[s] += 1
+    status = Counter(str(r.get("label_status")) for r in records)
     return {
         "total": len(records),
-        "label_status": dict(Counter(str(r.get("label_status")) for r in records)),
-        "style_counts": dict(Counter(str(r.get("refined_style_label") or "none") for r in records)),
+        "label_status": dict(status),
+        "primary_style_counts": dict(primary),
+        "style_multihot_counts": dict(multihot_counts),
         "category_counts": dict(Counter(str(r.get("category")) for r in records)),
+        "target_ranges": {
+            "cozy": [150, 300],
+            "romantic": [120, 250],
+            "calm": [150, 300],
+            "energetic": "maintain_or_downsample",
+            "local": "maintain_or_downsample",
+            "aesthetic": "maintain_or_downsample",
+        },
     }
 
 
@@ -158,6 +260,9 @@ def run(
     limit: Optional[int],
     use_segment: bool,
     use_gemini: bool,
+    version: str = "v3",
+    downsample: bool = True,
+    seed: int = 42,
 ) -> Dict[str, Path]:
     if input_json and input_json.is_file():
         entries = load_manifest(input_json)
@@ -180,22 +285,37 @@ def run(
         refined.append(process_image(path, entry, use_segment=use_segment, use_gemini=use_gemini))
 
     balanced = balanced_subset(refined)
+    training_subset = (
+        downsample_overrepresented(refined, caps=DEFAULT_OVER_CAPS, seed=seed)
+        if downsample
+        else [r for r in refined if r.get("label_status") in ("hard", "weak")]
+    )
+
     rep = {
+        "version": version,
         "skipped": skipped,
         "refined": report(refined),
-        "balanced": report(balanced),
+        "balanced_primary": report(balanced),
+        "training_subset": report(training_subset),
         "use_segment": use_segment,
         "use_gemini": use_gemini,
+        "downsample_caps": DEFAULT_OVER_CAPS if downsample else None,
+        "style_target_order": list(STYLE_LABELS),
     }
 
+    suffix = f"_{version}" if version else ""
     output_dir.mkdir(parents=True, exist_ok=True)
     paths = {
-        "refined": output_dir / "pseudo_labels_refined.json",
-        "balanced": output_dir / "pseudo_labels_balanced.json",
-        "report": output_dir / "label_distribution_report.json",
+        "refined": output_dir / f"pseudo_labels_refined{suffix}.json",
+        "balanced": output_dir / f"pseudo_labels_balanced{suffix}.json",
+        "training": output_dir / f"pseudo_labels_training{suffix}.json",
+        "report": output_dir / f"label_distribution_report{suffix}.json",
     }
     paths["refined"].write_text(json.dumps(refined, ensure_ascii=False, indent=2), encoding="utf-8")
     paths["balanced"].write_text(json.dumps(balanced, ensure_ascii=False, indent=2), encoding="utf-8")
+    paths["training"].write_text(
+        json.dumps(training_subset, ensure_ascii=False, indent=2), encoding="utf-8"
+    )
     paths["report"].write_text(json.dumps(rep, ensure_ascii=False, indent=2), encoding="utf-8")
     return paths
 
@@ -207,11 +327,16 @@ def main() -> None:
     p.add_argument(
         "--output-dir",
         type=str,
-        default=str(KAGGLE_WORKING if KAGGLE_WORKING.is_dir() else _ROOT / "outputs" / "pseudo_labels"),
+        default=str(
+            KAGGLE_WORKING if KAGGLE_WORKING.is_dir() else _ROOT / "outputs" / "pseudo_labels"
+        ),
     )
     p.add_argument("--limit", type=int, default=None)
     p.add_argument("--segment", action="store_true")
     p.add_argument("--no-gemini", action="store_true")
+    p.add_argument("--version", type=str, default="v3")
+    p.add_argument("--no-downsample", action="store_true")
+    p.add_argument("--seed", type=int, default=42)
     args = p.parse_args()
 
     paths = run(
@@ -221,6 +346,9 @@ def main() -> None:
         limit=args.limit,
         use_segment=args.segment,
         use_gemini=not args.no_gemini,
+        version=args.version,
+        downsample=not args.no_downsample,
+        seed=args.seed,
     )
     for k, v in paths.items():
         print(f"{k}: {v}")
