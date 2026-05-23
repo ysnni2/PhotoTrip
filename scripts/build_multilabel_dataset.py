@@ -40,6 +40,13 @@ def load_refined(path: Path) -> List[Dict[str, Any]]:
     return raw if isinstance(raw, list) else list(raw["records"])
 
 
+def _style_multihot(row: Dict[str, Any]) -> Dict[str, float]:
+    blob = row.get("style_multihot")
+    if isinstance(blob, dict):
+        return blob
+    return {}
+
+
 def vector_from_record(row: Dict[str, Any], labels: Sequence[str], key: str) -> List[float]:
     if key in row and isinstance(row[key], list):
         return [float(v) for v in row[key]]
@@ -61,7 +68,17 @@ def build(
 ) -> Dict[str, Any]:
     rows = load_refined(refined_path)
     if only_usable:
-        rows = [r for r in rows if r.get("label_status") in ("hard", "weak")]
+        rows = [
+            r
+            for r in rows
+            if r.get("label_status") in ("hard", "weak")
+            and (
+                r.get("refined_style_label")
+                or any(
+                    float(_style_multihot(r).get(lab, 0.0)) >= 0.5 for lab in STYLE_LABELS
+                )
+            )
+        ]
 
     random.seed(seed)
     random.shuffle(rows)
@@ -157,14 +174,20 @@ def build(
     return {"dataset": output_path, "report": report_path, "stats": report}
 
 
+def _default_training_json() -> Path:
+    for base in (KAGGLE_WORKING, _ROOT / "outputs" / "pseudo_labels"):
+        training = base / "pseudo_labels_training_v3.json"
+        if training.is_file():
+            return training
+        refined = base / "pseudo_labels_refined_v3.json"
+        if refined.is_file():
+            return refined
+    return _ROOT / "outputs" / "pseudo_labels" / "pseudo_labels_training_v3.json"
+
+
 def main() -> None:
     p = argparse.ArgumentParser()
-    default_in = KAGGLE_WORKING / "pseudo_labels_refined_v3.json"
-    if not default_in.is_file():
-        default_in = _ROOT / "outputs" / "pseudo_labels" / "pseudo_labels_refined_v3.json"
-    if not default_in.is_file():
-        default_in = _ROOT / "outputs" / "pseudo_labels" / "pseudo_labels_training_v3.json"
-    p.add_argument("--input", type=str, default=str(default_in))
+    p.add_argument("--input", type=str, default=str(_default_training_json()))
     p.add_argument(
         "--output",
         type=str,
@@ -176,19 +199,23 @@ def main() -> None:
     )
     p.add_argument("--val-ratio", type=float, default=0.15)
     p.add_argument(
-        "--training-subset",
+        "--refined-full",
         action="store_true",
-        help="Use pseudo_labels_training_v3.json if present",
+        help="Use pseudo_labels_refined_v3.json instead of training subset",
     )
     args = p.parse_args()
 
     input_path = Path(args.input)
-    if args.training_subset:
-        alt = input_path.parent / "pseudo_labels_training_v3.json"
+    if args.refined_full:
+        alt = input_path.parent / "pseudo_labels_refined_v3.json"
         if alt.is_file():
             input_path = alt
 
-    out = build(input_path, Path(args.output), use_training_subset=args.training_subset)
+    out = build(
+        input_path,
+        Path(args.output),
+        use_training_subset=not args.refined_full,
+    )
     print(json.dumps(out["stats"], indent=2))
     print(f"saved: {out['dataset']}")
 

@@ -137,6 +137,8 @@ def process_image(
         "label_status": ev.get("label_status"),
         "discard_reason": ev.get("discard_reason"),
         "rule_hits": ev.get("rule_hits"),
+        "primary_rule_hits": ev.get("primary_rule_hits"),
+        "supplement_rule_hits": ev.get("supplement_rule_hits"),
         "y_place": y_place,
         "y_mood": y_mood,
         "y_style": y_style,
@@ -177,14 +179,14 @@ def downsample_overrepresented(
     seed: int = 42,
 ) -> List[Dict[str, Any]]:
     """
-    Keep all samples that activate any rare style; cap primary labels in OVER_STYLES.
+    MLP training subset: keep all multihot rare (cozy/romantic/calm) samples;
+    lightly cap images whose multihot is only energetic/local/aesthetic.
     """
     rng = random.Random(seed)
     usable = [
         dict(r)
         for r in records
         if r.get("label_status") in ("hard", "weak")
-        and r.get("refined_style_label")
         and _active_styles(_style_multihot_dict(r))
     ]
     rare_keep: List[Dict[str, Any]] = []
@@ -196,9 +198,9 @@ def downsample_overrepresented(
         if active & RARE_STYLES:
             rare_keep.append(r)
             continue
-        primary = str(r.get("refined_style_label"))
-        if primary in OVER_STYLES:
-            over_buckets[primary].append(r)
+        if active and active <= OVER_STYLES:
+            dominant = max(active, key=lambda s: _style_multihot_dict(r).get(s, 0.0))
+            over_buckets[dominant].append(r)
         else:
             other.append(r)
 
@@ -228,36 +230,49 @@ def downsample_overrepresented(
     return out
 
 
+def _supplement_rule_counts(records: Sequence[Mapping[str, Any]], style: str) -> Counter:
+    counts: Counter = Counter()
+    for r in records:
+        for hit in r.get("supplement_rule_hits") or []:
+            if isinstance(hit, dict) and hit.get("style") == style:
+                counts[str(hit.get("rule", "unknown"))] += 1
+        for hit in r.get("rule_hits") or []:
+            if (
+                isinstance(hit, dict)
+                and hit.get("style") == style
+                and hit.get("tier") == "supplement"
+            ):
+                counts[str(hit.get("rule", "unknown"))] += 1
+    return counts
+
+
 def report(records: Sequence[Mapping[str, Any]]) -> Dict[str, Any]:
     primary = Counter(str(r.get("refined_style_label") or "none") for r in records)
     multihot_counts = Counter()
-    cozy_rule_counts = Counter()
     for r in records:
         for s in _active_styles(_style_multihot_dict(r)):
             multihot_counts[s] += 1
-        for hit in r.get("rule_hits") or []:
-            if isinstance(hit, dict) and hit.get("style") == "cozy":
-                cozy_rule_counts[str(hit.get("rule", "unknown"))] += 1
     status = Counter(str(r.get("label_status")) for r in records)
-    cozy_count = int(multihot_counts.get("cozy", 0))
+    cozy_mh = int(multihot_counts.get("cozy", 0))
+    romantic_mh = int(multihot_counts.get("romantic", 0))
+    calm_mh = int(multihot_counts.get("calm", 0))
     return {
         "total": len(records),
         "label_status": dict(status),
         "primary_style_counts": dict(primary),
         "style_multihot_counts": dict(multihot_counts),
-        "cozy_multihot_count": cozy_count,
-        "cozy_target_min": 100,
-        "cozy_target_met": cozy_count >= 100,
-        "cozy_rule_hit_counts": dict(cozy_rule_counts),
-        "category_counts": dict(Counter(str(r.get("category")) for r in records)),
-        "target_ranges": {
-            "cozy": [150, 300],
-            "romantic": [120, 250],
-            "calm": [150, 300],
-            "energetic": "maintain_or_downsample",
-            "local": "maintain_or_downsample",
-            "aesthetic": "maintain_or_downsample",
+        "multihot_targets": {
+            "cozy": {"count": cozy_mh, "min": 100, "met": cozy_mh >= 100},
+            "romantic": {"count": romantic_mh, "min": 80, "met": romantic_mh >= 80},
+            "calm": {"count": calm_mh, "min": 100, "met": calm_mh >= 100},
         },
+        "cozy_supplement_rule_counts": dict(_supplement_rule_counts(records, "cozy")),
+        "romantic_supplement_rule_counts": dict(_supplement_rule_counts(records, "romantic")),
+        "category_counts": dict(Counter(str(r.get("category")) for r in records)),
+        "mlp_training_note": (
+            "Train MLP on style_multihot (y_style) from training_subset; "
+            "primary_style_counts is audit-only."
+        ),
     }
 
 
@@ -303,13 +318,14 @@ def run(
     rep = {
         "version": version,
         "skipped": skipped,
-        "refined": report(refined),
-        "balanced_primary": report(balanced),
-        "training_subset": report(training_subset),
+        "refined_full": report(refined),
+        "training_subset_mlp": report(training_subset),
+        "balanced_primary_audit_only": report(balanced),
         "use_segment": use_segment,
         "use_gemini": use_gemini,
         "downsample_caps": DEFAULT_OVER_CAPS if downsample else None,
         "style_target_order": list(STYLE_LABELS),
+        "default_mlp_input": "pseudo_labels_training_v3.json",
     }
 
     suffix = f"_{version}" if version else ""

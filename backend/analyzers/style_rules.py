@@ -1,4 +1,8 @@
-"""Refined style pseudo-label rules (hard / weak / discard)."""
+"""Refined style pseudo-label rules (hard / weak / discard).
+
+Primary ``refined_style_label`` comes from core styles only (calm, energetic, local, aesthetic).
+Cozy / romantic rules augment ``style_multihot`` and ``style_candidates`` for MLP training.
+"""
 
 from __future__ import annotations
 
@@ -10,17 +14,22 @@ from .labels import STYLE_LABELS
 CATEGORY_CONF_HARD = 0.55
 CATEGORY_CONF_WEAK = 0.38
 CATEGORY_CONF_DISCARD = 0.32
-MAX_STYLE_LABELS = 3
-COZY_PROTECT_IN_LIMIT = True  # keep cozy in top styles when any cozy rule fires
+MAX_PRIMARY_CANDIDATES = 2
+MAX_MULTIHOT_LABELS = 5
+
+PRIMARY_STYLES = frozenset({"calm", "energetic", "local", "aesthetic"})
+SUPPLEMENT_STYLES = frozenset({"cozy", "romantic"})
 
 WARM_COZY_MIN = 0.42
-FOOD_COZY_WARM_STRONG = 0.52
+FOOD_COZY_WARM_STRONG = 0.60
+TAG_CAFE_COZY_WARM_MIN = 0.50
 FOOD_COZY_WARM_CAFE = 0.50
 FOOD_COZY_WARM_MARKET = 0.48
 NATURE_COZY_GREEN_MIN = 0.20
 NATURE_COZY_WARM_MIN = 0.48
 NATURE_COZY_CONTRAST_MAX = 0.40
-BEACH_COZY_WARM_MIN = 0.48
+BEACH_COZY_WARM_MIN = 0.55
+BEACH_COZY_CONTRAST_MAX = 0.40
 CULTURE_COZY_WARM_MIN = 0.48
 WARM_ROMANTIC_MIN = 0.46
 LOW_CONTRAST_COZY = 0.48
@@ -64,7 +73,6 @@ def _has_cozy_anchor(
     t: Mapping[str, float],
     visual_tone: Mapping[str, float],
 ) -> bool:
-    """At least one cozy evidence: warm tone, cafe/food, indoor, or food item hint."""
     if t.get("warm_tone", 0.0) >= WARM_COZY_MIN:
         return True
     if "cafe" in tags:
@@ -87,26 +95,6 @@ def _has_cozy_anchor(
     return False
 
 
-def _maybe_add_cozy(
-    hits: List[Tuple[str, str]],
-    *,
-    category: str,
-    culture_subtype: Optional[str],
-    tags: Set[str],
-    t: Mapping[str, float],
-    visual_tone: Mapping[str, float],
-    rule: str,
-) -> None:
-    if _has_cozy_anchor(
-        category=category,
-        culture_subtype=culture_subtype,
-        tags=tags,
-        t=t,
-        visual_tone=visual_tone,
-    ):
-        hits.append(("cozy", rule))
-
-
 def _allow_calm(t: Mapping[str, float]) -> bool:
     if t.get("person_ratio", 0.0) >= 0.12:
         return False
@@ -119,29 +107,20 @@ def _low_crowd(t: Mapping[str, float]) -> bool:
     return t.get("person_ratio", 0.0) < 0.12
 
 
-def _limit_style_hits(
+def _limit_primary_hits(
     hits: List[Tuple[str, str]],
     *,
-    max_styles: int = MAX_STYLE_LABELS,
+    max_styles: int = MAX_PRIMARY_CANDIDATES,
 ) -> List[Tuple[str, str]]:
-    """Cap distinct style labels; reserve a slot for cozy when any cozy rule matched."""
     if not hits:
         return hits
     counts: Dict[str, int] = defaultdict(int)
     for style, _ in hits:
         counts[style] += 1
-    ranked = sorted(counts.keys(), key=lambda s: (-counts[s], s))
-    allowed: List[str] = []
-    if COZY_PROTECT_IN_LIMIT and "cozy" in counts and "cozy" not in allowed:
-        allowed.append("cozy")
-    for style in ranked:
-        if style in allowed:
-            continue
-        if len(allowed) >= max_styles:
-            break
-        allowed.append(style)
-    allowed_set = set(allowed)
-    return [(s, r) for s, r in hits if s in allowed_set]
+    allowed = set(
+        sorted(counts.keys(), key=lambda s: (-counts[s], s))[:max_styles]
+    )
+    return [(s, r) for s, r in hits if s in allowed]
 
 
 def collect_style_rule_hits(
@@ -152,31 +131,35 @@ def collect_style_rule_hits(
     visual_tone: Mapping[str, float],
     festival_evidence: Optional[Mapping[str, float]] = None,
     segment_vegetation: float = 0.0,
-) -> List[Tuple[str, str]]:
+) -> Dict[str, List[Tuple[str, str]]]:
+    """Return ``primary`` and ``supplement`` (cozy/romantic) rule hit lists."""
     tags = _tags(interest_tags)
     t = _tone(visual_tone)
     fest = festival_evidence or {}
     subtype = culture_subtype or ""
-    hits: List[Tuple[str, str]] = []
+    primary: List[Tuple[str, str]] = []
+    supplement: List[Tuple[str, str]] = []
     calm_added = False
     food_items = _food_cozy_items(visual_tone)
 
     def add(style: str, rule: str) -> None:
-        hits.append((style, rule))
+        primary.append((style, rule))
         nonlocal calm_added
         if style == "calm":
             calm_added = True
 
     def cozy(rule: str) -> None:
-        _maybe_add_cozy(
-            hits,
+        if _has_cozy_anchor(
             category=category,
             culture_subtype=subtype or None,
             tags=tags,
             t=t,
             visual_tone=visual_tone,
-            rule=rule,
-        )
+        ):
+            supplement.append(("cozy", rule))
+
+    def romantic(rule: str) -> None:
+        supplement.append(("romantic", rule))
 
     if "history" in tags:
         add("local", "tag_history")
@@ -187,9 +170,7 @@ def collect_style_rule_hits(
         if "sports" in tags:
             add("energetic", "tag_sports")
 
-    # --- Cozy (each match recorded as rule_hits: {style: cozy, rule: <name>}) ---
     if category == "food":
-        # legacy: cafe + warm
         if "cafe" in tags and t.get("warm_tone", 0.0) >= FOOD_COZY_WARM_CAFE:
             cozy("food_cafe_warm_cozy")
         if t.get("warm_tone", 0.0) >= FOOD_COZY_WARM_STRONG:
@@ -205,12 +186,12 @@ def collect_style_rule_hits(
         ):
             add("aesthetic", "food_cafe_aesthetic")
         if "cafe" in tags and t.get("warm_tone", 0.0) >= 0.50:
-            add("romantic", "food_cafe_romantic")
+            romantic("food_cafe_romantic")
         if "local_market" in tags:
             add("local", "food_local_market")
             add("energetic", "food_local_market")
 
-    if "cafe" in tags and t.get("warm_tone", 0.0) >= WARM_COZY_MIN:
+    if "cafe" in tags and t.get("warm_tone", 0.0) >= TAG_CAFE_COZY_WARM_MIN:
         cozy("tag_cafe_warm_cozy")
 
     indoor = float(visual_tone.get("indoor_score", 0.0)) >= 0.35
@@ -223,7 +204,7 @@ def collect_style_rule_hits(
         if t.get("night_score", 0.0) >= 0.25:
             add("aesthetic", "city_night_aesthetic")
         if t.get("night_score", 0.0) >= 0.20 and t.get("warm_tone", 0.0) >= 0.48:
-            add("romantic", "city_night_warm")
+            romantic("city_night_warm")
         if (
             t.get("night_score", 0.0) >= 0.18
             and t.get("warm_tone", 0.0) >= WARM_COZY_MIN
@@ -248,16 +229,20 @@ def collect_style_rule_hits(
         ):
             add("calm", "beach_low_sat_contrast")
         if t.get("warm_tone", 0.0) >= 0.48:
-            add("romantic", "beach_warm")
+            romantic("beach_warm")
         if (
             t.get("warm_tone", 0.0) >= WARM_ROMANTIC_MIN
             and t.get("saturation", 0.0) >= 0.40
             and t.get("brightness", 0.0) >= 0.40
         ):
-            add("romantic", "beach_sunset_like")
+            romantic("beach_sunset_like")
         if t.get("saturation", 0.0) >= 0.55 and t.get("blue_tone", 0.0) >= 0.40:
             add("aesthetic", "beach_aesthetic")
-        if _allow_calm(t) and t.get("warm_tone", 0.0) >= BEACH_COZY_WARM_MIN:
+        if (
+            _allow_calm(t)
+            and t.get("warm_tone", 0.0) >= BEACH_COZY_WARM_MIN
+            and t.get("contrast", 0.0) <= BEACH_COZY_CONTRAST_MAX
+        ):
             cozy("beach_allow_calm_warm_cozy")
 
     elif category == "nature":
@@ -276,7 +261,7 @@ def collect_style_rule_hits(
         if t.get("contrast", 0.0) >= 0.50:
             add("energetic", "nature_contrast")
         if t.get("warm_tone", 0.0) >= 0.50 and t.get("brightness", 0.0) >= 0.45:
-            add("romantic", "nature_warm_bright")
+            romantic("nature_warm_bright")
         if (
             t.get("green_tone", 0.0) >= NATURE_COZY_GREEN_MIN
             and t.get("warm_tone", 0.0) >= NATURE_COZY_WARM_MIN
@@ -307,7 +292,7 @@ def collect_style_rule_hits(
             subtype == "traditional_architecture"
             and t.get("warm_tone", 0.0) >= WARM_ROMANTIC_MIN
         ):
-            add("romantic", "culture_traditional_warm")
+            romantic("culture_traditional_warm")
         if (
             subtype == "traditional_architecture"
             and t.get("warm_tone", 0.0) >= CULTURE_COZY_WARM_MIN
@@ -332,23 +317,29 @@ def collect_style_rule_hits(
             add("energetic", "festival_night")
             add("aesthetic", "festival_night")
 
-    # Romantic: cafe + warm + low contrast (any category)
     if (
         "cafe" in tags
         and t.get("warm_tone", 0.0) >= WARM_ROMANTIC_MIN
         and t.get("contrast", 0.0) <= LOW_CONTRAST_ROMANTIC
     ):
-        add("romantic", "cafe_warm_low_contrast")
+        romantic("cafe_warm_low_contrast")
 
     if calm_added and t.get("warm_tone", 0.0) >= 0.52:
-        add("romantic", "calm_warm_combo")
+        romantic("calm_warm_combo")
 
-    return _limit_style_hits(hits, max_styles=MAX_STYLE_LABELS)
+    primary = _limit_primary_hits(primary, max_styles=MAX_PRIMARY_CANDIDATES)
+    return {"primary": primary, "supplement": supplement}
+
+
+def collect_style_rule_hits_flat(**kwargs: Any) -> List[Tuple[str, str]]:
+    """Flat list of all hits (primary + supplement) for backward compatibility."""
+    split = collect_style_rule_hits(**kwargs)
+    return split["primary"] + split["supplement"]
 
 
 def _tone_matches(style: str, t: Mapping[str, float]) -> bool:
-    if style == "cozy":
-        return t.get("warm_tone", 0.0) >= FOOD_COZY_WARM_MARKET
+    if style in SUPPLEMENT_STYLES:
+        return True
     if style == "calm":
         if t.get("person_ratio", 0.0) >= 0.12 or t.get("saturation", 0.0) >= 0.62:
             return False
@@ -365,8 +356,6 @@ def _tone_matches(style: str, t: Mapping[str, float]) -> bool:
             and t.get("contrast", 0.0) <= 0.48
         )
         return beach_calm or nature_calm
-    if style == "romantic":
-        return t.get("warm_tone", 0.0) >= 0.46
     if style == "energetic":
         return (
             t.get("contrast", 0.0) >= 0.38
@@ -376,6 +365,39 @@ def _tone_matches(style: str, t: Mapping[str, float]) -> bool:
     if style == "aesthetic":
         return t.get("contrast", 0.0) >= 0.32 or t.get("saturation", 0.0) >= 0.38
     return True
+
+
+def _build_multihot_and_candidates(
+    *,
+    primary_style: Optional[str],
+    primary_ranked: List[str],
+    supplement_styles: List[str],
+) -> Tuple[Dict[str, float], List[str]]:
+    multihot = {s: 0.0 for s in STYLE_LABELS}
+    candidates: List[str] = []
+
+    if primary_style:
+        multihot[primary_style] = 1.0
+        candidates.append(primary_style)
+
+    for style in primary_ranked:
+        if style != primary_style and style not in candidates:
+            candidates.append(style)
+        multihot[style] = 1.0
+
+    for style in supplement_styles:
+        multihot[style] = 1.0
+        if style not in candidates:
+            candidates.append(style)
+
+    candidates = candidates[:MAX_MULTIHOT_LABELS]
+    active = sum(1 for v in multihot.values() if v >= 0.5)
+    if active > MAX_MULTIHOT_LABELS:
+        keep = set(candidates)
+        for s in STYLE_LABELS:
+            if s not in keep:
+                multihot[s] = 0.0
+    return multihot, candidates
 
 
 def assign_refined_style(
@@ -388,7 +410,7 @@ def assign_refined_style(
     festival_evidence: Optional[Mapping[str, float]] = None,
     segment_vegetation: float = 0.0,
 ) -> Dict[str, Any]:
-    rule_hits = collect_style_rule_hits(
+    split = collect_style_rule_hits(
         category=category,
         culture_subtype=culture_subtype,
         interest_tags=interest_tags,
@@ -396,31 +418,56 @@ def assign_refined_style(
         festival_evidence=festival_evidence,
         segment_vegetation=segment_vegetation,
     )
-    style_rules: Dict[str, List[str]] = defaultdict(list)
-    for style, rule in rule_hits:
-        style_rules[style].append(rule)
+    primary_hits = split["primary"]
+    supplement_hits = split["supplement"]
+    all_hits = primary_hits + supplement_hits
 
-    if category_confidence < CATEGORY_CONF_DISCARD or not rule_hits:
+    primary_rules: Dict[str, List[str]] = defaultdict(list)
+    for style, rule in primary_hits:
+        primary_rules[style].append(rule)
+
+    supplement_rules: Dict[str, List[str]] = defaultdict(list)
+    for style, rule in supplement_hits:
+        supplement_rules[style].append(rule)
+
+    rule_hits_payload = [
+        {"style": s, "rule": r, "tier": "primary"} for s, r in primary_hits
+    ] + [
+        {"style": s, "rule": r, "tier": "supplement"} for s, r in supplement_hits
+    ]
+
+    if category_confidence < CATEGORY_CONF_DISCARD or not primary_hits:
+        supplement_only = bool(supplement_hits)
+        multihot, candidates = _build_multihot_and_candidates(
+            primary_style=None,
+            primary_ranked=[],
+            supplement_styles=sorted(supplement_rules.keys()),
+        )
         return {
             "refined_style_label": None,
-            "style_candidates": [],
-            "style_multihot": {s: 0.0 for s in STYLE_LABELS},
-            "label_status": "discard",
-            "discard_reason": "low_confidence_or_no_rules",
-            "rule_hits": [{"style": s, "rule": r} for s, r in rule_hits],
+            "style_candidates": candidates,
+            "style_multihot": multihot,
+            "label_status": "weak" if supplement_only else "discard",
+            "discard_reason": None if supplement_only else "low_confidence_or_no_primary_rules",
+            "rule_hits": rule_hits_payload,
+            "primary_rule_hits": [{"style": s, "rule": r} for s, r in primary_hits],
+            "supplement_rule_hits": [{"style": s, "rule": r} for s, r in supplement_hits],
         }
 
     ranked = sorted(
-        ((s, len(r)) for s, r in style_rules.items()),
+        ((s, len(r)) for s, r in primary_rules.items()),
         key=lambda x: (-x[1], x[0]),
     )
     primary, evidence_count = ranked[0]
+    primary_ranked = [s for s, _ in ranked[:MAX_PRIMARY_CANDIDATES]]
+    supplement_styles = sorted(supplement_rules.keys())
     tone_ok = _tone_matches(primary, _tone(visual_tone))
-    candidates = [s for s, _ in ranked[:MAX_STYLE_LABELS]]
 
-    multihot = {s: 0.0 for s in STYLE_LABELS}
-    for style in candidates:
-        multihot[style] = 1.0
+    multihot, candidates = _build_multihot_and_candidates(
+        primary_style=primary,
+        primary_ranked=primary_ranked,
+        supplement_styles=supplement_styles,
+    )
 
     status = "discard"
     reason: Optional[str] = None
@@ -430,21 +477,24 @@ def assign_refined_style(
     elif evidence_count >= 1 and category_confidence >= CATEGORY_CONF_WEAK:
         status = "weak"
         if evidence_count < 2:
-            reason = "single_rule_evidence"
+            reason = "single_primary_rule"
         elif not tone_ok:
             reason = "tone_mismatch"
         elif category_confidence < CATEGORY_CONF_HARD:
             reason = "category_conf_not_hard"
     else:
-        reason = "ambiguous_style_rules"
+        reason = "ambiguous_primary_rules"
         primary = None
-        candidates = []
-        multihot = {s: 0.0 for s in STYLE_LABELS}
+        multihot, candidates = _build_multihot_and_candidates(
+            primary_style=None,
+            primary_ranked=[],
+            supplement_styles=supplement_styles,
+        )
 
-    calm_count = len(style_rules.get("calm", []))
+    calm_count = len(primary_rules.get("calm", []))
     if (
-        "calm" in style_rules
-        and len(style_rules) > 1
+        primary == "calm"
+        and len(primary_rules) > 1
         and calm_count <= 2
         and status == "hard"
     ):
@@ -457,8 +507,13 @@ def assign_refined_style(
         "style_multihot": multihot,
         "label_status": status,
         "discard_reason": reason,
-        "rule_hits": [{"style": s, "rule": r} for s, r in rule_hits],
-        "style_rule_counts": {s: len(rs) for s, rs in style_rules.items()},
+        "rule_hits": rule_hits_payload,
+        "primary_rule_hits": [{"style": s, "rule": r} for s, r in primary_hits],
+        "supplement_rule_hits": [{"style": s, "rule": r} for s, r in supplement_hits],
+        "style_rule_counts": {
+            **{s: len(rs) for s, rs in primary_rules.items()},
+            **{f"{s}_supplement": len(rs) for s, rs in supplement_rules.items()},
+        },
         "primary_evidence_count": evidence_count,
         "tone_matches_primary": tone_ok,
     }
