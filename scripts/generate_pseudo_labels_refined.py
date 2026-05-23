@@ -231,15 +231,24 @@ def downsample_overrepresented(
 def report(records: Sequence[Mapping[str, Any]]) -> Dict[str, Any]:
     primary = Counter(str(r.get("refined_style_label") or "none") for r in records)
     multihot_counts = Counter()
+    cozy_rule_counts = Counter()
     for r in records:
         for s in _active_styles(_style_multihot_dict(r)):
             multihot_counts[s] += 1
+        for hit in r.get("rule_hits") or []:
+            if isinstance(hit, dict) and hit.get("style") == "cozy":
+                cozy_rule_counts[str(hit.get("rule", "unknown"))] += 1
     status = Counter(str(r.get("label_status")) for r in records)
+    cozy_count = int(multihot_counts.get("cozy", 0))
     return {
         "total": len(records),
         "label_status": dict(status),
         "primary_style_counts": dict(primary),
         "style_multihot_counts": dict(multihot_counts),
+        "cozy_multihot_count": cozy_count,
+        "cozy_target_min": 100,
+        "cozy_target_met": cozy_count >= 100,
+        "cozy_rule_hit_counts": dict(cozy_rule_counts),
         "category_counts": dict(Counter(str(r.get("category")) for r in records)),
         "target_ranges": {
             "cozy": [150, 300],

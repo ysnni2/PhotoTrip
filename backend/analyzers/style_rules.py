@@ -11,8 +11,17 @@ CATEGORY_CONF_HARD = 0.55
 CATEGORY_CONF_WEAK = 0.38
 CATEGORY_CONF_DISCARD = 0.32
 MAX_STYLE_LABELS = 3
+COZY_PROTECT_IN_LIMIT = True  # keep cozy in top styles when any cozy rule fires
 
 WARM_COZY_MIN = 0.42
+FOOD_COZY_WARM_STRONG = 0.52
+FOOD_COZY_WARM_CAFE = 0.50
+FOOD_COZY_WARM_MARKET = 0.48
+NATURE_COZY_GREEN_MIN = 0.20
+NATURE_COZY_WARM_MIN = 0.48
+NATURE_COZY_CONTRAST_MAX = 0.40
+BEACH_COZY_WARM_MIN = 0.48
+CULTURE_COZY_WARM_MIN = 0.48
 WARM_ROMANTIC_MIN = 0.46
 LOW_CONTRAST_COZY = 0.48
 LOW_CONTRAST_ROMANTIC = 0.46
@@ -50,6 +59,7 @@ def _food_cozy_items(visual_tone: Mapping[str, float]) -> Set[str]:
 def _has_cozy_anchor(
     *,
     category: str,
+    culture_subtype: Optional[str],
     tags: Set[str],
     t: Mapping[str, float],
     visual_tone: Mapping[str, float],
@@ -60,6 +70,15 @@ def _has_cozy_anchor(
     if "cafe" in tags:
         return True
     if category == "food":
+        return True
+    if category == "nature" and t.get("green_tone", 0.0) >= NATURE_COZY_GREEN_MIN:
+        return True
+    if category == "beach" and _allow_calm(t):
+        return True
+    if category == "culture" and (culture_subtype or "") in (
+        "traditional_architecture",
+        "historical_site",
+    ):
         return True
     if float(visual_tone.get("indoor_score", 0.0)) >= 0.35:
         return True
@@ -72,12 +91,19 @@ def _maybe_add_cozy(
     hits: List[Tuple[str, str]],
     *,
     category: str,
+    culture_subtype: Optional[str],
     tags: Set[str],
     t: Mapping[str, float],
     visual_tone: Mapping[str, float],
     rule: str,
 ) -> None:
-    if _has_cozy_anchor(category=category, tags=tags, t=t, visual_tone=visual_tone):
+    if _has_cozy_anchor(
+        category=category,
+        culture_subtype=culture_subtype,
+        tags=tags,
+        t=t,
+        visual_tone=visual_tone,
+    ):
         hits.append(("cozy", rule))
 
 
@@ -93,31 +119,29 @@ def _low_crowd(t: Mapping[str, float]) -> bool:
     return t.get("person_ratio", 0.0) < 0.12
 
 
-def _beach_calm_like(t: Mapping[str, float]) -> bool:
-    if not _allow_calm(t):
-        return False
-    if t.get("brightness", 0.0) >= 0.50 and t.get("blue_tone", 0.0) >= 0.25:
-        return True
-    return (
-        t.get("saturation", 0.0) <= 0.52
-        and t.get("contrast", 0.0) <= 0.48
-        and t.get("blue_tone", 0.0) >= 0.20
-    )
-
-
 def _limit_style_hits(
     hits: List[Tuple[str, str]],
     *,
     max_styles: int = MAX_STYLE_LABELS,
 ) -> List[Tuple[str, str]]:
+    """Cap distinct style labels; reserve a slot for cozy when any cozy rule matched."""
     if not hits:
         return hits
     counts: Dict[str, int] = defaultdict(int)
     for style, _ in hits:
         counts[style] += 1
-    top_styles = sorted(counts.keys(), key=lambda s: (-counts[s], s))[:max_styles]
-    allowed = set(top_styles)
-    return [(s, r) for s, r in hits if s in allowed]
+    ranked = sorted(counts.keys(), key=lambda s: (-counts[s], s))
+    allowed: List[str] = []
+    if COZY_PROTECT_IN_LIMIT and "cozy" in counts and "cozy" not in allowed:
+        allowed.append("cozy")
+    for style in ranked:
+        if style in allowed:
+            continue
+        if len(allowed) >= max_styles:
+            break
+        allowed.append(style)
+    allowed_set = set(allowed)
+    return [(s, r) for s, r in hits if s in allowed_set]
 
 
 def collect_style_rule_hits(
@@ -147,6 +171,7 @@ def collect_style_rule_hits(
         _maybe_add_cozy(
             hits,
             category=category,
+            culture_subtype=subtype or None,
             tags=tags,
             t=t,
             visual_tone=visual_tone,
@@ -162,13 +187,14 @@ def collect_style_rule_hits(
         if "sports" in tags:
             add("energetic", "tag_sports")
 
-    # --- Cozy (anchor required per rule via cozy()) ---
+    # --- Cozy (each match recorded as rule_hits: {style: cozy, rule: <name>}) ---
     if category == "food":
-        if "cafe" in tags and t.get("warm_tone", 0.0) >= 0.50:
+        # legacy: cafe + warm
+        if "cafe" in tags and t.get("warm_tone", 0.0) >= FOOD_COZY_WARM_CAFE:
             cozy("food_cafe_warm_cozy")
-        if t.get("warm_tone", 0.0) >= 0.52:
+        if t.get("warm_tone", 0.0) >= FOOD_COZY_WARM_STRONG:
             cozy("food_warm_strong_cozy")
-        if "local_market" in tags and t.get("warm_tone", 0.0) >= 0.48:
+        if "local_market" in tags and t.get("warm_tone", 0.0) >= FOOD_COZY_WARM_MARKET:
             cozy("food_local_market_warm_cozy")
         if food_items:
             cozy("food_item_cozy")
@@ -231,8 +257,8 @@ def collect_style_rule_hits(
             add("romantic", "beach_sunset_like")
         if t.get("saturation", 0.0) >= 0.55 and t.get("blue_tone", 0.0) >= 0.40:
             add("aesthetic", "beach_aesthetic")
-        if _beach_calm_like(t) and t.get("warm_tone", 0.0) >= 0.48:
-            cozy("beach_calm_warm_cozy")
+        if _allow_calm(t) and t.get("warm_tone", 0.0) >= BEACH_COZY_WARM_MIN:
+            cozy("beach_allow_calm_warm_cozy")
 
     elif category == "nature":
         if _allow_calm(t) and (
@@ -252,9 +278,9 @@ def collect_style_rule_hits(
         if t.get("warm_tone", 0.0) >= 0.50 and t.get("brightness", 0.0) >= 0.45:
             add("romantic", "nature_warm_bright")
         if (
-            t.get("green_tone", 0.0) >= 0.20
-            and t.get("warm_tone", 0.0) >= 0.48
-            and t.get("contrast", 0.0) <= 0.40
+            t.get("green_tone", 0.0) >= NATURE_COZY_GREEN_MIN
+            and t.get("warm_tone", 0.0) >= NATURE_COZY_WARM_MIN
+            and t.get("contrast", 0.0) <= NATURE_COZY_CONTRAST_MAX
         ):
             cozy("nature_green_warm_cozy")
 
@@ -282,10 +308,13 @@ def collect_style_rule_hits(
             and t.get("warm_tone", 0.0) >= WARM_ROMANTIC_MIN
         ):
             add("romantic", "culture_traditional_warm")
-        if subtype == "traditional_architecture" and t.get("warm_tone", 0.0) >= 0.48:
-            cozy("culture_traditional_warm_cozy")
-        if subtype == "historical_site" and t.get("warm_tone", 0.0) >= 0.48:
-            cozy("culture_historical_warm_cozy")
+        if (
+            subtype == "traditional_architecture"
+            and t.get("warm_tone", 0.0) >= CULTURE_COZY_WARM_MIN
+        ):
+            cozy("culture_traditional_architecture_warm_cozy")
+        if subtype == "historical_site" and t.get("warm_tone", 0.0) >= CULTURE_COZY_WARM_MIN:
+            cozy("culture_historical_site_warm_cozy")
         if (
             subtype == "museum_gallery"
             and t.get("warm_tone", 0.0) >= WARM_COZY_MIN
@@ -319,7 +348,7 @@ def collect_style_rule_hits(
 
 def _tone_matches(style: str, t: Mapping[str, float]) -> bool:
     if style == "cozy":
-        return t.get("warm_tone", 0.0) >= WARM_COZY_MIN
+        return t.get("warm_tone", 0.0) >= FOOD_COZY_WARM_MARKET
     if style == "calm":
         if t.get("person_ratio", 0.0) >= 0.12 or t.get("saturation", 0.0) >= 0.62:
             return False
