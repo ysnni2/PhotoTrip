@@ -60,28 +60,10 @@ def _indoor_score(segment_result: Optional[Mapping[str, float]]) -> float:
     return float(max(0.0, min(1.0, building / (building + sky + 0.05))))
 
 
-def _food_cozy_items(image: Image.Image, *, threshold: float = 0.22) -> list[str]:
-    prompts = {
-        "dessert": "a photo of dessert cake pastry sweet food close-up",
-        "coffee": "a photo of coffee cup latte cafe drink",
-        "bread": "a photo of bread bakery pastry baked goods",
-    }
-    try:
-        from .clip_base import clip_zero_shot_scores
-    except ImportError:
-        from analyzers.clip_base import clip_zero_shot_scores
-
-    scores = clip_zero_shot_scores(
-        image, list(prompts.keys()), prompts, "food_cozy_v1"
-    )
-    return [k for k, v in scores.items() if float(v) >= threshold]
-
-
 def _visual_tone(
     opencv_result: Mapping[str, float],
     *,
     segment_result: Optional[Mapping[str, float]] = None,
-    food_cozy_items: Optional[Sequence[str]] = None,
 ) -> Dict[str, float]:
     keys = (
         "brightness",
@@ -96,8 +78,6 @@ def _visual_tone(
     )
     out = {k: round(float(opencv_result.get(k, 0.0)), 4) for k in keys}
     out["indoor_score"] = round(_indoor_score(segment_result), 4)
-    if food_cozy_items:
-        out["food_cozy_items"] = list(food_cozy_items)
     return out
 
 
@@ -132,14 +112,7 @@ def extract_visual_evidence(
     festival_block = analyze_festival(
         image, opencv_result=opencv_result, category_scores=category_scores, use_gemini=use_gemini_festival
     )
-    food_cozy_items: list[str] = []
-    if category == "food":
-        food_cozy_items = _food_cozy_items(image)
-    visual_tone = _visual_tone(
-        opencv_result,
-        segment_result=segment_result,
-        food_cozy_items=food_cozy_items or None,
-    )
+    visual_tone = _visual_tone(opencv_result, segment_result=segment_result)
     seg_veg = float((segment_result or {}).get("vegetation", 0.0))
 
     style_block = assign_refined_style(

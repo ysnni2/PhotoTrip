@@ -34,7 +34,6 @@ CULTURE_COZY_WARM_MIN = 0.48
 WARM_ROMANTIC_MIN = 0.46
 LOW_CONTRAST_COZY = 0.48
 LOW_CONTRAST_ROMANTIC = 0.46
-FOOD_COZY_ITEMS = ("dessert", "coffee", "bread")
 
 
 def _tags(interest_tags: Sequence[Mapping[str, Any]]) -> Set[str]:
@@ -54,15 +53,6 @@ def _tone(visual_tone: Mapping[str, float]) -> Dict[str, float]:
         "indoor_score",
     )
     return {k: float(visual_tone.get(k, 0.0)) for k in keys}
-
-
-def _food_cozy_items(visual_tone: Mapping[str, float]) -> Set[str]:
-    raw = visual_tone.get("food_cozy_items", [])
-    if isinstance(raw, str):
-        return {raw} if raw in FOOD_COZY_ITEMS else set()
-    if isinstance(raw, (list, tuple, set)):
-        return {str(x) for x in raw if str(x) in FOOD_COZY_ITEMS}
-    return set()
 
 
 def _has_cozy_anchor(
@@ -89,8 +79,6 @@ def _has_cozy_anchor(
     ):
         return True
     if float(visual_tone.get("indoor_score", 0.0)) >= 0.35:
-        return True
-    if _food_cozy_items(visual_tone):
         return True
     return False
 
@@ -140,7 +128,6 @@ def collect_style_rule_hits(
     primary: List[Tuple[str, str]] = []
     supplement: List[Tuple[str, str]] = []
     calm_added = False
-    food_items = _food_cozy_items(visual_tone)
 
     def add(style: str, rule: str) -> None:
         primary.append((style, rule))
@@ -177,8 +164,6 @@ def collect_style_rule_hits(
             cozy("food_warm_strong_cozy")
         if "local_market" in tags and t.get("warm_tone", 0.0) >= FOOD_COZY_WARM_MARKET:
             cozy("food_local_market_warm_cozy")
-        if food_items:
-            cozy("food_item_cozy")
         if (
             "cafe" in tags
             and t.get("warm_tone", 0.0) >= 0.55
