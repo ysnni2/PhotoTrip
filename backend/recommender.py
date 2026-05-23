@@ -11,6 +11,8 @@ SCENE_CATEGORIES = ("beach", "nature", "city", "culture", "festival", "food")
 
 _TOP_K = 3
 _UNCERTAIN_THRESHOLD = 0.3
+_INTEREST_MATCH_BONUS = 0.05
+_INTEREST_BONUS_MAX = 0.20
 _HOMEBODY_KEYWORDS = {
     "sofa", "bed", "chair", "table", "desk", "monitor",
     "cabinet", "shelf", "lamp", "curtain", "carpet",
@@ -70,7 +72,7 @@ def _semantic(
     }
 
 
-# name, category, scene, visual, semantic
+# name, category, scene, visual, semantic, interest_tags
 _DESTINATION_PROFILES: Tuple[Dict[str, Any], ...] = (
     # beach
     {
@@ -79,6 +81,7 @@ _DESTINATION_PROFILES: Tuple[Dict[str, Any], ...] = (
         "scene": _scene(beach=0.95, nature=0.15),
         "visual": _visual(0.78, 0.72, 0.45, 0.82),
         "semantic": _semantic(water=0.35, sky=0.25, vegetation=0.2),
+        "interest_tags": ["cafe", "nature"],
     },
     {
         "name": "몰디브",
@@ -86,6 +89,7 @@ _DESTINATION_PROFILES: Tuple[Dict[str, Any], ...] = (
         "scene": _scene(beach=0.98, nature=0.1),
         "visual": _visual(0.85, 0.68, 0.4, 0.75),
         "semantic": _semantic(water=0.55, sky=0.35, vegetation=0.05),
+        "interest_tags": ["nature", "cafe"],
     },
     {
         "name": "제주",
@@ -93,6 +97,7 @@ _DESTINATION_PROFILES: Tuple[Dict[str, Any], ...] = (
         "scene": _scene(beach=0.7, nature=0.55),
         "visual": _visual(0.72, 0.65, 0.5, 0.68),
         "semantic": _semantic(water=0.4, sky=0.3, vegetation=0.35),
+        "interest_tags": ["nature", "cafe", "local_market"],
     },
     {
         "name": "세부",
@@ -100,6 +105,7 @@ _DESTINATION_PROFILES: Tuple[Dict[str, Any], ...] = (
         "scene": _scene(beach=0.92, food=0.1),
         "visual": _visual(0.8, 0.7, 0.42, 0.78),
         "semantic": _semantic(water=0.5, sky=0.28, vegetation=0.12),
+        "interest_tags": ["street_food", "local_market", "nightlife"],
     },
     {
         "name": "푸켓",
@@ -107,6 +113,7 @@ _DESTINATION_PROFILES: Tuple[Dict[str, Any], ...] = (
         "scene": _scene(beach=0.93, food=0.12),
         "visual": _visual(0.82, 0.75, 0.44, 0.85),
         "semantic": _semantic(water=0.48, sky=0.26, vegetation=0.18),
+        "interest_tags": ["street_food", "nightlife", "local_market"],
     },
     # nature
     {
@@ -115,6 +122,7 @@ _DESTINATION_PROFILES: Tuple[Dict[str, Any], ...] = (
         "scene": _scene(nature=0.95, beach=0.08),
         "visual": _visual(0.75, 0.62, 0.55, 0.45),
         "semantic": _semantic(water=0.25, sky=0.35, vegetation=0.45),
+        "interest_tags": ["sports", "nature"],
     },
     {
         "name": "파타고니아",
@@ -122,6 +130,7 @@ _DESTINATION_PROFILES: Tuple[Dict[str, Any], ...] = (
         "scene": _scene(nature=0.97),
         "visual": _visual(0.65, 0.5, 0.6, 0.25),
         "semantic": _semantic(sky=0.4, vegetation=0.35, water=0.15),
+        "interest_tags": ["nature", "sports"],
     },
     {
         "name": "설악산",
@@ -129,6 +138,7 @@ _DESTINATION_PROFILES: Tuple[Dict[str, Any], ...] = (
         "scene": _scene(nature=0.9, culture=0.1),
         "visual": _visual(0.68, 0.55, 0.58, 0.4),
         "semantic": _semantic(vegetation=0.5, sky=0.35, water=0.1),
+        "interest_tags": ["nature", "history"],
     },
     {
         "name": "요세미티",
@@ -136,6 +146,7 @@ _DESTINATION_PROFILES: Tuple[Dict[str, Any], ...] = (
         "scene": _scene(nature=0.96),
         "visual": _visual(0.7, 0.58, 0.52, 0.42),
         "semantic": _semantic(vegetation=0.55, sky=0.3, water=0.12),
+        "interest_tags": ["nature", "sports"],
     },
     {
         "name": "아이슬란드",
@@ -143,6 +154,7 @@ _DESTINATION_PROFILES: Tuple[Dict[str, Any], ...] = (
         "scene": _scene(nature=0.94, beach=0.12),
         "visual": _visual(0.62, 0.48, 0.55, 0.3),
         "semantic": _semantic(water=0.35, sky=0.4, vegetation=0.2),
+        "interest_tags": ["nature", "art"],
     },
     # city
     {
@@ -151,6 +163,7 @@ _DESTINATION_PROFILES: Tuple[Dict[str, Any], ...] = (
         "scene": _scene(city=0.95, festival=0.2, food=0.15),
         "visual": _visual(0.55, 0.7, 0.65, 0.45),
         "semantic": _semantic(building=0.55, sky=0.2, food=0.1),
+        "interest_tags": ["shopping", "nightlife", "cafe", "anime"],
     },
     {
         "name": "뉴욕",
@@ -158,6 +171,7 @@ _DESTINATION_PROFILES: Tuple[Dict[str, Any], ...] = (
         "scene": _scene(city=0.96, festival=0.25, culture=0.15),
         "visual": _visual(0.58, 0.68, 0.7, 0.4),
         "semantic": _semantic(building=0.6, sky=0.22, food=0.08),
+        "interest_tags": ["shopping", "nightlife", "art"],
     },
     {
         "name": "홍콩",
@@ -165,6 +179,7 @@ _DESTINATION_PROFILES: Tuple[Dict[str, Any], ...] = (
         "scene": _scene(city=0.94, food=0.2),
         "visual": _visual(0.52, 0.72, 0.68, 0.5),
         "semantic": _semantic(building=0.58, water=0.15, sky=0.18),
+        "interest_tags": ["shopping", "nightlife", "street_food"],
     },
     {
         "name": "싱가포르",
@@ -172,6 +187,7 @@ _DESTINATION_PROFILES: Tuple[Dict[str, Any], ...] = (
         "scene": _scene(city=0.9, food=0.25, beach=0.1),
         "visual": _visual(0.72, 0.75, 0.5, 0.62),
         "semantic": _semantic(building=0.5, water=0.2, vegetation=0.15),
+        "interest_tags": ["shopping", "cafe", "street_food"],
     },
     {
         "name": "파리",
@@ -179,6 +195,7 @@ _DESTINATION_PROFILES: Tuple[Dict[str, Any], ...] = (
         "scene": _scene(city=0.85, culture=0.35, festival=0.3),
         "visual": _visual(0.6, 0.65, 0.55, 0.5),
         "semantic": _semantic(building=0.45, sky=0.25, food=0.1),
+        "interest_tags": ["cafe", "art", "shopping"],
     },
     # culture
     {
@@ -187,6 +204,7 @@ _DESTINATION_PROFILES: Tuple[Dict[str, Any], ...] = (
         "scene": _scene(culture=0.95, city=0.25, food=0.2),
         "visual": _visual(0.72, 0.68, 0.5, 0.7),
         "semantic": _semantic(building=0.5, sky=0.2, food=0.15),
+        "interest_tags": ["history", "art", "local_market"],
     },
     {
         "name": "교토",
@@ -194,6 +212,7 @@ _DESTINATION_PROFILES: Tuple[Dict[str, Any], ...] = (
         "scene": _scene(culture=0.93, nature=0.3),
         "visual": _visual(0.65, 0.6, 0.48, 0.55),
         "semantic": _semantic(vegetation=0.4, building=0.35, sky=0.2),
+        "interest_tags": ["cafe", "history", "local_market"],
     },
     {
         "name": "이스탄불",
@@ -201,6 +220,7 @@ _DESTINATION_PROFILES: Tuple[Dict[str, Any], ...] = (
         "scene": _scene(culture=0.92, city=0.3, food=0.15),
         "visual": _visual(0.7, 0.65, 0.52, 0.72),
         "semantic": _semantic(building=0.45, water=0.2, sky=0.25),
+        "interest_tags": ["history", "local_market", "street_food"],
     },
     {
         "name": "바르셀로나",
@@ -208,6 +228,7 @@ _DESTINATION_PROFILES: Tuple[Dict[str, Any], ...] = (
         "scene": _scene(culture=0.9, beach=0.15, city=0.2),
         "visual": _visual(0.78, 0.72, 0.48, 0.75),
         "semantic": _semantic(building=0.4, water=0.18, sky=0.28),
+        "interest_tags": ["cafe", "art", "shopping"],
     },
     {
         "name": "앙코르와트",
@@ -215,6 +236,7 @@ _DESTINATION_PROFILES: Tuple[Dict[str, Any], ...] = (
         "scene": _scene(culture=0.97, nature=0.2),
         "visual": _visual(0.68, 0.58, 0.5, 0.6),
         "semantic": _semantic(vegetation=0.45, building=0.4, sky=0.25),
+        "interest_tags": ["history", "art"],
     },
     # festival
     {
@@ -223,6 +245,7 @@ _DESTINATION_PROFILES: Tuple[Dict[str, Any], ...] = (
         "scene": _scene(festival=0.95, city=0.3, culture=0.2),
         "visual": _visual(0.62, 0.78, 0.6, 0.55),
         "semantic": _semantic(building=0.45, sky=0.2),
+        "interest_tags": ["shopping", "art", "cafe"],
     },
     {
         "name": "비엔나",
@@ -230,6 +253,7 @@ _DESTINATION_PROFILES: Tuple[Dict[str, Any], ...] = (
         "scene": _scene(festival=0.9, culture=0.35),
         "visual": _visual(0.65, 0.7, 0.55, 0.5),
         "semantic": _semantic(building=0.5, sky=0.25, vegetation=0.15),
+        "interest_tags": ["art", "history", "cafe"],
     },
     {
         "name": "리우데자네이루",
@@ -237,6 +261,7 @@ _DESTINATION_PROFILES: Tuple[Dict[str, Any], ...] = (
         "scene": _scene(festival=0.88, beach=0.2, culture=0.15),
         "visual": _visual(0.75, 0.85, 0.55, 0.8),
         "semantic": _semantic(water=0.3, sky=0.25, building=0.2),
+        "interest_tags": ["nightlife", "street_food", "sports"],
     },
     {
         "name": "에든버러",
@@ -244,6 +269,7 @@ _DESTINATION_PROFILES: Tuple[Dict[str, Any], ...] = (
         "scene": _scene(festival=0.85, culture=0.3),
         "visual": _visual(0.55, 0.6, 0.62, 0.35),
         "semantic": _semantic(building=0.48, sky=0.35, vegetation=0.2),
+        "interest_tags": ["history", "art", "nightlife"],
     },
     {
         "name": "뉴욕 브로드웨이",
@@ -251,6 +277,7 @@ _DESTINATION_PROFILES: Tuple[Dict[str, Any], ...] = (
         "scene": _scene(festival=0.92, city=0.5),
         "visual": _visual(0.5, 0.75, 0.72, 0.42),
         "semantic": _semantic(building=0.55, sky=0.15, food=0.08),
+        "interest_tags": ["nightlife", "art", "shopping"],
     },
     # food
     {
@@ -259,6 +286,7 @@ _DESTINATION_PROFILES: Tuple[Dict[str, Any], ...] = (
         "scene": _scene(food=0.95, culture=0.25),
         "visual": _visual(0.75, 0.7, 0.48, 0.78),
         "semantic": _semantic(food=0.35, building=0.3, sky=0.2),
+        "interest_tags": ["street_food", "history", "local_market"],
     },
     {
         "name": "방콕",
@@ -266,6 +294,7 @@ _DESTINATION_PROFILES: Tuple[Dict[str, Any], ...] = (
         "scene": _scene(food=0.92, city=0.25, culture=0.15),
         "visual": _visual(0.7, 0.8, 0.5, 0.75),
         "semantic": _semantic(food=0.3, building=0.35, water=0.12),
+        "interest_tags": ["street_food", "local_market", "nightlife"],
     },
     {
         "name": "오사카",
@@ -273,6 +302,7 @@ _DESTINATION_PROFILES: Tuple[Dict[str, Any], ...] = (
         "scene": _scene(food=0.93, city=0.3),
         "visual": _visual(0.68, 0.72, 0.55, 0.5),
         "semantic": _semantic(food=0.32, building=0.4, sky=0.15),
+        "interest_tags": ["local_market", "street_food", "cafe"],
     },
     {
         "name": "멕시코시티",
@@ -280,6 +310,7 @@ _DESTINATION_PROFILES: Tuple[Dict[str, Any], ...] = (
         "scene": _scene(food=0.9, culture=0.2),
         "visual": _visual(0.72, 0.82, 0.52, 0.7),
         "semantic": _semantic(food=0.28, building=0.38, sky=0.22),
+        "interest_tags": ["street_food", "local_market", "history"],
     },
     {
         "name": "이스탄불 (미식)",
@@ -287,6 +318,7 @@ _DESTINATION_PROFILES: Tuple[Dict[str, Any], ...] = (
         "scene": _scene(food=0.94, culture=0.35),
         "visual": _visual(0.7, 0.68, 0.5, 0.74),
         "semantic": _semantic(food=0.38, building=0.35, water=0.15),
+        "interest_tags": ["street_food", "history", "local_market"],
     },
 )
 
@@ -308,6 +340,26 @@ def _flatten_vector(
         + [sem[k] for k in _SEMANTIC_KEYS]
     )
     return np.asarray(parts, dtype=np.float64)
+
+
+def _normalize_interest_tags(
+    interest_tags: Optional[List[str]],
+) -> set[str]:
+    if not interest_tags:
+        return set()
+    out: set[str] = set()
+    for tag in interest_tags:
+        if isinstance(tag, str) and tag.strip():
+            out.add(tag.strip().lower())
+    return out
+
+
+def _interest_bonus(user_tags: set[str], dest_tags: Sequence[str]) -> float:
+    if not user_tags or not dest_tags:
+        return 0.0
+    dest_set = {str(t).strip().lower() for t in dest_tags if str(t).strip()}
+    matches = len(user_tags & dest_set)
+    return min(matches * _INTEREST_MATCH_BONUS, _INTEREST_BONUS_MAX)
 
 
 def _cosine_similarity(a: np.ndarray, b: np.ndarray) -> float:
@@ -391,11 +443,13 @@ def recommend(
     preference_vector: Mapping[str, Any],
     photo_top_categories: Optional[Sequence[str]] = None,
     detected_objects: Optional[set] = None,
+    interest_tags: Optional[List[str]] = None,
 ) -> Dict[str, Any]:
     """
-  Recommend Top-3 destinations via cosine similarity to hand-crafted destination profiles.
+    Recommend Top-3 destinations via cosine similarity + interest-tag bonus.
 
-  photo_top_categories: top_category from each photo in a session; if all differ, triggers random mode.
+    photo_top_categories: top_category from each photo in a session; if all differ, triggers random mode.
+    interest_tags: user interest tag strings; +0.05 per overlap with destination (max +0.20).
     """
     top_category = str(preference_vector.get("top_category", ""))
 
@@ -406,6 +460,7 @@ def recommend(
         return _random_recommendation(preference_vector, reason=reason)
 
     user_vec = _preference_to_array(preference_vector)
+    user_interests = _normalize_interest_tags(interest_tags)
     ranked: List[Tuple[str, float]] = []
 
     for profile in _DESTINATION_PROFILES:
@@ -414,7 +469,11 @@ def recommend(
             profile["visual"],
             _fix_semantic(profile["semantic"]),
         )
-        score = _cosine_similarity(user_vec, dest_vec)
+        cosine = _cosine_similarity(user_vec, dest_vec)
+        bonus = _interest_bonus(
+            user_interests, profile.get("interest_tags", [])
+        )
+        score = cosine + bonus
         ranked.append((str(profile["name"]), score))
 
     ranked.sort(key=lambda x: (-x[1], x[0]))
