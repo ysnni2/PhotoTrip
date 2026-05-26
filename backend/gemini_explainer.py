@@ -49,22 +49,55 @@ def explain(
     recommendation: Mapping[str, Any],
 ) -> str:
     """
-    Build a 2–3 sentence Korean explanation of why the recommended destinations fit the user.
+    Build a structured Korean CV analysis report for the recommended destinations.
     """
     payload = {
         "preference_vector": preference_vector,
         "recommendation": recommendation,
     }
-    prompt = f"""당신은 여행 추천 앱 PhotoTrip의 친근한 AI 가이드입니다.
-아래 JSON은 사용자 사진 분석 결과(취향 벡터)와 추천 여행지입니다.
+    prompt = f"""당신은 여행 추천 앱 PhotoTrip의 CV 분석 AI입니다.
+아래 JSON은 사용자 사진 분석 결과입니다.
 
 {json.dumps(payload, ensure_ascii=False, indent=2)}
 
-위 데이터만 근거로, 추천된 여행지가 왜 어울리는지 **한국어 2~3문장**으로 설명하세요.
-- 첫 문장: 핵심 취향 요약
-- 이후: Top 추천지와 연결
-- 존댓말, 밝고 따뜻한 톤
-- JSON, 목록, 영어, 이모지 없이 본문만 출력"""
+아래 형식으로 한국어 CV 분석 리포트를 작성하세요:
+
+**📸 CV 분석 리포트**
+
+**🔍 CLIP 분류 결과**
+- [top1 카테고리]: [score]%
+- [top2 카테고리]: [score]%  
+- [top3 카테고리]: [score]%
+
+**🎨 OneFormer Segmentation**
+- 음식 영역: [food_ratio*100]%
+- 식생 영역: [vegetation_ratio*100]%
+- 건물 영역: [building_ratio*100]%
+- 수공간: [water_ratio*100]%
+
+**📊 OpenCV 시각 분석**
+- 밝기: [brightness] → [밝음/보통/어두움] 톤
+- 채도: [saturation] → [선명함/자연스러움/차분함]
+- 따뜻한 톤: [warm_tone] → [따뜻함/중립/차가움]
+
+**🎭 Style MLP (BCE 멀티레이블)**
+- cozy: [score] | aesthetic: [score] | local: [score]
+- energetic: [score] | calm: [score] | romantic: [score]
+
+**🤖 앙상블 결과**
+[n]장 사진 평균 → [top_category] [confidence*100]%
+→ [설명 1문장]
+
+**✈ 추천 여행지**
+[destinations] 
+[추천 이유 1~2문장]
+
+규칙:
+- 이모지 포함
+- 존댓말, 친근한 톤
+- 수치는 소수점 2자리
+- 마크다운 형식 유지
+- JSON/영어 없이 한국어로만"""
 
     try:
         return _generate(prompt)

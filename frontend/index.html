@@ -3,125 +3,371 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>PhotoTrip — 탑승권</title>
+    <title>AI Vision &amp; Travel</title>
     <link rel="stylesheet" href="/static/style.css" />
   </head>
   <body>
     <!-- Screen 1: Main -->
     <section id="screen-main" class="screen active" aria-label="메인">
-      <div class="stars" aria-hidden="true"></div>
-      <div class="ticket-wrap">
-        <article class="ticket" id="ticket-main">
-          <div class="ticket-map" aria-hidden="true"></div>
-          <div class="ticket-route">
-            <div>
-              <div class="airport-code">ICN</div>
-              <div class="airport-name">인천</div>
+      <div class="main-page">
+        <header class="main-hero">
+          <div class="main-hero__plane" aria-hidden="true">✈</div>
+          <h1 class="main-hero__title">Virtual Boarding Pass</h1>
+          <p class="main-hero__subtitle">인천국제공항에서 미지의 목적지로</p>
+        </header>
+
+        <article class="main-ticket" id="ticket-main">
+          <div class="main-ticket__top">
+            <svg class="main-barcode-svg main-barcode-svg--left" viewBox="0 0 52 70" aria-hidden="true">
+              <rect x="0" y="0" width="3" height="70" fill="#1a2e4a" />
+              <rect x="5" y="0" width="2" height="70" fill="#1a2e4a" />
+              <rect x="9" y="0" width="4" height="70" fill="#1a2e4a" />
+              <rect x="15" y="0" width="2" height="70" fill="#1a2e4a" />
+              <rect x="19" y="0" width="3" height="70" fill="#1a2e4a" />
+              <rect x="24" y="0" width="2" height="70" fill="#1a2e4a" />
+              <rect x="28" y="0" width="5" height="70" fill="#1a2e4a" />
+              <rect x="35" y="0" width="2" height="70" fill="#1a2e4a" />
+              <rect x="39" y="0" width="3" height="70" fill="#1a2e4a" />
+              <rect x="44" y="0" width="2" height="70" fill="#1a2e4a" />
+              <rect x="48" y="0" width="4" height="70" fill="#1a2e4a" />
+            </svg>
+
+            <div class="main-ticket__brand">
+              <p class="main-ticket__brand-title">BOARDING PASS</p>
+              <p class="main-ticket__brand-sub">VIRTUAL TRAVEL EXPERIENCE</p>
             </div>
-            <div class="route-mid">
-              <span class="route-plane">✈</span>
-              <span class="route-time" data-flight-hours>12h 40m</span>
-            </div>
-            <div>
-              <div class="airport-code" data-to-code>???</div>
-              <div class="airport-name" data-to-name>목적지</div>
+
+            <div class="main-time-box">
+              <p class="main-time-box__label">⏱ CURRENT TIME</p>
+              <p class="main-time-box__clock" id="main-clock">00:00:00</p>
+              <p class="main-time-box__date" id="main-clock-date">—</p>
             </div>
           </div>
-          <dl class="ticket-meta">
-            <div><dt>Flight No.</dt><dd data-flight-no>PT 2026</dd></div>
-            <div><dt>Distance</dt><dd data-distance>—</dd></div>
-            <div><dt>Boarding</dt><dd data-boarding>Gate A12</dd></div>
-            <div><dt>Date</dt><dd data-date>—</dd></div>
-          </dl>
-          <div class="ticket-barcode" aria-hidden="true"></div>
-          <button type="button" class="ticket-fab" aria-label="비행기">✈</button>
+
+          <div class="main-passenger">
+            <label class="main-passenger__label" for="passenger-name-input">
+              <span aria-hidden="true">👤</span> PASSENGER NAME
+            </label>
+            <input
+              type="text"
+              id="passenger-name-input"
+              class="main-passenger__input"
+              placeholder="이름을 입력하세요"
+              autocomplete="name"
+            />
+          </div>
+
+          <div class="main-route-card">
+            <div class="main-route-col">
+              <span class="main-route-label">FROM</span>
+              <span class="main-route-code">ICN</span>
+              <span class="main-route-airport">인천국제공항</span>
+              <span class="main-route-place">Incheon, South Korea 🇰🇷</span>
+            </div>
+            <div class="main-route-mid" aria-hidden="true">
+              <span class="main-route-line"></span>
+              <span class="main-route-plane">✈</span>
+            </div>
+            <div class="main-route-col main-route-col--to">
+              <span class="main-route-label">TO</span>
+              <span class="main-route-code main-route-code--unknown" data-to-code>???</span>
+              <span class="main-route-airport" data-to-name>미지의 목적지</span>
+              <span class="main-route-place">Unknown Destination ✨</span>
+            </div>
+          </div>
+
+          <div class="main-flight-grid">
+            <div class="main-flight-box">
+              <span class="main-flight-box__label">FLIGHT</span>
+              <span class="main-flight-box__value">PT2026</span>
+            </div>
+            <div class="main-flight-box">
+              <span class="main-flight-box__label">DATE</span>
+              <span class="main-flight-box__value" id="main-flight-date">—</span>
+            </div>
+            <div class="main-flight-box">
+              <span class="main-flight-box__label">GATE</span>
+              <span class="main-flight-box__value">--</span>
+            </div>
+            <div class="main-flight-box">
+              <span class="main-flight-box__label">SEAT</span>
+              <span class="main-flight-box__value">--</span>
+            </div>
+          </div>
+
+          <div class="main-divider" aria-hidden="true"></div>
+
+          <div class="main-ticket__bottom">
+            <div class="main-boarding">
+              <div class="main-boarding__icon" aria-hidden="true">🕐</div>
+              <div class="main-boarding__text">
+                <span class="main-boarding__label">BOARDING TIME</span>
+                <span class="main-boarding__time" id="main-boarding-time">00:00:00</span>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              class="main-barcode"
+              title="클릭하여 탑승권 발급받기"
+              aria-label="클릭하여 탑승권 발급받기"
+            >
+              <svg class="main-barcode-svg" viewBox="0 0 52 70" aria-hidden="true">
+                <rect x="0" y="0" width="3" height="70" fill="currentColor" />
+                <rect x="5" y="0" width="2" height="70" fill="currentColor" />
+                <rect x="9" y="0" width="4" height="70" fill="currentColor" />
+                <rect x="15" y="0" width="2" height="70" fill="currentColor" />
+                <rect x="19" y="0" width="3" height="70" fill="currentColor" />
+                <rect x="24" y="0" width="2" height="70" fill="currentColor" />
+                <rect x="28" y="0" width="5" height="70" fill="currentColor" />
+                <rect x="35" y="0" width="2" height="70" fill="currentColor" />
+                <rect x="39" y="0" width="3" height="70" fill="currentColor" />
+                <rect x="44" y="0" width="2" height="70" fill="currentColor" />
+                <rect x="48" y="0" width="4" height="70" fill="currentColor" />
+              </svg>
+            </button>
+          </div>
         </article>
+
+        <p class="main-footer-note">🔥 현재 시각이 실시간으로 반영되는 가상 탑승권입니다</p>
       </div>
-      <button type="button" class="btn-issue" id="btn-issue">탑승권 발급받기</button>
     </section>
 
     <!-- Screen 2: Upload -->
     <section id="screen-upload" class="screen" aria-label="업로드">
-      <header class="upload-header">
-        <h2>PhotoTrip</h2>
-        <p>일상 사진 5~7장을 업로드하세요</p>
-      </header>
-      <label class="upload-drop" id="upload-drop">
-        <input type="file" id="file-input" accept="image/*" multiple />
-        <p><strong>탭하여 선택</strong> 또는 사진을 끌어다 놓으세요</p>
-        <p class="upload-count" id="upload-count">0 / 7장</p>
-      </label>
-      <div class="preview-grid" id="preview-grid"></div>
-      <button type="button" class="btn-analyze" id="btn-analyze" disabled>분석 시작</button>
+      <div class="upload-page">
+        <header class="upload-header">
+          <h2 class="upload-logo">PhotoTrip</h2>
+          <p class="upload-subtitle">일상 사진 5~7장을 업로드하세요</p>
+        </header>
+
+        <label class="upload-drop" id="upload-drop">
+          <input type="file" id="file-input" accept="image/*" multiple />
+          <span class="upload-drop__icon" aria-hidden="true">☁</span>
+          <p class="upload-drop__text">탭하여 선택 또는 끌어다 놓으세요</p>
+        </label>
+
+        <div class="preview-grid" id="preview-grid"></div>
+
+        <p class="upload-count upload-count--warn" id="upload-count">0 / 7장</p>
+
+        <button type="button" class="btn-analyze" id="btn-analyze" disabled>
+          ✨ AI 분석 시작하기
+        </button>
+      </div>
     </section>
 
     <!-- Screen 3: Gesture -->
     <section id="screen-gesture" class="screen" aria-label="제스처">
-      <div class="stars" aria-hidden="true"></div>
-      <p class="gesture-hint">✈ 비행기를 날려보세요!</p>
-      <div class="gesture-area" id="gesture-area">
-        <svg class="gesture-trail" id="gesture-trail" xmlns="http://www.w3.org/2000/svg">
-          <polyline id="gesture-poly" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" />
-        </svg>
-        <div class="gesture-plane" id="gesture-plane" role="img" aria-label="드래그하여 비행">✈</div>
+      <div class="gesture-page">
+        <header class="gesture-header">
+          <p class="gesture-hint">✈ 비행기를 날려보세요!</p>
+          <p class="gesture-subhint">오른쪽 위 방향으로 드래그하세요</p>
+        </header>
+        <div class="gesture-area" id="gesture-area">
+          <svg class="gesture-trail" id="gesture-trail" xmlns="http://www.w3.org/2000/svg">
+            <polyline id="gesture-poly" fill="none" stroke-width="3" stroke-linecap="round" />
+          </svg>
+          <div class="gesture-plane" id="gesture-plane" role="img" aria-label="드래그하여 비행">✈</div>
+        </div>
       </div>
     </section>
 
     <!-- Screen 3-B: Loading -->
     <section id="screen-loading" class="screen" aria-label="분석 중">
-      <div class="stars" aria-hidden="true"></div>
-      <div class="loading-map">
-        <div class="loading-line" aria-hidden="true"></div>
-        <span class="loading-plane" aria-hidden="true">✈</span>
+      <div class="loading-page">
+        <article class="loading-card">
+          <h2 class="loading-title" id="loading-title">✈ ANALYZING...</h2>
+
+          <img
+            id="loading-thumb"
+            class="loading-thumb"
+            alt="분석 중인 사진"
+            width="80"
+            height="80"
+            hidden
+          />
+
+          <div class="loading-route">
+            <div class="loading-route-end">
+              <span class="loading-route-label">FROM</span>
+              <span class="loading-route-code">ICN</span>
+            </div>
+            <div class="loading-map">
+              <div class="loading-line" aria-hidden="true"></div>
+              <span class="loading-plane" aria-hidden="true">✈</span>
+            </div>
+            <div class="loading-route-end loading-route-end--to">
+              <span class="loading-route-label">TO</span>
+              <span class="loading-route-code loading-route-code--dest">???</span>
+            </div>
+          </div>
+
+          <p class="loading-photo-count" id="loading-photo-count">사진 1 / 7 분석 중...</p>
+
+          <div class="loading-progress-track" aria-hidden="true">
+            <div id="loading-progress-bar" class="loading-progress-bar"></div>
+          </div>
+
+          <p class="loading-distance" id="loading-distance">Distance: 9,742 km</p>
+
+          <p class="loading-sub" id="loading-sub" hidden>분석 중...</p>
+        </article>
       </div>
-      <p class="loading-title">AI가 취향을 분석하는 중...</p>
-      <p class="loading-sub" id="loading-sub">Distance: 9,742 km | Time remaining: 분석 중...</p>
     </section>
 
     <!-- Screen 4: Result -->
     <section id="screen-result" class="screen" aria-label="결과">
-      <div class="result-scene">
-        <canvas id="scene-canvas"></canvas>
-      </div>
-      <div class="result-body">
-        <p id="gemini-text">분석 결과를 불러오는 중입니다.</p>
-        <div class="result-footer">
-          <div class="ticket-wrap">
-            <article class="ticket ticket--on-white" id="ticket-result">
-              <div class="ticket-map" aria-hidden="true"></div>
-              <div class="ticket-route">
-                <div>
-                  <div class="airport-code">ICN</div>
-                  <div class="airport-name">인천</div>
-                </div>
-                <div class="route-mid">
-                  <span class="route-plane">✈</span>
-                  <span class="route-time" id="result-flight-hours">—</span>
-                </div>
-                <div>
-                  <div class="airport-code" id="result-to-code">—</div>
-                  <div class="airport-name" id="result-to-name">—</div>
-                </div>
-              </div>
-              <dl class="ticket-meta">
-                <div><dt>Flight No.</dt><dd id="result-flight-no">—</dd></div>
-                <div><dt>Distance</dt><dd id="result-distance">—</dd></div>
-                <div><dt>Boarding</dt><dd id="result-boarding">—</dd></div>
-                <div><dt>Date</dt><dd id="result-date">—</dd></div>
-              </dl>
-              <div class="ticket-barcode" aria-hidden="true"></div>
-            </article>
+      <div class="result-layout">
+        <div class="result-left">
+          <div class="result-scene" aria-label="3D travel scene">
+            <canvas id="scene-canvas"></canvas>
           </div>
-          <div class="dest-tabs" id="dest-tabs" role="tablist"></div>
-          <button type="button" class="btn-bucket" id="btn-bucket">🌱 버킷리스트 저장</button>
+
+          <section class="result-cv glass-card" aria-label="CV Analysis Results">
+            <h2 class="glass-card__title result-cv__title">CV Analysis Results</h2>
+            <div class="cv-ensemble">
+              <div id="cv-ensemble-hero" class="cv-ensemble-hero"></div>
+              <div id="cv-scene-bars" class="cv-scene-bars"></div>
+              <div id="cv-visual-metrics" class="cv-visual-metrics"></div>
+            </div>
+            <div class="per-image-strip" id="per-image-strip" role="list"></div>
+            <div class="per-image-detail" id="per-image-detail" hidden></div>
+          </section>
+        </div>
+
+        <div class="result-right">
+          <article id="gemini-explain-card" class="gemini-explain-card" aria-label="Gemini 분석 설명">
+            <div id="gemini-assist" class="gemini-assist">
+              <div id="gemini-user-summary" class="gemini-user-summary"></div>
+              <button type="button" id="btn-toggle-cv-detail" class="btn-toggle-cv-detail">
+                🔬 CV 상세 분석 보기 ▼
+              </button>
+              <div id="gemini-cv-detail" class="gemini-cv-detail"></div>
+            </div>
+          </article>
+
+          <section class="result-chat gemini-panel glass-card" aria-label="Flying">
+            <h2 class="gemini-panel__title">✈ Flying</h2>
+            <div class="gemini-panel__body">
+              <div class="chat-messages" id="chat-messages" role="log" aria-live="polite"></div>
+              <div class="chat-input-row">
+                <input
+                  type="text"
+                  id="chat-input"
+                  class="chat-input"
+                  placeholder="메시지를 입력하세요..."
+                  autocomplete="off"
+                />
+                <button type="button" class="btn-chat-send" id="btn-chat-send" aria-label="전송">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path
+                      d="M3 11.5L20.5 4L12.5 12.5M20.5 4L14 20L12.5 12.5M20.5 4L12.5 12.5L3 11.5"
+                      stroke="currentColor"
+                      stroke-width="1.8"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                </button>
+              </div>
+              <p class="result-chat__hint">여행 계획, 음식, 숙소 등 무엇이든 물어보세요</p>
+            </div>
+          </section>
+
+          <div class="result-boarding-trigger">
+            <button type="button" class="btn-boarding-open" id="btn-boarding-open">
+              <span class="btn-boarding-open__barcode" aria-hidden="true">▌▌▌▌</span>
+              탑승권 발급하기
+            </button>
+          </div>
         </div>
       </div>
     </section>
 
+    <!-- Screen 5: Bucket list -->
+    <section id="screen-bucket" class="screen" aria-label="버킷리스트">
+      <header class="bucket-header">
+        <button type="button" class="btn-bucket-back" id="btn-bucket-back" aria-label="뒤로가기">
+          ← 뒤로
+        </button>
+        <h1 class="bucket-header__title">버킷리스트</h1>
+      </header>
+      <ul class="bucket-list" id="bucket-list"></ul>
+    </section>
+
+    <div id="bucket-toast" class="bucket-toast" role="status" aria-live="polite" hidden>
+      <p class="bucket-toast__text">저장됐어요! 버킷리스트 목록 보러 가실래요?</p>
+      <button type="button" class="bucket-toast__action" id="btn-toast-bucket">보러가기</button>
+    </div>
+
+    <div id="boarding-modal" class="boarding-modal" aria-hidden="true" role="dialog" aria-modal="true">
+      <div class="boarding-modal__backdrop" data-close-modal></div>
+      <div class="boarding-modal__dialog">
+        <button type="button" class="boarding-modal__close" id="btn-boarding-close" aria-label="닫기">
+          ×
+        </button>
+        <article class="boarding-card" id="ticket-result">
+          <div class="boarding-card__head">
+            <h2 class="boarding-card__title">Virtual Boarding Pass</h2>
+            <span class="boarding-card__plane" aria-hidden="true">✈</span>
+          </div>
+
+          <div class="route-card">
+            <div class="route-end">
+              <span class="route-prefix">From</span>
+              <div class="route-code">ICN</div>
+              <div class="route-city">Incheon</div>
+            </div>
+            <div class="route-mid" aria-hidden="true">
+              <span class="route-line"></span>
+              <span class="route-plane-icon">✈</span>
+            </div>
+            <div class="route-end route-end--dest">
+              <span class="route-prefix">To</span>
+              <div class="route-code" id="result-to-code">—</div>
+              <div class="route-city" id="result-to-name">—</div>
+            </div>
+          </div>
+
+          <p class="dest-tabs-label">Select Destination</p>
+          <div class="dest-tabs" id="dest-tabs" role="tablist"></div>
+
+          <ul class="trip-details">
+            <li>
+              <span class="trip-details__icon" aria-hidden="true">📍</span>
+              <span id="result-location">—</span>
+            </li>
+            <li>
+              <span class="trip-details__icon" aria-hidden="true">📅</span>
+              <span id="result-date">—</span>
+            </li>
+            <li>
+              <span class="trip-details__icon" aria-hidden="true">🕐</span>
+              <span id="result-time">—</span>
+            </li>
+          </ul>
+
+          <button type="button" class="btn-bucket" id="btn-bucket">
+            <span class="btn-bucket__icon" aria-hidden="true">🌱</span>
+            Save to Bucket List
+          </button>
+        </article>
+      </div>
+    </div>
+
     <script type="module">
       import { initScene, updateScene } from "/static/three_scene.js";
 
-      const SCREENS = ["screen-main", "screen-upload", "screen-gesture", "screen-loading", "screen-result"];
+      const SCREENS = [
+        "screen-main",
+        "screen-upload",
+        "screen-gesture",
+        "screen-loading",
+        "screen-result",
+        "screen-bucket",
+      ];
+      const BUCKET_STORAGE_KEY = "phototrip_bucket_list";
       const MIN_PHOTOS = 5;
       const MAX_PHOTOS = 7;
 
@@ -161,9 +407,92 @@
         "Kyoto (culture)": "UKY",
       };
 
+      const SCENE_LABELS = {
+        nature: "자연",
+        beach: "해변",
+        city: "도시",
+        culture: "문화",
+        food: "음식",
+        festival: "축제",
+      };
+
+      const SCENE_LABELS_EN = {
+        nature: "Nature",
+        beach: "Beach",
+        city: "City",
+        culture: "Culture",
+        food: "Food",
+        festival: "Festival",
+      };
+
+      const SCENE_COLORS = {
+        nature: "#4caf50",
+        beach: "#00bcd4",
+        city: "#607d8b",
+        culture: "#d4a574",
+        food: "#ff7043",
+        festival: "#ab47bc",
+      };
+
+      const DEST_COUNTRY = {
+        나폴리: "IT",
+        방콕: "TH",
+        이스탄불: "TR",
+        "이스탄불 (미식)": "TR",
+        로마: "IT",
+        파리: "FR",
+        도쿄: "JP",
+        교토: "JP",
+        오사카: "JP",
+        뉴욕: "US",
+        "뉴욕 브로드웨이": "US",
+        발리: "ID",
+        홍콩: "HK",
+        싱가포르: "SG",
+        바르셀로나: "ES",
+        밀라노: "IT",
+        비엔나: "AT",
+        제주: "KR",
+      };
+
+      const DEST_DISPLAY = {
+        나폴리: "Naples, Italy",
+        방콕: "Bangkok, Thailand",
+        이스탄불: "Istanbul, Turkey",
+        "이스탄불 (미식)": "Istanbul, Turkey",
+        로마: "Rome, Italy",
+        파리: "Paris, France",
+        도쿄: "Tokyo, Japan",
+        교토: "Kyoto, Japan",
+        발리: "Bali, Indonesia",
+        뉴욕: "New York, USA",
+        홍콩: "Hong Kong",
+        싱가포르: "Singapore",
+      };
+
+      const CV_METRICS = [
+        { key: "brightness", label: "Brightness", icon: "sun" },
+        { key: "saturation", label: "Saturation", icon: "palette" },
+        { key: "warm_tone", label: "Warm tone", icon: "palette" },
+      ];
+
+      const SCENE_EMOJI = {
+        nature: "🌲",
+        beach: "🌊",
+        city: "🏙️",
+        culture: "🏛️",
+        food: "🍕",
+        festival: "🎆",
+      };
+
       let uploadedFiles = [];
       let analysisData = null;
       let activeDestIndex = 0;
+      let selectedPerImageIndex = 0;
+      let perImageThumbUrls = [];
+      let previewObjectUrls = [];
+      let chatBusy = false;
+      let bucketReturnScreen = "screen-result";
 
       const gestureState = {
         dragging: false,
@@ -179,11 +508,161 @@
         if (id === "screen-result") {
           initScene(document.getElementById("scene-canvas"));
         }
+        if (id === "screen-main") {
+          updateMainClock();
+        }
+      }
+
+      let mainClockTimer = null;
+
+      function pad2(n) {
+        return String(n).padStart(2, "0");
+      }
+
+      function updateMainClock() {
+        const now = new Date();
+        const time = `${pad2(now.getHours())}:${pad2(now.getMinutes())}:${pad2(now.getSeconds())}`;
+        const dateKr = `${now.getFullYear()}년 ${pad2(now.getMonth() + 1)}월 ${pad2(now.getDate())}일`;
+
+        const clock = document.getElementById("main-clock");
+        const boarding = document.getElementById("main-boarding-time");
+        const dateEl = document.getElementById("main-clock-date");
+
+        if (clock) clock.textContent = time;
+        if (boarding) boarding.textContent = time;
+        if (dateEl) dateEl.textContent = dateKr;
+      }
+
+      function initMainClock() {
+        if (mainClockTimer) clearInterval(mainClockTimer);
+        updateMainClock();
+        mainClockTimer = setInterval(updateMainClock, 1000);
       }
 
       function formatDate() {
         const d = new Date();
         return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, "0")}.${String(d.getDate()).padStart(2, "0")}`;
+      }
+
+      function formatDateEn() {
+        const d = new Date();
+        const months = [
+          "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+          "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+        ];
+        return `${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
+      }
+
+      function destTabLabel(name) {
+        const code = DEST_COUNTRY[name] || iataFor(name).slice(0, 2);
+        return `${code} ${name}`;
+      }
+
+      function destLocationLabel(name) {
+        return DEST_DISPLAY[name] || name;
+      }
+
+      function escapeHtml(str) {
+        return String(str)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;");
+      }
+
+      function countryCodeToFlag(code) {
+        if (!code || code.length !== 2) return "🌍";
+        const upper = code.toUpperCase();
+        return String.fromCodePoint(
+          ...[...upper].map((c) => 0x1f1e6 + c.charCodeAt(0) - 65)
+        );
+      }
+
+      function getCurrentDestinationName() {
+        const rec = analysisData?.recommendation || {};
+        const dests = rec.destinations || [];
+        return dests[activeDestIndex] || dests[0] || "—";
+      }
+
+      function loadBucketList() {
+        try {
+          const raw = localStorage.getItem(BUCKET_STORAGE_KEY);
+          return raw ? JSON.parse(raw) : [];
+        } catch {
+          return [];
+        }
+      }
+
+      function saveBucketList(list) {
+        localStorage.setItem(BUCKET_STORAGE_KEY, JSON.stringify(list));
+      }
+
+      function addCurrentDestinationToBucket() {
+        const name = getCurrentDestinationName();
+        if (!name || name === "—") return false;
+
+        const country = DEST_COUNTRY[name] || "KR";
+        const item = {
+          id: String(Date.now()),
+          city: name,
+          date: formatDateEn(),
+          flag: countryCodeToFlag(country),
+        };
+
+        const list = loadBucketList();
+        if (list.some((entry) => entry.city === name)) return false;
+
+        list.unshift(item);
+        saveBucketList(list);
+        return true;
+      }
+
+      function renderBucketList() {
+        const listEl = document.getElementById("bucket-list");
+        const list = loadBucketList();
+
+        if (!list.length) {
+          listEl.innerHTML = '<li class="bucket-empty">저장된 여행지가 없습니다.</li>';
+          return;
+        }
+
+        listEl.innerHTML = list
+          .map(
+            (item) => `
+          <li class="bucket-item">
+            <span class="bucket-item__flag" aria-hidden="true">${item.flag || "🌍"}</span>
+            <div class="bucket-item__body">
+              <span class="bucket-item__city">${escapeHtml(item.city)}</span>
+              <span class="bucket-item__date">${escapeHtml(item.date)}</span>
+            </div>
+          </li>`
+          )
+          .join("");
+      }
+
+      function showBucketToast() {
+        const toast = document.getElementById("bucket-toast");
+        toast.hidden = false;
+        toast.classList.add("is-visible");
+        clearTimeout(showBucketToast._timer);
+        showBucketToast._timer = setTimeout(() => hideBucketToast(), 8000);
+      }
+
+      function hideBucketToast() {
+        const toast = document.getElementById("bucket-toast");
+        toast.classList.remove("is-visible");
+        toast.hidden = true;
+      }
+
+      function openBucketScreen() {
+        bucketReturnScreen =
+          document.querySelector(".screen.active")?.id === "screen-bucket"
+            ? bucketReturnScreen
+            : document.querySelector(".screen.active")?.id || "screen-result";
+        hideBucketToast();
+        closeBoardingModal();
+        renderBucketList();
+        showScreen("screen-bucket");
       }
 
       function iataFor(name) {
@@ -193,42 +672,330 @@
       }
 
       function setMainTicketPending() {
-        document.querySelector("#ticket-main [data-to-code]").textContent = "???";
-        document.querySelector("#ticket-main [data-to-name]").textContent = "목적지";
-        document.querySelector("#ticket-main [data-distance]").textContent = "—";
-        document.querySelector("#ticket-main [data-date]").textContent = formatDate();
+        const toCode = document.querySelector("#ticket-main [data-to-code]");
+        const toName = document.querySelector("#ticket-main [data-to-name]");
+        if (toCode) toCode.textContent = "???";
+        if (toName) toName.textContent = "미지의 목적지";
+
+        const flightDate = document.getElementById("main-flight-date");
+        if (flightDate) {
+          const d = new Date();
+          const months = [
+            "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+            "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+          ];
+          flightDate.textContent = `${d.getDate()} ${months[d.getMonth()]}`;
+        }
       }
 
       function updateResultTicket(destName, score) {
         const code = iataFor(destName);
         document.getElementById("result-to-code").textContent = code;
         document.getElementById("result-to-name").textContent = destName;
-        document.getElementById("result-flight-hours").textContent =
-          score > 0.85 ? "11h 20m" : "13h 05m";
-        document.getElementById("result-flight-no").textContent = `PT ${100 + activeDestIndex}`;
-        document.getElementById("result-distance").textContent =
-          `${Math.round(8200 + score * 2000).toLocaleString()} km`;
-        document.getElementById("result-boarding").textContent = `Gate ${String.fromCharCode(65 + activeDestIndex)}${10 + activeDestIndex}`;
-        document.getElementById("result-date").textContent = formatDate();
+        document.getElementById("result-location").textContent = destLocationLabel(destName);
+        document.getElementById("result-date").textContent = formatDateEn();
+        document.getElementById("result-time").textContent =
+          score > 0.85 ? "11:20 KST" : "14:30 KST";
       }
 
-      function buildGeminiText(pv, rec) {
-        const cat = rec.top_category || "travel";
-        const conf = (pv.confidence * 100).toFixed(0);
-        const scene = pv.scene || {};
-        const topScene = Object.entries(scene).sort((a, b) => b[1] - a[1])[0];
-        const sceneLabel = topScene ? `${topScene[0]}(${(topScene[1] * 100).toFixed(0)}%)` : cat;
-        const dests = (rec.destinations || []).join(", ");
-        const randomNote = rec.is_random
-          ? "사진에서 뚜렷한 단일 취향이 잡히지 않아 다양한 여행지를 제안했어요."
-          : `당신의 사진은 **${cat}** 취향이 ${conf}%로 가장 두드러집니다.`;
+      function revokePerImageUrls() {
+        perImageThumbUrls.forEach((url) => URL.revokeObjectURL(url));
+        perImageThumbUrls = [];
+      }
 
-        return (
-          `${randomNote}\n\n` +
-          `장면 분석상 ${sceneLabel} 요소가 강하고, 시각적으로는 밝기 ${(pv.visual?.brightness ?? 0).toFixed(2)}, ` +
-          `채도 ${(pv.visual?.saturation ?? 0).toFixed(2)}, 따뜻한 톤 ${(pv.visual?.warm_tone ?? 0).toFixed(2)}입니다. ` +
-          `추천 여행지 Top-3: **${dests}**. 마음에 드는 도시를 탭해 탑승권을 확인하고 버킷리스트에 저장해 보세요.`
-        );
+      function sceneBarsHtml(scene, limit = 3) {
+        return Object.entries(scene || {})
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, limit)
+          .map(([name, score]) => {
+            const pct = Math.round(score * 100);
+            const color = SCENE_COLORS[name] || "#0ea5e9";
+            const label = SCENE_LABELS_EN[name] || SCENE_LABELS[name] || name;
+            return `
+              <div class="scene-bar-row">
+                <span class="scene-bar-label">${label}</span>
+                <div class="scene-bar-track" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100">
+                  <div class="scene-bar-fill" style="width:${pct}%; background:${color}"></div>
+                </div>
+                <span class="scene-bar-pct">${pct}%</span>
+              </div>`;
+          })
+          .join("");
+      }
+
+      function visualMetricsHtml(visual) {
+        return CV_METRICS.map(({ key, label }) => {
+          const val = Number(visual?.[key] ?? 0);
+          return `
+            <div class="visual-metric">
+              <span class="visual-metric__label">${label}</span>
+              <span class="visual-metric__value">${val.toFixed(2)}</span>
+            </div>`;
+        }).join("");
+      }
+
+      function renderPerImageDetail(pv, index) {
+        const detail = document.getElementById("per-image-detail");
+        if (!pv) {
+          detail.hidden = true;
+          return;
+        }
+        const catKey = (pv.top_category || "nature").toLowerCase();
+        const label = SCENE_LABELS_EN[catKey] || SCENE_LABELS[catKey] || catKey;
+        const conf = Math.round((pv.confidence ?? 0) * 100);
+        const emoji = SCENE_EMOJI[catKey] || "📷";
+
+        detail.hidden = false;
+        detail.innerHTML = `
+          <p class="per-image-detail__title">Photo ${index + 1} — ${emoji} ${label} (${conf}%)</p>
+          <div class="cv-scene-bars cv-scene-bars--compact">${sceneBarsHtml(pv.scene, 3)}</div>
+          <div class="cv-visual-metrics cv-visual-metrics--compact">${visualMetricsHtml(pv.visual)}</div>`;
+      }
+
+      function renderPerImageCards(perImages) {
+        const strip = document.getElementById("per-image-strip");
+        revokePerImageUrls();
+
+        if (!perImages?.length) {
+          strip.innerHTML = '<p class="per-image-empty">No per-image data</p>';
+          document.getElementById("per-image-detail").hidden = true;
+          return;
+        }
+
+        perImageThumbUrls = uploadedFiles.map((f) => URL.createObjectURL(f));
+        selectedPerImageIndex = Math.min(selectedPerImageIndex, perImages.length - 1);
+
+        strip.innerHTML = perImages
+          .map((pv, i) => {
+            const catKey = (pv.top_category || "nature").toLowerCase();
+            const label = SCENE_LABELS_EN[catKey] || catKey;
+            const conf = Math.round((pv.confidence ?? 0) * 100);
+            const emoji = SCENE_EMOJI[catKey] || "📷";
+            const thumb = perImageThumbUrls[i] || "";
+            return `
+              <button
+                type="button"
+                class="per-image-card${i === selectedPerImageIndex ? " active" : ""}"
+                data-index="${i}"
+                role="listitem"
+              >
+                <img class="per-image-card__thumb" src="${thumb}" alt="Photo ${i + 1}" />
+                <span class="per-image-card__meta">${emoji} ${label} ${conf}%</span>
+              </button>`;
+          })
+          .join("");
+
+        strip.querySelectorAll(".per-image-card").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            selectedPerImageIndex = Number(btn.dataset.index);
+            strip.querySelectorAll(".per-image-card").forEach((b, j) =>
+              b.classList.toggle("active", j === selectedPerImageIndex)
+            );
+            renderPerImageDetail(perImages[selectedPerImageIndex], selectedPerImageIndex);
+          });
+        });
+
+        renderPerImageDetail(perImages[selectedPerImageIndex], selectedPerImageIndex);
+      }
+
+      function renderCvResults(pv) {
+        const catKey = (pv.top_category || "nature").toLowerCase();
+        const label = SCENE_LABELS_EN[catKey] || SCENE_LABELS[catKey] || catKey;
+        const conf = Math.round((pv.confidence ?? 0) * 100);
+        const emoji = SCENE_EMOJI[catKey] || "✨";
+
+        document.getElementById("cv-ensemble-hero").innerHTML = `
+          <span class="cv-ensemble-hero__emoji" aria-hidden="true">${emoji}</span>
+          <div class="cv-ensemble-hero__text">
+            <span class="cv-ensemble-hero__category">${label}</span>
+            <span class="cv-ensemble-hero__confidence">${conf}%</span>
+          </div>`;
+
+        document.getElementById("cv-scene-bars").innerHTML = sceneBarsHtml(pv.scene, 3);
+        document.getElementById("cv-visual-metrics").innerHTML = visualMetricsHtml(pv.visual);
+      }
+
+      function getGeminiAssistMessage(rec, pv) {
+        const cat = (rec.top_category || pv.top_category || "").toLowerCase();
+        if (cat === "festival" || cat === "city") {
+          const label = SCENE_LABELS[cat] || cat;
+          return `🤖 Gemini 보조 판단: ${label} 요소 감지`;
+        }
+        return "";
+      }
+
+      function appendChatMessage(role, text) {
+        const box = document.getElementById("chat-messages");
+        const bubble = document.createElement("div");
+        bubble.className = `chat-bubble chat-bubble--${role}`;
+        bubble.textContent = text;
+        box.appendChild(bubble);
+        box.scrollTop = box.scrollHeight;
+      }
+
+      function formatInlineMarkdown(text) {
+        return escapeHtml(text).replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+      }
+
+      function formatGeminiMarkdown(raw) {
+        if (!raw?.trim()) {
+          return '<p class="gemini-explain__empty">분석 설명을 불러오는 중입니다.</p>';
+        }
+        const lines = raw.split(/\n/);
+        let html = "";
+        let inList = false;
+
+        const closeList = () => {
+          if (inList) {
+            html += "</ul>";
+            inList = false;
+          }
+        };
+
+        for (const line of lines) {
+          const t = line.trim();
+          if (!t) {
+            closeList();
+            html += "<br>";
+            continue;
+          }
+
+          if (/^[-*•]\s+/.test(t)) {
+            if (!inList) {
+              html += '<ul class="gemini-explain__list">';
+              inList = true;
+            }
+            const item = t.replace(/^[-*•]\s+/, "");
+            html += `<li>${formatInlineMarkdown(item)}</li>`;
+            continue;
+          }
+
+          closeList();
+
+          if (/^#{1,3}\s+/.test(t)) {
+            const heading = t.replace(/^#{1,3}\s+/, "");
+            html += `<p class="gemini-explain__heading">${formatInlineMarkdown(heading)}</p>`;
+          } else if (/^\*\*(.+)\*\*$/.test(t)) {
+            html += `<p class="gemini-explain__heading">${formatInlineMarkdown(t.slice(2, -2))}</p>`;
+          } else {
+            html += `<p class="gemini-explain__para">${formatInlineMarkdown(t)}</p>`;
+          }
+        }
+
+        closeList();
+        return html;
+      }
+
+      function extractGeminiOneLiner(text) {
+        if (!text?.trim()) return "사진에서 당신만의 여행 취향이 느껴져요!";
+        const lines = text.split(/\n/).map((l) => l.trim()).filter(Boolean);
+        for (const line of lines) {
+          if (/^\*\*/.test(line)) continue;
+          if (/^[-*•#]/.test(line)) continue;
+          const plain = line.replace(/\*\*/g, "").trim();
+          if (plain.length >= 8) return plain;
+        }
+        return "사진에서 당신만의 여행 취향이 느껴져요!";
+      }
+
+      function setCvDetailOpen(open) {
+        const detail = document.getElementById("gemini-cv-detail");
+        const btn = document.getElementById("btn-toggle-cv-detail");
+        if (!detail || !btn) return;
+        detail.style.display = open ? "block" : "none";
+        btn.textContent = open ? "🔬 CV 상세 분석 닫기 ▲" : "🔬 CV 상세 분석 보기 ▼";
+      }
+
+      function renderGeminiSummary(data) {
+        const rec = data.recommendation || {};
+        const pv = data.preference_vector || {};
+        const text = data.gemini_text || "";
+        const catKey = (rec.top_category || pv.top_category || "nature").toLowerCase();
+        const emoji = SCENE_EMOJI[catKey] || "📷";
+        const label = SCENE_LABELS_EN[catKey] || SCENE_LABELS[catKey] || catKey;
+        const conf = Math.round((rec.confidence ?? pv.confidence ?? 0) * 100);
+        const destLine = (rec.destinations || []).join(" · ");
+        const assist = getGeminiAssistMessage(rec, pv);
+        const tagline = assist || extractGeminiOneLiner(text);
+
+        const summaryEl = document.getElementById("gemini-user-summary");
+        if (summaryEl) {
+          summaryEl.innerHTML = `
+            <p class="gemini-user-summary__headline">${emoji} ${escapeHtml(label)} 취향 ${conf}%</p>
+            <p class="gemini-user-summary__dests">✈ ${escapeHtml(destLine || "추천 여행지")}</p>
+            <p class="gemini-user-summary__tagline">${escapeHtml(tagline)}</p>`;
+        }
+
+        const detailEl = document.getElementById("gemini-cv-detail");
+        if (detailEl) detailEl.innerHTML = formatGeminiMarkdown(text);
+        setCvDetailOpen(false);
+      }
+
+      function openBoardingModal() {
+        const modal = document.getElementById("boarding-modal");
+        modal.classList.add("is-open");
+        modal.setAttribute("aria-hidden", "false");
+        document.body.classList.add("modal-open");
+      }
+
+      function closeBoardingModal() {
+        const modal = document.getElementById("boarding-modal");
+        modal.classList.remove("is-open");
+        modal.setAttribute("aria-hidden", "true");
+        document.body.classList.remove("modal-open");
+      }
+
+      function resetChat(initialAiText) {
+        const box = document.getElementById("chat-messages");
+        box.innerHTML = "";
+        if (initialAiText) {
+          appendChatMessage("ai", initialAiText);
+        }
+      }
+
+      async function sendChat() {
+        const input = document.getElementById("chat-input");
+        const message = input.value.trim();
+        if (!message || chatBusy || !analysisData?.preference_vector) return;
+
+        appendChatMessage("user", message);
+        input.value = "";
+        chatBusy = true;
+        document.getElementById("btn-chat-send").disabled = true;
+        input.disabled = true;
+
+        try {
+          const res = await fetch("/api/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              message,
+              context: analysisData.preference_vector,
+            }),
+          });
+          if (!res.ok) throw new Error(await res.text());
+          const data = await res.json();
+          appendChatMessage("ai", data.reply || "잠시 후 다시 시도해주세요.");
+        } catch (err) {
+          console.error(err);
+          appendChatMessage("ai", "잠시 후 다시 시도해주세요.");
+        } finally {
+          chatBusy = false;
+          input.disabled = false;
+          document.getElementById("btn-chat-send").disabled = false;
+          input.focus();
+        }
+      }
+
+      function updateSceneFromCategory(category) {
+        const cat = category || "nature";
+        if (cat === "city") {
+          const brightness = analysisData?.preference_vector?.visual?.brightness ?? 0.5;
+          window.__cityBrightness = brightness;
+          updateScene("city");
+          return;
+        }
+        updateScene(cat);
       }
 
       function renderTabs(rec) {
@@ -237,7 +1004,7 @@
         tabs.innerHTML = dests
           .map(
             (name, i) =>
-              `<button type="button" class="dest-tab${i === activeDestIndex ? " active" : ""}" data-index="${i}" role="tab">${name}</button>`
+              `<button type="button" class="dest-tab${i === activeDestIndex ? " active" : ""}" data-index="${i}" role="tab">${destTabLabel(name)}</button>`
           )
           .join("");
 
@@ -250,9 +1017,10 @@
             const name = dests[activeDestIndex];
             const score = rec.scores?.[name] ?? 0.5;
             updateResultTicket(name, score);
-            updateScene({ topCategory: rec.top_category, destinations: dests });
+            updateSceneFromCategory(rec.top_category || "nature");
             document.getElementById("btn-bucket").classList.remove("saved");
-            document.getElementById("btn-bucket").textContent = "🌱 버킷리스트 저장";
+            document.getElementById("btn-bucket").innerHTML =
+              '<span class="btn-bucket__icon" aria-hidden="true">🌱</span> Save to Bucket List';
           });
         });
       }
@@ -262,34 +1030,117 @@
         const pv = data.preference_vector || {};
         const rec = data.recommendation || {};
         activeDestIndex = 0;
+        selectedPerImageIndex = 0;
 
-        document.getElementById("gemini-text").innerHTML = buildGeminiText(pv, rec)
-          .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-          .replace(/\n/g, "<br />");
-
+        renderPerImageCards(data.per_image || []);
+        renderCvResults(pv);
+        renderGeminiSummary(data);
+        resetChat("");
+        closeBoardingModal();
+        hideBucketToast();
+        document.getElementById("btn-bucket").classList.remove("saved");
+        document.getElementById("btn-bucket").innerHTML =
+          '<span class="btn-bucket__icon" aria-hidden="true">🌱</span> Save to Bucket List';
         renderTabs(rec);
         const first = rec.destinations?.[0] || "—";
         const score = rec.scores?.[first] ?? 0.5;
         updateResultTicket(first, score);
-        updateScene({ topCategory: rec.top_category, destinations: rec.destinations });
+        updateSceneFromCategory(rec.top_category || "nature");
         showScreen("screen-result");
+      }
+
+      let loadingThumbUrls = [];
+
+      function startLoadingAnimation(totalCount) {
+        const count = Math.max(totalCount, 1);
+        const photoCount = document.getElementById("loading-photo-count");
+        const distEl = document.getElementById("loading-distance");
+        const bar = document.getElementById("loading-progress-bar");
+        const subEl = document.getElementById("loading-sub");
+
+        if (subEl) subEl.hidden = true;
+        if (photoCount) photoCount.textContent = `사진 1 / ${count} 분석 중...`;
+        if (bar) bar.style.width = "0%";
+
+        loadingThumbUrls.forEach((url) => URL.revokeObjectURL(url));
+        loadingThumbUrls = [];
+
+        const distInterval = setInterval(() => {
+          if (distEl) {
+            distEl.textContent = `Distance: ${(Math.floor(Math.random() * 4000) + 8000).toLocaleString()} km`;
+          }
+        }, 1000);
+
+        let progress = 0;
+        const progInterval = setInterval(() => {
+          progress = Math.min(progress + 1, 90);
+          if (bar) bar.style.width = `${progress}%`;
+        }, 300);
+
+        let photoIdx = 0;
+        const thumbInterval = setInterval(() => {
+          if (photoIdx < uploadedFiles.length) {
+            const thumb = document.getElementById("loading-thumb");
+            if (thumb && uploadedFiles[photoIdx]) {
+              if (thumb.src && thumb.src.startsWith("blob:")) {
+                URL.revokeObjectURL(thumb.src);
+              }
+              const url = URL.createObjectURL(uploadedFiles[photoIdx]);
+              loadingThumbUrls.push(url);
+              thumb.src = url;
+              thumb.hidden = false;
+            }
+            if (photoCount) {
+              photoCount.textContent = `사진 ${photoIdx + 1} / ${count} 분석 중...`;
+            }
+            photoIdx++;
+          }
+        }, 2000);
+
+        if (uploadedFiles[0]) {
+          const thumb = document.getElementById("loading-thumb");
+          if (thumb) {
+            const url = URL.createObjectURL(uploadedFiles[0]);
+            loadingThumbUrls.push(url);
+            thumb.src = url;
+            thumb.hidden = false;
+          }
+        }
+
+        if (distEl) {
+          distEl.textContent = `Distance: ${(Math.floor(Math.random() * 4000) + 8000).toLocaleString()} km`;
+        }
+
+        window._stopLoadingAnimation = () => {
+          clearInterval(distInterval);
+          clearInterval(progInterval);
+          clearInterval(thumbInterval);
+          if (bar) bar.style.width = "100%";
+          loadingThumbUrls.forEach((url) => URL.revokeObjectURL(url));
+          loadingThumbUrls = [];
+        };
       }
 
       async function runAnalysis() {
         showScreen("screen-loading");
+        startLoadingAnimation(uploadedFiles.length);
         const formData = new FormData();
         uploadedFiles.forEach((f) => formData.append("files", f));
-        if (uploadedFiles[0]) formData.append("file", uploadedFiles[0]);
 
         try {
           const res = await fetch("/api/analyze", { method: "POST", body: formData });
           if (!res.ok) throw new Error(await res.text());
           const data = await res.json();
+          if (window._stopLoadingAnimation) window._stopLoadingAnimation();
           showResult(data);
         } catch (err) {
           console.error(err);
-          document.getElementById("loading-sub").textContent =
-            "분석 실패 — 서버를 확인한 뒤 다시 시도해 주세요.";
+          if (window._stopLoadingAnimation) window._stopLoadingAnimation();
+          const subEl = document.getElementById("loading-sub");
+          if (subEl) {
+            subEl.hidden = false;
+            subEl.textContent = "분석 실패 — 서버를 확인한 뒤 다시 시도해 주세요.";
+          }
           setTimeout(() => showScreen("screen-upload"), 2500);
         }
       }
@@ -380,17 +1231,62 @@
       }
 
       function refreshPreviews() {
+        previewObjectUrls.forEach((url) => URL.revokeObjectURL(url));
+        previewObjectUrls = [];
+
         const grid = document.getElementById("preview-grid");
+        const drop = document.getElementById("upload-drop");
+        const countEl = document.getElementById("upload-count");
+        const fileInput = document.getElementById("file-input");
+
+        drop.style.display = uploadedFiles.length === 0 ? "" : "none";
+
         grid.innerHTML = "";
-        uploadedFiles.forEach((file) => {
+        uploadedFiles.forEach((file, index) => {
+          const card = document.createElement("div");
+          card.className = "preview-card";
+
           const img = document.createElement("img");
-          img.src = URL.createObjectURL(file);
+          const url = URL.createObjectURL(file);
+          previewObjectUrls.push(url);
+          img.src = url;
           img.alt = file.name;
-          grid.appendChild(img);
+
+          const removeBtn = document.createElement("button");
+          removeBtn.type = "button";
+          removeBtn.className = "preview-card__remove";
+          removeBtn.setAttribute("aria-label", `${file.name} 삭제`);
+          removeBtn.textContent = "×";
+          removeBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            uploadedFiles.splice(index, 1);
+            fileInput.value = "";
+            refreshPreviews();
+          });
+
+          card.appendChild(img);
+          card.appendChild(removeBtn);
+          grid.appendChild(card);
         });
-        document.getElementById("upload-count").textContent =
-          `${uploadedFiles.length} / ${MAX_PHOTOS}장`;
-        const ok = uploadedFiles.length >= MIN_PHOTOS && uploadedFiles.length <= MAX_PHOTOS;
+
+        if (uploadedFiles.length < MAX_PHOTOS) {
+          const addCard = document.createElement("button");
+          addCard.type = "button";
+          addCard.className = "preview-add";
+          addCard.innerHTML =
+            '<span class="preview-add__icon" aria-hidden="true">+</span><span class="preview-add__label">추가</span>';
+          addCard.addEventListener("click", () => fileInput.click());
+          grid.appendChild(addCard);
+        }
+
+        countEl.textContent = `${uploadedFiles.length} / ${MAX_PHOTOS}장`;
+        const meetsMin = uploadedFiles.length >= MIN_PHOTOS;
+        countEl.classList.toggle("upload-count--ok", meetsMin);
+        countEl.classList.toggle("upload-count--warn", !meetsMin);
+
+        const ok =
+          uploadedFiles.length >= MIN_PHOTOS && uploadedFiles.length <= MAX_PHOTOS;
         document.getElementById("btn-analyze").disabled = !ok;
       }
 
@@ -400,7 +1296,9 @@
         refreshPreviews();
       }
 
-      document.getElementById("btn-issue").addEventListener("click", () => showScreen("screen-upload"));
+      document.querySelector(".main-barcode")?.addEventListener("click", () => {
+        showScreen("screen-upload");
+      });
 
       const fileInput = document.getElementById("file-input");
       const uploadDrop = document.getElementById("upload-drop");
@@ -408,14 +1306,14 @@
       fileInput.addEventListener("change", (e) => addFiles(e.target.files));
       uploadDrop.addEventListener("dragover", (e) => {
         e.preventDefault();
-        uploadDrop.style.borderColor = "#c4e5fb";
+        uploadDrop.classList.add("is-dragover");
       });
       uploadDrop.addEventListener("dragleave", () => {
-        uploadDrop.style.borderColor = "";
+        uploadDrop.classList.remove("is-dragover");
       });
       uploadDrop.addEventListener("drop", (e) => {
         e.preventDefault();
-        uploadDrop.style.borderColor = "";
+        uploadDrop.classList.remove("is-dragover");
         addFiles(e.dataTransfer.files);
       });
 
@@ -432,11 +1330,58 @@
 
       document.getElementById("btn-bucket").addEventListener("click", (e) => {
         const btn = e.currentTarget;
+        if (btn.classList.contains("saved")) return;
+
+        const saved = addCurrentDestinationToBucket();
         btn.classList.add("saved");
-        btn.textContent = "✓ 버킷리스트에 저장됨";
+        btn.innerHTML =
+          '<span class="btn-bucket__icon" aria-hidden="true">✓</span> 저장 완료';
+
+        if (saved) {
+          closeBoardingModal();
+          showBucketToast();
+        }
+      });
+
+      document.getElementById("btn-toast-bucket").addEventListener("click", () => {
+        openBucketScreen();
+      });
+
+      document.getElementById("btn-bucket-back").addEventListener("click", () => {
+        showScreen(bucketReturnScreen || "screen-result");
+      });
+
+      document.getElementById("btn-toggle-cv-detail").addEventListener("click", () => {
+        const detail = document.getElementById("gemini-cv-detail");
+        const open = detail && detail.style.display !== "block";
+        setCvDetailOpen(open);
+      });
+
+      document.getElementById("btn-boarding-open").addEventListener("click", () => openBoardingModal());
+      document.getElementById("btn-boarding-close").addEventListener("click", () => closeBoardingModal());
+      document.querySelectorAll("[data-close-modal]").forEach((el) => {
+        el.addEventListener("click", () => closeBoardingModal());
+      });
+      document.querySelector(".boarding-modal__dialog")?.addEventListener("click", (e) => {
+        e.stopPropagation();
+      });
+
+      document.getElementById("btn-chat-send").addEventListener("click", () => sendChat());
+      document.getElementById("chat-input").addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          sendChat();
+        }
+      });
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && document.getElementById("boarding-modal").classList.contains("is-open")) {
+          closeBoardingModal();
+        }
       });
 
       setMainTicketPending();
+      initMainClock();
       setupGesture();
     </script>
   </body>
