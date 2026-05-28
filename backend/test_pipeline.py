@@ -27,11 +27,14 @@ for name, path in imgs.items():
     top = max(clip_scores, key=clip_scores.get)
     all_scores = {cat: float(clip_scores.get(cat, 0.0)) for cat in SCENE_CATEGORIES}
     clip_result = {"category": top, "confidence": clip_scores[top], "all_scores": all_scores}
+    from oneformer import segment_ratios
+
     segment_result = segment(img)
+    seg_ratios = segment_ratios(segment_result)
     opencv_result = analyze(img)
     style_result = analyze_style(img, opencv_result)
-    pv = build_vector(clip_result, segment_result, opencv_result, style_result)
-    detected_objects = set(segment_result.keys())
+    pv = build_vector(clip_result, seg_ratios, opencv_result, style_result)
+    detected_objects = set(seg_ratios.keys())
     rec = recommend(pv, detected_objects=detected_objects)
     print(
         f'{name}: {top} ({clip_scores[top]:.1%}) → {rec["destinations"]} / random={rec["is_random"]}'

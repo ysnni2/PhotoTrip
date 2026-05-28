@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Dict, List, Union
+from typing import Any, Dict, List, Union
 
 from PIL import Image
 
@@ -48,3 +48,38 @@ def top_category(scores: Dict[str, float]) -> tuple[str, float]:
         return "", 0.0
     label = max(scores, key=scores.get)
     return label, float(scores[label])
+
+
+def classify_with_fallback(
+    image: Image.Image,
+    *,
+    threshold: float = 0.35,
+) -> Dict[str, Any]:
+    """
+    CLIP zero-shot category; if confidence < threshold, enrich with Gemini travel hint.
+    """
+    scores = analyze_category(image)
+    all_scores = {lab: float(scores.get(lab, 0.0)) for lab in CATEGORY_LABELS}
+    category, confidence = top_category(scores)
+
+    is_other = confidence < threshold
+    other_hint = None
+    travel_hint = None
+    hint_weight = 0.0
+
+    if is_other:
+        from .other_analyzer import analyze_other_as_travel_hint
+
+        other_hint = analyze_other_as_travel_hint(image)
+        travel_hint = other_hint.get("travel_hint")
+        hint_weight = float(other_hint.get("hint_weight", 0.3))
+
+    return {
+        "category": category,
+        "confidence": confidence,
+        "all_scores": all_scores,
+        "is_other": is_other,
+        "other_hint": other_hint,
+        "travel_hint": travel_hint,
+        "hint_weight": hint_weight,
+    }

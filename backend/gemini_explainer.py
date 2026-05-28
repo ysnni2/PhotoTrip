@@ -7,6 +7,7 @@ import io
 import json
 import os
 import re
+import traceback
 from typing import Any, Dict, Mapping
 
 from google import genai
@@ -32,16 +33,25 @@ def _get_client() -> genai.Client:
     return _client
 
 
+def _log_gemini_error(context: str, exc: Exception) -> None:
+    print(f"[Gemini 오류] {context} | {type(exc).__name__}: {exc}")
+    traceback.print_exc()
+
+
 def _generate(prompt: str) -> str:
-    client = _get_client()
-    response = client.models.generate_content(
-        model=MODEL_NAME,
-        contents=prompt,
-    )
-    text = (response.text or "").strip()
-    if not text:
-        raise ValueError("Gemini returned an empty response")
-    return text
+    try:
+        client = _get_client()
+        response = client.models.generate_content(
+            model=MODEL_NAME,
+            contents=prompt,
+        )
+        text = (response.text or "").strip()
+        if not text:
+            raise ValueError("Gemini returned an empty response")
+        return text
+    except Exception as e:
+        _log_gemini_error("_generate()", e)
+        raise
 
 
 def explain(
@@ -55,60 +65,48 @@ def explain(
         "preference_vector": preference_vector,
         "recommendation": recommendation,
     }
-    prompt = f"""당신은 여행 추천 앱 PhotoTrip의 CV 분석 AI입니다.
-아래 JSON은 사용자 사진 분석 결과입니다.
+    analysis_json = json.dumps(payload, ensure_ascii=False, indent=2)
+    prompt = f"""당신은 여행 큐레이터입니다.
+아래 CV 분석 결과를 바탕으로 사용자의 여행 스타일을 설명해주세요.
 
-{json.dumps(payload, ensure_ascii=False, indent=2)}
+아래 문구는 절대 출력하지 말 것:
+- "차분하고 세련된"
+- "감성적인 분이시네요"
+- "여유로운 시간을"
+- "특별한 추억을"
 
-아래 형식으로 한국어 CV 분석 리포트를 작성하세요:
+대신 preference_vector 안의 실제 수치를 언급할 것:
+- scene.food가 높으면 → "음식 사진 비중이 높게 나왔어요!"
+- warm_tone이 높으면 → "따뜻한 색감의 사진을 많이 찍으시네요"
+- brightness가 높으면 → "밝고 화사한 사진을 좋아하시는군요"
+visual, semantic, scene, style 수치도 필요하면 활용할 것.
 
-**📸 CV 분석 리포트**
+top_category별 말투 (recommendation.top_category 기준, 아래 톤에 맞게):
+- food: "먹는 게 여행이다! 현지 맛집 탐방 스타일이시네요 🍜"
+- city: "도시의 에너지를 즐기시는 분! 야경 보며 걷고 싶으시죠? 🌆"
+- beach: "파도 소리가 그리우신가요? 바다가 부르고 있어요! 🌊"
+- nature: "도시 소음에서 벗어나 자연이 그리우신 분이군요 🌿"
+- culture: "진짜 그 나라를 느끼고 싶은 탐구형 여행자시네요 🏛️"
+- festival: "흥이 넘치는 분! 축제 현장에서 같이 뛰고 싶으시죠? 🎉"
 
-**🔍 CLIP 분류 결과**
-- [top1 카테고리]: [score]%
-- [top2 카테고리]: [score]%  
-- [top3 카테고리]: [score]%
+2~3문장, 자연스러운 존댓말.
+** 같은 마크다운 기호 사용 금지
+추천 여행지(recommendation.destinations)가 왜 어울리는지 한 문장 포함.
 
-**🎨 OneFormer Segmentation**
-- 음식 영역: [food_ratio*100]%
-- 식생 영역: [vegetation_ratio*100]%
-- 건물 영역: [building_ratio*100]%
-- 수공간: [water_ratio*100]%
+분석 데이터: {analysis_json}
 
-**📊 OpenCV 시각 분석**
-- 밝기: [brightness] → [밝음/보통/어두움] 톤
-- 채도: [saturation] → [선명함/자연스러움/차분함]
-- 따뜻한 톤: [warm_tone] → [따뜻함/중립/차가움]
-
-**🎭 Style MLP (BCE 멀티레이블)**
-- cozy: [score] | aesthetic: [score] | local: [score]
-- energetic: [score] | calm: [score] | romantic: [score]
-
-**🤖 앙상블 결과**
-[n]장 사진 평균 → [top_category] [confidence*100]%
-→ [설명 1문장]
-
-**✈ 추천 여행지**
-[destinations] 
-[추천 이유 1~2문장]
-
-규칙:
-- 이모지 포함
-- 존댓말, 친근한 톤
-- 수치는 소수점 2자리
-- 마크다운 형식 유지
-- JSON/영어 없이 한국어로만"""
+위 분석 데이터만 참고하여, top_category에 맞는 톤으로 본문만 출력하세요."""
 
     try:
         return _generate(prompt)
-    except Exception:
-        top = recommendation.get("top_category", "")
+    except Exception as e:
+        _log_gemini_error("explain()", e)
         dests = recommendation.get("destinations", [])
-        names = ", ".join(str(d) for d in dests[:3]) if dests else "추천 여행지"
+        dest = str(dests[0]) if dests else "추천 여행지"
         return (
-            f"사진에서 {top} 취향이 두드러져요. "
-            f"{names}처럼 그 분위기를 느낄 수 있는 곳을 골라봤어요. "
-            "마음에 드는 도시를 골라 떠나보세요!"
+            "차분하고 세련된 감성을 가진 분이시네요. "
+            "사진에서 느껴지는 분위기와 어울리는 여행지를 골라봤어요. "
+            f"{dest}에서 특별한 시간을 내보시는 건 어떨까요?"
         )
 
 
@@ -141,7 +139,8 @@ def classify_festival_subtype(
     }
     try:
         client = _get_client()
-    except Exception:
+    except Exception as e:
+        _log_gemini_error("classify_festival_subtype() client", e)
         return empty
 
     prompt = f"""Classify this photo's event atmosphere.
@@ -179,7 +178,8 @@ Labels: concert, festival, carnival, sports_event, nightlife_event, parade, not_
             "festival_confidence": conf,
             "gemini_fallback_used": True,
         }
-    except Exception:
+    except Exception as e:
+        _log_gemini_error("classify_festival_subtype() generate_content", e)
         return empty
 
 
@@ -214,5 +214,6 @@ def random_explain(reason: str = "uncertain") -> str:
 
     try:
         return _generate(prompt)
-    except Exception:
+    except Exception as e:
+        _log_gemini_error(f"random_explain(reason={reason!r})", e)
         return fallback

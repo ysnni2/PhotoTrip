@@ -18,6 +18,10 @@ _FALLBACK_MODEL_ID = MODEL_ID
 
 CLASS_NAMES = ["beach", "nature", "city", "culture", "festival", "food"]
 
+# Low confidence or tight top-2 margin → treat as "other" and ask Gemini for a travel hint
+OTHER_CONF_THRESHOLD = 0.35
+OTHER_MARGIN_THRESHOLD = 0.08
+
 # ── Temperature Scaling ───────────────────────────────────────────────────────
 # 1.0 = 원본, >1.0 = softer (오버피팅된 confidence 낮춰 보정)
 # train 98.8% vs val 93.5% 갭 고려 → 1.1
@@ -241,6 +245,63 @@ def classify(
         probs = (logits / temperature).softmax(dim=1)[0].cpu()
 
     return {str(name).lower(): float(probs[i]) for i, name in enumerate(class_names)}
+
+
+def classify_with_fallback(
+    image: Image.Image,
+    *,
+    use_tta: bool = True,
+    temperature: float = 1.1,
+    debug: bool = False,
+) -> Dict[str, Any]:
+    """
+    SigLIP classify; when confidence is low (is_other), enrich with Gemini travel hint.
+    """
+    scores = classify(
+        image, use_tta=use_tta, temperature=temperature, debug=debug
+    )
+    all_scores = {str(name).lower(): float(scores.get(name, 0.0)) for name in CLASS_NAMES}
+    if not all_scores:
+        return {
+            "category": "",
+            "confidence": 0.0,
+            "all_scores": {},
+            "is_other": True,
+            "other_hint": None,
+            "travel_hint": None,
+            "hint_weight": 0.0,
+        }
+
+    category = max(all_scores, key=all_scores.get)
+    confidence = all_scores[category]
+    sorted_probs = sorted(all_scores.values(), reverse=True)
+    margin = (
+        sorted_probs[0] - sorted_probs[1] if len(sorted_probs) > 1 else 1.0
+    )
+    is_other = (
+        confidence < OTHER_CONF_THRESHOLD
+        or margin < OTHER_MARGIN_THRESHOLD
+    )
+
+    other_hint = None
+    travel_hint = None
+    hint_weight = 0.0
+    if is_other:
+        from analyzers.other_analyzer import analyze_other_as_travel_hint
+
+        other_hint = analyze_other_as_travel_hint(image)
+        travel_hint = other_hint.get("travel_hint")
+        hint_weight = float(other_hint.get("hint_weight", 0.3))
+
+    return {
+        "category": category,
+        "confidence": confidence,
+        "all_scores": all_scores,
+        "is_other": is_other,
+        "other_hint": other_hint,
+        "travel_hint": travel_hint,
+        "hint_weight": hint_weight,
+    }
 
 
 def tune_temperature(

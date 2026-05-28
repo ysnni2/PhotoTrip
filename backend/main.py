@@ -22,8 +22,8 @@ _FRONTEND_DIR = _PROJECT_ROOT / "frontend"
 if str(_BACKEND_DIR) not in sys.path:
     sys.path.insert(0, str(_BACKEND_DIR))
 
-from siglip_classifier import classify  # noqa: E402
-from oneformer import segment  # noqa: E402
+from siglip_classifier import classify_with_fallback  # noqa: E402
+from oneformer import segment, segment_ratios  # noqa: E402
 from opencv_analyzer import analyze  # noqa: E402
 from preference_vector import SCENE_CATEGORIES, build_vector  # noqa: E402
 from recommender import recommend  # noqa: E402
@@ -39,23 +39,13 @@ class ChatRequest(BaseModel):
     context: dict = {}
 
 
+class RouletteRequest(BaseModel):
+    preference_vector: dict
+    category: str
+
+
 if _FRONTEND_DIR.is_dir():
     app.mount("/static", StaticFiles(directory=str(_FRONTEND_DIR)), name="static")
-
-
-def _clip_result_from_scores(scores: Dict[str, float]) -> Dict[str, Any]:
-    """Map classify() softmax dict to build_vector() clip_result shape."""
-    all_scores: Dict[str, float] = {}
-    for cat in SCENE_CATEGORIES:
-        all_scores[cat] = float(
-            scores.get(cat, scores.get(cat.capitalize(), 0.0))
-        )
-    top_category = max(all_scores, key=all_scores.get) if all_scores else ""
-    return {
-        "category": top_category,
-        "confidence": all_scores.get(top_category, 0.0),
-        "all_scores": all_scores,
-    }
 
 
 def ensemble_vectors(vectors: List[Dict[str, Any]]) -> Dict[str, Any]:
@@ -126,18 +116,22 @@ async def analyze_image(files: List[UploadFile] = File(...)) -> Dict[str, Any]:
         raw = await file.read()
         image = Image.open(io.BytesIO(raw)).convert("RGB")
 
-        clip_scores = classify(image, use_tta=True, temperature=1.1)
-        clip_result = _clip_result_from_scores(clip_scores)
+        clip_result = classify_with_fallback(
+            image, use_tta=True, temperature=1.1
+        )
         segment_result = segment(image)
+        seg_ratios = segment_ratios(segment_result)
         opencv_result = analyze(image)
         style_result = analyze_style(image, opencv_result)
         lifestyle_result = analyze_lifestyle(image)
 
         pv = build_vector(
-            clip_result, segment_result, opencv_result, style_result, lifestyle_result
+            clip_result, seg_ratios, opencv_result, style_result, lifestyle_result
         )
+        pv["segment_ratios"] = seg_ratios
+        pv["segment_mask_base64"] = str(segment_result.get("mask_base64", ""))
         vectors.append(pv)
-        detected_objects.update(segment_result.keys())
+        detected_objects.update(seg_ratios.keys())
 
     final_vector = ensemble_vectors(vectors)
     photo_top_categories = [str(v.get("top_category", "")) for v in vectors]
@@ -158,6 +152,31 @@ async def analyze_image(files: List[UploadFile] = File(...)) -> Dict[str, Any]:
         "recommendation": recommendation,
         "gemini_text": gemini_text,
         "per_image": vectors,
+    }
+
+
+@app.post("/api/roulette-finish")
+async def roulette_finish(body: RouletteRequest) -> Dict[str, Any]:
+    """Apply roulette category, refresh recommendations and Gemini text."""
+    cat = str(body.category).strip().lower()
+    if cat not in SCENE_CATEGORIES:
+        raise HTTPException(status_code=400, detail=f"Invalid category: {cat}")
+
+    pv = dict(body.preference_vector)
+    scene = {c: float((pv.get("scene") or {}).get(c, 0.0)) * 0.35 for c in SCENE_CATEGORIES}
+    scene[cat] = max(scene.get(cat, 0.0), 0.82)
+    pv["scene"] = scene
+    pv["top_category"] = cat
+    pv["confidence"] = max(float(pv.get("confidence", 0.0)), scene[cat])
+    pv["is_uncertain"] = False
+
+    recommendation = recommend(pv)
+    gemini_text = explain(pv, recommendation)
+
+    return {
+        "preference_vector": pv,
+        "recommendation": recommendation,
+        "gemini_text": gemini_text,
     }
 
 
