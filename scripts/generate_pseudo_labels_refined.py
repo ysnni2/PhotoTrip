@@ -104,9 +104,10 @@ def process_image(
     segment_result = None
     if use_segment:
         try:
-            from oneformer import segment
+            from oneformer import segment, segment_ratios
 
             segment_result = segment(image)
+            segment_result = segment_ratios(segment_result)
         except Exception:
             pass
 

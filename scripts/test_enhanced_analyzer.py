@@ -43,9 +43,9 @@ def main() -> None:
         image = Image.open(path).convert("RGB")
         seg = None
         if args.segment:
-            from oneformer import segment
+            from oneformer import segment, segment_ratios
 
-            seg = segment(image)
+            seg = segment_ratios(segment(image))
         record = extract_visual_evidence(
             image, segment_result=seg, use_gemini_festival=not args.no_gemini
         )
