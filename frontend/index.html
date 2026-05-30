@@ -27,6 +27,13 @@
         line-height: 1.4;
         color: #6d4c41;
       }
+      #gemini-user-summary .gemini-user-summary__profile {
+        margin: 0 0 0.5rem;
+        font-size: 0.88rem;
+        font-weight: 700;
+        line-height: 1.5;
+        color: #4e342e;
+      }
       #gemini-user-summary .gemini-user-summary__dests {
         margin: 0 0 0.55rem;
         font-size: 0.95rem;
@@ -39,6 +46,13 @@
         font-size: 0.88rem;
         line-height: 1.55;
         color: #5d4037;
+      }
+      #gemini-user-summary .gemini-user-summary__dest-label {
+        margin: 0.55rem 0 0.18rem;
+        font-size: 0.74rem;
+        font-weight: 600;
+        color: #8d6e63;
+        letter-spacing: 0.04em;
       }
       #btn-toggle-cv-detail.btn-toggle-cv-detail {
         width: 100%;
@@ -66,8 +80,37 @@
         margin-top: 0.5rem;
         padding: 1rem;
         border-radius: 12px;
-        max-height: min(360px, 42vh);
+        max-height: min(480px, 54vh);
         overflow-y: auto;
+      }
+      .cv-detail-bar-row {
+        display: grid;
+        grid-template-columns: minmax(3rem, 5.5rem) 1fr 2.8rem;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.35rem;
+      }
+      .cv-detail-bar-label {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #5d4037;
+      }
+      .cv-detail-bar-track {
+        height: 10px;
+        background: rgba(255, 255, 255, 0.75);
+        border-radius: 5px;
+        overflow: hidden;
+      }
+      .cv-detail-bar-fill {
+        height: 100%;
+        border-radius: 5px;
+      }
+      .cv-detail-bar-pct {
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: #4e342e;
+        text-align: right;
+        font-variant-numeric: tabular-nums;
       }
       .cv-detail-section {
         margin-bottom: 1rem;
@@ -152,13 +195,13 @@
       .result-right__main {
         flex: 0 1 auto;
         min-height: 0;
-        max-height: 42vh;
+        max-height: 62vh;
         overflow-x: hidden;
         overflow-y: auto;
         display: flex;
         flex-direction: column;
         gap: 0.75rem;
-        scrollbar-width: thin;
+        scrollbar-width: none;
       }
       .result-right__footer {
         flex-shrink: 0;
@@ -168,17 +211,39 @@
         background: transparent;
       }
       #per-image-strip .per-image-card {
-        width: auto;
-        min-width: 108px;
-        max-width: 118px;
-        align-items: center;
+        width: 116px;
+        min-width: 116px;
+        max-width: 116px;
+        flex-shrink: 0;
+        align-items: stretch;
         padding: 0.35rem;
       }
       #per-image-strip .per-image-card__thumb {
-        width: 80px;
-        height: 80px;
+        width: 100%;
+        height: 54px;
         object-fit: cover;
-        border-radius: 8px;
+        border-radius: 6px;
+        display: block;
+      }
+      .per-image-card__title {
+        font-size: 0.6rem;
+        font-weight: 700;
+        color: #334155;
+        line-height: 1.2;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        margin-bottom: 0.05rem;
+      }
+      .per-image-card__score-bar-track {
+        height: 4px;
+        background: #e2e8f0;
+        border-radius: 2px;
+        overflow: hidden;
+      }
+      .per-image-card__score-bar-fill {
+        height: 100%;
+        border-radius: 2px;
       }
       .per-image-detail-panel {
         margin-bottom: 0.85rem;
@@ -280,24 +345,18 @@
       }
       .per-image-card__score-row {
         display: grid;
-        grid-template-columns: 3.6rem 1fr 1.65rem;
+        grid-template-columns: 2.8rem 1fr 1.6rem;
         align-items: center;
-        gap: 0.2rem;
-        font-size: 11px;
-        line-height: 1.25;
+        gap: 0.18rem;
+        font-size: 9px;
+        line-height: 1.2;
       }
       .per-image-card__score-label {
         white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
         font-weight: 600;
         color: #334155;
-      }
-      .per-image-card__score-blocks {
-        font-family: ui-monospace, "Consolas", monospace;
-        font-size: 10px;
-        letter-spacing: -0.07em;
-        color: #5b7fd4;
-        overflow: hidden;
-        white-space: nowrap;
       }
       .per-image-card__score-pct {
         text-align: right;
@@ -402,7 +461,7 @@
         <header class="main-hero">
           <div class="main-hero__plane" aria-hidden="true">✈</div>
           <h1 class="main-hero__title">Virtual Boarding Pass</h1>
-          <p class="main-hero__subtitle">인천국제공항에서 미지의 목적지로</p>
+          <p class="main-hero__subtitle">일상사진공항에서 미지의 목적지로</p>
         </header>
 
         <article class="main-ticket" id="ticket-main">
@@ -449,9 +508,9 @@
           <div class="main-route-card">
             <div class="main-route-col">
               <span class="main-route-label">FROM</span>
-              <span class="main-route-code">ICN</span>
-              <span class="main-route-airport">인천국제공항</span>
-              <span class="main-route-place">Incheon, South Korea 🇰🇷</span>
+              <span class="main-route-code">ELP</span>
+              <span class="main-route-airport">일상사진공항</span>
+              <span class="main-route-place">Everyday Life, Korea 🇰🇷</span>
             </div>
             <div class="main-route-mid" aria-hidden="true">
               <span class="main-route-line"></span>
@@ -564,7 +623,7 @@
           <div class="loading-route">
             <div class="loading-route-end">
               <span class="loading-route-label">FROM</span>
-              <span class="loading-route-code">ICN</span>
+              <span class="loading-route-code">ELP</span>
             </div>
             <div class="loading-map">
               <div class="loading-line" aria-hidden="true"></div>
@@ -665,10 +724,27 @@
     <section id="screen-bucket" class="screen" aria-label="버킷리스트">
       <header class="bucket-header">
         <button type="button" class="btn-bucket-back" id="btn-bucket-back" aria-label="뒤로가기">
-          ← 뒤로
+          ← 결과 화면으로
         </button>
-        <h1 class="bucket-header__title">버킷리스트</h1>
+        <h1 class="bucket-header__title">✈ 버킷리스트</h1>
       </header>
+
+      <div class="bucket-controls">
+        <div class="bucket-input-row">
+          <input
+            type="text"
+            id="bucket-input"
+            class="bucket-input"
+            placeholder="여행지를 입력하세요..."
+            autocomplete="off"
+          />
+          <button type="button" class="btn-bucket-add" id="btn-bucket-add">추가</button>
+        </div>
+        <button type="button" class="btn-bucket-random" id="btn-bucket-random">
+          🎲 랜덤 여행지 추천
+        </button>
+      </div>
+
       <ul class="bucket-list" id="bucket-list"></ul>
     </section>
 
@@ -692,8 +768,8 @@
           <div class="route-card">
             <div class="route-end">
               <span class="route-prefix">From</span>
-              <div class="route-code">ICN</div>
-              <div class="route-city">Incheon</div>
+              <div class="route-code">ELP</div>
+              <div class="route-city">Everyday Life</div>
             </div>
             <div class="route-mid" aria-hidden="true">
               <span class="route-line"></span>
@@ -877,6 +953,24 @@
         adventurous: "#66bb6a",
       };
 
+      const SCENE_PROFILE_KO = {
+        nature: "자연 속 힐링을 추구하는",
+        beach: "바다와 해변을 사랑하는",
+        city: "도시의 감각과 트렌드를 즐기는",
+        food: "맛과 미식 문화를 탐험하는",
+        culture: "역사와 문화 체험을 소중히 여기는",
+        festival: "축제와 활기찬 에너지를 즐기는",
+      };
+
+      const STYLE_ADJ_KO = {
+        luxury: "고급스럽고 품격 있는",
+        cozy: "아늑하고 편안함을 중시하는",
+        vibrant: "활기차고 생동감 넘치는",
+        minimal: "세련되고 감성적인",
+        romantic: "낭만적이고 감성 풍부한",
+        adventurous: "모험적이고 역동적인",
+      };
+
       const SCENE_EMOJI = {
         nature: "🌲",
         beach: "🌊",
@@ -1025,22 +1119,35 @@
         const list = loadBucketList();
 
         if (!list.length) {
-          listEl.innerHTML = '<li class="bucket-empty">저장된 여행지가 없습니다.</li>';
+          listEl.innerHTML = '<li class="bucket-empty">저장된 여행지가 없어요.<br><small class="bucket-empty__hint">아래에서 여행지를 추가해보세요!</small></li>';
           return;
         }
 
         listEl.innerHTML = list
-          .map(
-            (item) => `
-          <li class="bucket-item">
-            <span class="bucket-item__flag" aria-hidden="true">${item.flag || "🌍"}</span>
+          .map((item) => {
+            const code = DEST_COUNTRY[item.city];
+            const badgeHtml = code
+              ? `<span class="bucket-item__badge" aria-hidden="true">${code}</span>`
+              : `<span class="bucket-item__badge bucket-item__badge--emoji" aria-hidden="true">${item.flag || "🌍"}</span>`;
+            return `
+          <li class="bucket-item" data-id="${item.id}">
+            ${badgeHtml}
             <div class="bucket-item__body">
               <span class="bucket-item__city">${escapeHtml(item.city)}</span>
               <span class="bucket-item__date">${escapeHtml(item.date)}</span>
             </div>
-          </li>`
-          )
+            <button type="button" class="btn-bucket-delete" aria-label="${escapeHtml(item.city)} 삭제" data-id="${item.id}">×</button>
+          </li>`;
+          })
           .join("");
+
+        listEl.querySelectorAll(".btn-bucket-delete").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            const updated = loadBucketList().filter((it) => it.id !== btn.dataset.id);
+            saveBucketList(updated);
+            renderBucketList();
+          });
+        });
       }
 
       function showBucketToast() {
@@ -1138,11 +1245,13 @@
           .map(([key, score]) => {
             const meta = PER_IMAGE_CATEGORIES[key];
             const pct = Math.round(Number(score) * 100);
-            const blocks = miniBarBlocks(pct);
+            const color = SCENE_COLORS[key] || "#90a4ae";
             return `
               <div class="per-image-card__score-row">
                 <span class="per-image-card__score-label">${meta.emoji} ${meta.label}</span>
-                <span class="per-image-card__score-blocks" aria-hidden="true">${blocks}</span>
+                <div class="per-image-card__score-bar-track">
+                  <div class="per-image-card__score-bar-fill" style="width:${pct}%;background:${color}"></div>
+                </div>
                 <span class="per-image-card__score-pct">${pct}%</span>
               </div>`;
           })
@@ -1272,32 +1381,103 @@
           .join("");
       }
 
+      function visualMetricBrief(key, value) {
+        const v = Number(value);
+        if (key === "brightness") {
+          if (v >= 0.65) return "밝은 톤";
+          if (v >= 0.4) return "보통 톤";
+          return "어두운 톤";
+        }
+        if (key === "saturation") {
+          if (v >= 0.6) return "높은 채도";
+          if (v >= 0.35) return "보통 색감";
+          return "낮은 채도";
+        }
+        if (key === "warm_tone") {
+          if (v >= 0.6) return "따뜻한 톤";
+          if (v >= 0.4) return "중립적 톤";
+          return "차가운 톤";
+        }
+        return "";
+      }
+
+      function visualSummaryHint(visual) {
+        const b = Number(visual?.brightness ?? 0.5);
+        const s = Number(visual?.saturation ?? 0.5);
+        const w = Number(visual?.warm_tone ?? 0.5);
+        if (b < 0.4 && s < 0.35) return "전반적으로 차분하고 자연스러운 색의 사진들이에요.";
+        if (b >= 0.6 && s >= 0.5) return "밝고 선명한 색감의 활기찬 사진들이에요.";
+        if (w >= 0.6) return "따뜻하고 포근한 색감의 사진들이에요.";
+        if (w < 0.4) return "시원하고 깔끔한 색감의 사진들이에요.";
+        return "전반적으로 차분하고 자연스러운 색의 사진들이에요.";
+      }
+
+      function styleDetailHint(name) {
+        const m = {
+          luxury: "세련되고 고급스러운 분위기를 선호하시는 것 같아요.",
+          cozy: "아늑하고 편안한 분위기를 좋아하시는군요.",
+          vibrant: "활기차고 생동감 넘치는 분위기를 선호하시는 것 같아요.",
+          minimal: "세련되고 감성적인 분위기를 선호하시는 것 같아요.",
+          romantic: "낭만적이고 감성적인 분위기를 좋아하시는군요.",
+          adventurous: "모험적이고 역동적인 분위기를 선호하시는 것 같아요.",
+        };
+        return m[name] || "독특하고 개성 있는 분위기를 선호하시는 것 같아요.";
+      }
+
       function renderCvDetailHtml(pv) {
         const visual = pv?.visual || {};
         const style = pv?.style || {};
         const scene = pv?.scene || {};
 
-        const visualBlock = CV_DETAIL_VISUAL.map(({ key, label }) => {
+        const visualLines = CV_DETAIL_VISUAL.map(({ key, label }) => {
           const val = Number(visual[key] ?? 0);
-          const hint = visualMetricHint(key, val);
-          return `<p class="cv-detail-visual-line"><strong>${label}</strong> ${escapeHtml(hint)}</p>`;
+          const brief = visualMetricBrief(key, val);
+          return `<p class="cv-detail-visual-line"><strong>${label}</strong> ${val.toFixed(2)} → ${escapeHtml(brief)}</p>`;
         }).join("");
+        const visualSummary = `<p class="cv-detail-visual-line">→ "${escapeHtml(visualSummaryHint(visual))}"</p>`;
 
-        const styleBlock = styleBarsHtml(style);
-        const ensembleBlock = sceneBarsHtml(scene, 6, true);
+        const styleEntries = Object.entries(style || {}).sort((a, b) => b[1] - a[1]).slice(0, 3);
+        const styleText = styleEntries.length
+          ? styleEntries.map(([n, v]) => `${STYLE_LABELS_KO[n] || n} ${Number(v).toFixed(2)}`).join(" · ")
+          : "분위기 데이터 없음";
+        const topStyle = styleEntries[0]?.[0] || "";
+        const styleHintLine = topStyle
+          ? `<p class="cv-detail-visual-line">→ "${escapeHtml(styleDetailHint(topStyle))}"</p>` : "";
+
+        const topSceneEntry = Object.entries(scene || {}).sort((a, b) => b[1] - a[1])[0];
+        const topStyleEntry = Object.entries(style || {}).sort((a, b) => b[1] - a[1])[0];
+        let ensembleContent = "";
+        if (topSceneEntry) {
+          const [sceneName, sceneScore] = topSceneEntry;
+          const scenePct = Math.round(Number(sceneScore) * 100);
+          const sceneLabel = SCENE_LABELS[sceneName] || SCENE_LABELS_EN[sceneName] || sceneName;
+          const sceneProfile = SCENE_PROFILE_KO[sceneName] || (sceneLabel + " 취향을 가진");
+          const topStyleName = topStyleEntry?.[0] || "";
+          const styleAdj = STYLE_ADJ_KO[topStyleName] || "";
+          const line1 = styleAdj
+            ? (sceneProfile + " " + styleAdj + " 여행자 타입이에요.")
+            : (sceneProfile + " 여행자 타입이에요.");
+          const line2 = "사진 분류에서 " + sceneLabel + "(" + scenePct + "%)이 가장 높게 나타났으며, "
+            + (styleAdj ? (styleAdj + " 분위기를 선호하시는 것 같아요.") : "다양한 여행 스타일을 지니셨네요.");
+          ensembleContent = `
+            <p class="cv-detail-visual-line" style="font-weight:700;color:#4e342e;">${escapeHtml(line1)}</p>
+            <p class="cv-detail-visual-line">${escapeHtml(line2)}</p>`;
+        }
 
         return `
-          <section class="cv-detail-section" aria-label="OpenCV 톤 분석">
+          <section class="cv-detail-section" aria-label="OpenCV 톤 분析">
             <h4 class="cv-detail-section__title">📊 밝기 · 채도 · 색온도</h4>
-            ${visualBlock}
+            ${visualLines}
+            ${visualSummary}
           </section>
           <section class="cv-detail-section" aria-label="Style MLP 분위기">
-            <h4 class="cv-detail-section__title">🎨 Style MLP 분위기 분석</h4>
-            <div class="cv-scene-bars">${styleBlock || '<p class="cv-detail-metric__hint">분위기 데이터 없음</p>'}</div>
+            <h4 class="cv-detail-section__title">[ 🎨 Style MLP 분위기 ]</h4>
+            <p class="cv-detail-visual-line">"${escapeHtml(styleText)}"</p>
+            ${styleHintLine}
           </section>
           <section class="cv-detail-section" aria-label="앙상블 최종 결과">
-            <h4 class="cv-detail-section__title">🏆 앙상블 최종 결과</h4>
-            <div class="cv-scene-bars">${ensembleBlock || '<p class="cv-detail-metric__hint">씬 데이터 없음</p>'}</div>
+            <h4 class="cv-detail-section__title">[ 🏆 앙상블 최종 결과 ]</h4>
+            ${ensembleContent || '<p class="cv-detail-metric__hint">씬 데이터 없음</p>'}
           </section>`;
       }
 
@@ -1342,6 +1522,7 @@
         strip.innerHTML = perImages
           .map((pv, i) => {
             const thumb = perImageThumbUrls[i] || "";
+            const title = perImageDetailTitle(pv, i);
             return `
               <button
                 type="button"
@@ -1349,6 +1530,7 @@
                 data-index="${i}"
                 role="listitem"
               >
+                <span class="per-image-card__title">${escapeHtml(title)}</span>
                 <img class="per-image-card__thumb" src="${thumb}" alt="Photo ${i + 1}" />
                 <div class="per-image-card__scores">${perImageCardScoresHtml(pv)}</div>
               </button>`;
@@ -1502,13 +1684,25 @@
         const geminiDesc = assist || extractGeminiOneLiner(text);
         const subtitle = `사진에서 ${label} 취향이 두드러져요!`;
 
+        const styleEntries = Object.entries(pv.style || {}).sort((a, b) => b[1] - a[1]);
+        const topStyleName = styleEntries[0]?.[0] || "";
+        const sceneProfile = SCENE_PROFILE_KO[catKey] || `${label} 취향을 가진`;
+        const styleAdj = STYLE_ADJ_KO[topStyleName] || "";
+        const profileSentence = styleAdj
+          ? `${sceneProfile} ${styleAdj} 여행자예요.`
+          : `${sceneProfile} 여행자예요.`;
+
         const summaryEl = document.getElementById("gemini-user-summary");
         if (summaryEl) {
+          const passengerName = (document.getElementById("passenger-name-input")?.value || "").trim();
+          const headlineText = passengerName
+            ? `${emoji} ${escapeHtml(passengerName)}님의 여행 취향은 ${escapeHtml(label)} ${conf}%`
+            : `${emoji} ${escapeHtml(label)} 취향 ${conf}%`;
           summaryEl.innerHTML = `
-            <p class="gemini-user-summary__headline">${emoji} ${escapeHtml(label)} 취향 ${conf}%</p>
-            <p class="gemini-user-summary__subtitle">${escapeHtml(subtitle)}</p>
-            <p class="gemini-user-summary__dests">✈ ${escapeHtml(destLine)}</p>
-            <p class="gemini-user-summary__gemini">${escapeHtml(geminiDesc)}</p>`;
+            <p class="gemini-user-summary__headline">${headlineText}</p>
+            <p class="gemini-user-summary__subtitle">사진에서 ${escapeHtml(label)} 취향이 두드러져요!</p>
+            <p class="gemini-user-summary__dest-label">✈ 여행지 추천</p>
+            <p class="gemini-user-summary__dests">${escapeHtml(destLine)}</p>`;
         }
 
         const detailEl = document.getElementById("gemini-cv-detail");
@@ -1841,17 +2035,17 @@
 
       document.getElementById("btn-bucket").addEventListener("click", (e) => {
         const btn = e.currentTarget;
-        if (btn.classList.contains("saved")) return;
+        if (btn.classList.contains("saved")) {
+          openBucketScreen();
+          return;
+        }
 
-        const saved = addCurrentDestinationToBucket();
+        addCurrentDestinationToBucket();
         btn.classList.add("saved");
         btn.innerHTML =
           '<span class="btn-bucket__icon" aria-hidden="true">✓</span> 저장 완료';
 
-        if (saved) {
-          closeBoardingModal();
-          showBucketToast();
-        }
+        setTimeout(() => openBucketScreen(), 500);
       });
 
       document.getElementById("btn-toast-bucket").addEventListener("click", () => {
@@ -1890,6 +2084,53 @@
         if (e.key === "Escape" && document.getElementById("boarding-modal").classList.contains("is-open")) {
           closeBoardingModal();
         }
+      });
+
+      const RANDOM_CITIES = [
+        { city: "발리", flag: "🇮🇩" }, { city: "도쿄", flag: "🇯🇵" },
+        { city: "파리", flag: "🇫🇷" }, { city: "뉴욕", flag: "🇺🇸" },
+        { city: "방콕", flag: "🇹🇭" }, { city: "싱가포르", flag: "🇸🇬" },
+        { city: "로마", flag: "🇮🇹" }, { city: "바르셀로나", flag: "🇪🇸" },
+        { city: "이스탄불", flag: "🇹🇷" }, { city: "교토", flag: "🇯🇵" },
+        { city: "제주", flag: "🇰🇷" }, { city: "홍콩", flag: "🇭🇰" },
+        { city: "오사카", flag: "🇯🇵" }, { city: "세부", flag: "🇵🇭" },
+        { city: "몰디브", flag: "🇲🇻" }, { city: "아이슬란드", flag: "🇮🇸" },
+        { city: "비엔나", flag: "🇦🇹" }, { city: "밀라노", flag: "🇮🇹" },
+        { city: "리스본", flag: "🇵🇹" }, { city: "프라하", flag: "🇨🇿" },
+      ];
+
+      function addToBucketByName(city, flag) {
+        if (!city?.trim()) return false;
+        const list = loadBucketList();
+        if (list.some((it) => it.city === city)) return false;
+        list.unshift({ id: String(Date.now()), city: city.trim(), date: formatDateEn(), flag: flag || "🌍" });
+        saveBucketList(list);
+        return true;
+      }
+
+      document.getElementById("btn-bucket-add")?.addEventListener("click", () => {
+        const input = document.getElementById("bucket-input");
+        const city = (input.value || "").trim();
+        if (!city) return;
+        addToBucketByName(city, "🌍");
+        input.value = "";
+        renderBucketList();
+      });
+
+      document.getElementById("bucket-input")?.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          document.getElementById("btn-bucket-add")?.click();
+        }
+      });
+
+      document.getElementById("btn-bucket-random")?.addEventListener("click", () => {
+        const list = loadBucketList();
+        const pool = RANDOM_CITIES.filter((c) => !list.some((it) => it.city === c.city));
+        if (!pool.length) return;
+        const pick = pool[Math.floor(Math.random() * pool.length)];
+        addToBucketByName(pick.city, pick.flag);
+        renderBucketList();
       });
 
       setMainTicketPending();

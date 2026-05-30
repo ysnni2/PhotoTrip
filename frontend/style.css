@@ -1199,7 +1199,7 @@ body {
   order: 1;
   border-radius: 16px;
   overflow: hidden;
-  background: linear-gradient(160deg, #eef4ff 0%, #d9ebf8 100%);
+  background: linear-gradient(180deg, #c7eeff 0%, #2f9fb3 60%, #1a6b8a 100%);
   border: 1px solid #bae6fd;
   box-shadow: 0 4px 16px rgba(26, 46, 74, 0.06);
 }
@@ -1251,9 +1251,9 @@ body {
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: 0.35rem;
+  gap: 0.28rem;
   padding: 0.35rem;
-  width: 88px;
+  width: 112px;
   border: 2px solid #e2e8f0;
   border-radius: 12px;
   background: var(--figma-surface);
@@ -1273,9 +1273,9 @@ body {
 
 .per-image-card__thumb {
   width: 100%;
-  height: 68px;
+  height: 54px;
   object-fit: cover;
-  border-radius: 8px;
+  border-radius: 6px;
   background: var(--figma-tint);
 }
 
@@ -1902,13 +1902,13 @@ body.modal-open {
   flex: 1;
   min-width: 0;
   padding: 0.5rem 0.65rem;
-  border: 1px solid var(--figma-border);
+  border: 2px solid #2563eb;
   border-radius: 999px;
-  background: transparent;
+  background: #ffffff;
   font-family: var(--font);
   font-size: 0.72rem;
   font-weight: 600;
-  color: var(--figma-accent);
+  color: #2563eb;
   cursor: pointer;
   white-space: nowrap;
   overflow: hidden;
@@ -1917,13 +1917,16 @@ body.modal-open {
 }
 
 .dest-tab:hover {
-  background: var(--figma-surface);
+  background: #eff6ff;
 }
 
 .dest-tab.active {
-  background: var(--figma-accent);
-  border-color: var(--figma-accent);
+  background: #2563eb;
+  border-color: #ffffff;
+  border-width: 2px;
   color: #ffffff;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
 }
 
 .trip-details {
@@ -1987,7 +1990,7 @@ body.modal-open {
 
 /* ── Screen 5: Bucket list ── */
 #screen-bucket {
-  background: var(--figma-page);
+  background: #dbeafe;
   color: var(--figma-navy);
   min-height: 100dvh;
 }
@@ -2003,16 +2006,16 @@ body.modal-open {
   gap: 0.75rem;
   padding: 1rem 1.25rem;
   background: #ffffff;
-  border-bottom: 1px solid var(--figma-border);
+  border-bottom: 2px solid #bfdbfe;
   flex-shrink: 0;
 }
 
 .btn-bucket-back {
-  padding: 0.45rem 0.75rem;
-  border: 1px solid var(--figma-border);
+  padding: 0.45rem 0.9rem;
+  border: 1.5px solid #3b82f6;
   border-radius: 10px;
-  background: var(--figma-surface);
-  color: var(--figma-navy);
+  background: transparent;
+  color: #2563eb;
   font-family: var(--font);
   font-size: 0.85rem;
   font-weight: 600;
@@ -2021,13 +2024,82 @@ body.modal-open {
 }
 
 .btn-bucket-back:hover {
-  background: var(--figma-tint);
+  background: #eff6ff;
 }
 
 .bucket-header__title {
   margin: 0;
   font-size: 1.15rem;
   font-weight: 800;
+  color: #1d4ed8;
+}
+
+.bucket-controls {
+  padding: 1rem 1.25rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  flex-shrink: 0;
+}
+
+.bucket-input-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.bucket-input {
+  flex: 1;
+  padding: 0.6rem 0.85rem;
+  border: 1.5px solid #93c5fd;
+  border-radius: 10px;
+  background: #ffffff;
+  color: var(--figma-navy);
+  font-family: var(--font);
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.bucket-input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+}
+
+.btn-bucket-add {
+  padding: 0.6rem 1.1rem;
+  border: none;
+  border-radius: 10px;
+  background: #3b82f6;
+  color: #ffffff;
+  font-family: var(--font);
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+
+.btn-bucket-add:hover {
+  background: #2563eb;
+}
+
+.btn-bucket-random {
+  width: 100%;
+  padding: 0.6rem 1rem;
+  border: 2px solid #2563eb;
+  border-radius: 10px;
+  background: transparent;
+  color: #2563eb;
+  font-family: var(--font);
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.btn-bucket-random:hover {
+  background: #eff6ff;
+  border-color: #2563eb;
 }
 
 .bucket-list {
@@ -2047,19 +2119,36 @@ body.modal-open {
 .bucket-item {
   display: flex;
   align-items: center;
-  gap: 0.85rem;
-  padding: 0.9rem 1rem;
-  margin-bottom: 0.65rem;
+  gap: 0.9rem;
+  padding: 1rem 1.1rem;
+  margin-bottom: 0.9rem;
   background: #ffffff;
-  border: 1px solid var(--figma-border);
+  border: 1.5px solid #bfdbfe;
   border-radius: 14px;
-  box-shadow: 0 2px 10px rgba(26, 46, 74, 0.05);
+  box-shadow: 0 2px 10px rgba(59, 130, 246, 0.1);
 }
 
-.bucket-item__flag {
-  font-size: 1.75rem;
-  line-height: 1;
+.bucket-item__badge {
   flex-shrink: 0;
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 50%;
+  background: #2563eb;
+  color: #ffffff;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.bucket-item__badge--emoji {
+  background: #dbeafe;
+  border: 2px solid #bfdbfe;
+  font-size: 1.3rem;
 }
 
 .bucket-item__body {
@@ -2067,25 +2156,55 @@ body.modal-open {
   flex-direction: column;
   gap: 0.2rem;
   min-width: 0;
+  flex: 1;
 }
 
 .bucket-item__city {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--figma-navy);
+  color: #1e3a5f;
 }
 
 .bucket-item__date {
   font-size: 0.82rem;
-  color: var(--figma-muted);
+  color: #64748b;
+}
+
+.btn-bucket-delete {
+  flex-shrink: 0;
+  width: 1.75rem;
+  height: 1.75rem;
+  border: 1px solid #fca5a5;
+  border-radius: 50%;
+  background: #fff5f5;
+  color: #ef4444;
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.btn-bucket-delete:hover {
+  background: #fee2e2;
+  border-color: #ef4444;
 }
 
 .bucket-empty {
   text-align: center;
-  padding: 2.5rem 1rem;
-  color: var(--figma-muted);
-  font-size: 0.9rem;
+  padding: 3rem 1rem 1.5rem;
+  color: #64748b;
+  font-size: 0.95rem;
   list-style: none;
+  line-height: 1.6;
+}
+
+.bucket-empty__hint {
+  font-size: 0.82rem;
+  color: #94a3b8;
 }
 
 /* Bucket save toast */
