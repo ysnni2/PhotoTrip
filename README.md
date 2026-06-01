@@ -18,38 +18,37 @@ PhotoTrip은 사용자가 업로드한 일상 사진(5~7장)을 입력으로 받
 
 ```mermaid
 flowchart TD
-    A[🖼️ 사진 업로드 5~7장] --> B
-
-    subgraph B[" Per-Image Analysis "]
-        C[CLIP Fine-tuned\n장면 분류 93.48%]
-        D[OneFormer\n의미론적 분할 45.6%]
-        E[OpenCV\n색감·밝기 분석]
-        F[Style MLP\n분위기 분석]
+    INPUT["🖼️ 사진 업로드 5~7장\n일상 사진 입력"]
+    INPUT --> CLIP
+    INPUT --> ONE
+    INPUT --> OCV
+    INPUT --> SMLP
+    subgraph ANALYSIS["📊 Per-Image Analysis (병렬)"]
+        CLIP["🔵 CLIP Fine-tuned\n장면 분류 · 93.48%"]
+        ONE["🟢 OneFormer\n의미론적 분할 · 45.6% mIoU"]
+        OCV["🟡 OpenCV\n색감 · 밝기 · 채도"]
+        SMLP["🟣 Style MLP\n분위기 · 스타일 분석"]
     end
-
-    B --> G
-
-    subgraph G[" Preference Vector Builder "]
-        H[scene · visual · semantic\nstyle · lifestyle 통합]
+    CLIP --> PV
+    ONE --> PV
+    OCV --> PV
+    SMLP --> PV
+    subgraph VECTOR["🧠 Preference Vector Builder"]
+        PV["scene · visual · semantic\nstyle · lifestyle 통합"]
+        PV --> ENS["앙상블 (N장 평균)\ntop_category · confidence · is_uncertain"]
     end
-
-    G --> I[앙상블\nN장 평균]
-
-    I --> J[추천 엔진\nTop-3 여행지]
-    I --> K[Gemini LLM\n취향 설명 생성]
-
-    J --> L
-    K --> L
-
-    subgraph L[" Frontend "]
-        M[Three.js 3D 씬]
-        N[CV Dashboard]
-        O[가상 탑승권]
+    ENS --> REC
+    ENS --> GEM
+    subgraph OUTPUT["🎯 Output"]
+        REC["📍 추천 엔진\nTop-3 여행지 · 코사인 유사도"]
+        GEM["💬 Gemini LLM\n취향 자연어 설명"]
+        REC --> FE
+        GEM --> FE
+        FE["🌐 Frontend\nThree.js 3D 씬 · CV Dashboard · 가상 탑승권"]
     end
-
-    style B fill:#e6f1fb,stroke:#378add
-    style G fill:#e1f5ee,stroke:#1d9e75
-    style L fill:#faeeda,stroke:#ba7517
+    style ANALYSIS fill:#e6f1fb,stroke:#378add
+    style VECTOR fill:#e1f5ee,stroke:#1d9e75
+    style OUTPUT fill:#faeeda,stroke:#ba7517
 ```
 
 **기술 스택**
@@ -113,22 +112,21 @@ Preference Vector는 분류 모델의 카테고리별 softmax 확률을 직접 �
 ## 모델 학습 구조
 
 ```mermaid
-flowchart LR
-    subgraph CLIP 학습
-        A1[Pixabay 데이터\n카테고리별 수집] --> A2[Pseudo Labeling\nSigLIP → CLIP]
+flowchart TD
+    subgraph CLIP["🔵 CLIP 장면 분류 학습"]
+        A1[Pixabay 데이터 수집\n카테고리별 6클래스] --> A2[Pseudo Labeling\nSigLIP → CLIP 자동 라벨링]
         A2 --> A3[CLIP Fine-tuning\nopenai/clip-vit-base-patch32]
-        A3 --> A4[Val Acc 93.48%\nConfidence 79~87%]
+        A3 --> A4["✅ Val Acc 93.48%\nConfidence 79~87%"]
     end
-
-    subgraph OneFormer 학습
-        B1[ADE20K\nFoodSeg103\nCityscapes] --> B2[통합 학습\ntask-conditioned]
-        B2 --> B3[mIoU 37.1%\n→ 45.6%]
+    subgraph ONE["🟢 OneFormer 분할 학습"]
+        B1[ADE20K\nFoodSeg103\nCityscapes] --> B2[멀티데이터셋 통합 학습\ntask-conditioned joint training]
+        B2 --> B3["✅ mIoU 37.1% → 45.6%\n+8.5%p 향상"]
     end
-
-    subgraph MLP 학습
-        C1[CLIP 임베딩\n768차원] --> C2[MLP\n768→512→256→128→6]
-        C2 --> C3[mood / place\nstyle 분류]
+    subgraph MLP["🟣 MLP 스타일 분류 학습"]
+        C1[CLIP 임베딩\n768차원 입력] --> C2[MLP\n768→512→256→128→6]
+        C2 --> C3["✅ mood / place / style\n카테고리별 분류"]
     end
+    CLIP ~~~ ONE ~~~ MLP
 ```
 
 ---
