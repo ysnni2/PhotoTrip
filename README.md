@@ -8,13 +8,17 @@
 
 기존 여행 추천 시스템은 설문·클릭 로그·예약 이력 등 명시적 신호에 의존하며, 사용자가 인지하지 못하는 잠재적 취향—일상 사진에 암묵적으로 내재된 장소 감성, 색감 선호, 분위기 취향—을 반영하기 어렵다는 근본적 한계를 지닌다.
 
-본 연구는 사용자의 일상 사진(5~7장)으로부터 여행 취향을 자동으로 정량화하고 맞춤형 여행지를 추천하는 end-to-end AI 시스템 **PhotoTrip**을 제안한다.
+본 연구는 사용자의 일상 사진(5~7장)으로부터 여행 취향을 자동으로 정량화하고 맞춤형 여행지를 추천하는 end-to-end AI 시스템 PhotoTrip을 제안한다.
 
-시스템은 네 개의 분석 모듈을 병렬로 구동한다. **(1) 장면 분류**: CLIP ViT-B/32를 beach·nature·city·culture·festival·food 6-class로 fine-tuning하여 장면 범주와 예측 confidence를 추출한다. **(2) 의미론적 분할**: OneFormer의 task-conditioned joint training으로 ADE20K·FoodSeg103·Cityscapes를 단일 모델에서 통합 학습하여 픽셀 수준의 water·sky·vegetation·building·food 비율을 산출한다. **(3) 시각 특성 분석**: OpenCV로 밝기·채도·대비·색온도를 정량화한다. **(4) 스타일 분류**: BCE Loss with class weights와 Pseudo Labeling을 적용한 MLP로 분위기·라이프스타일 벡터를 생성한다. 네 모듈의 출력을 통합한 **Preference Vector**는 코사인 유사도 기반 추천 엔진에 입력되어 Top-3 여행지를 선정하고, Gemini LLM이 결과를 자연어로 설명한다.
+시스템은 네 개의 분석 모듈을 병렬로 구동한다. (1) 장면 분류: CLIP ViT-B/32를 beach·nature·city·culture·festival·food 6-class로 fine-tuning하여 장면 범주와 예측 confidence를 추출한다. (2) 의미론적 분할: OneFormer의 task-conditioned joint training으로 ADE20K·FoodSeg103·Cityscapes를 단일 모델에서 통합 학습하여 픽셀 수준의 water·sky·vegetation·building·food 비율을 산출한다. (3) 시각 특성 분석: OpenCV로 밝기·채도·대비·색온도를 정량화한다. (4) 스타일 분류: BCE Loss with class weights와 Pseudo Labeling을 적용한 MLP로 분위기·라이프스타일 벡터를 생성한다.
 
-실험 결과, 장면 분류에서 CLIP zero-shot 64.27% 대비 fine-tuned 모델이 **93.48%**(+29.2%p)를 달성하였다. 모델 선택 과정에서 SigLIP fine-tuned는 accuracy(93.56%)가 유사하나 inference confidence가 **33~37%** 에 머무는 반면, CLIP fine-tuned는 **79~87%** confidence를 일관되게 산출하여 downstream preference vector 품질 관점에서 CLIP을 최종 채택하였다. OneFormer fine-tuning을 통해 mIoU **37.1% -> 45.6%**(+8.5%p)를 확보하였다.
+네 모듈의 출력을 통합한 Preference Vector는 코사인 유사도 기반 추천 엔진에 입력되어 Top-3 여행지를 선정하고, Gemini LLM이 결과를 자연어로 설명한다.
 
-분석 결과는 카테고리별 Three.js 3D 씬, CV 대시보드, 가상 탑승권 UI를 통해 시각화되며, 정량 분석과 Gemini기반 정성적 해석을 함께 제공하는 설명 가능한 추천 경험을 구현한다.
+실험 결과, 장면 분류에서 CLIP zero-shot 64.27% 대비 fine-tuned 모델이 93.48%(+29.2%p)를 달성하였다. 모델 선택 과정에서 SigLIP fine-tuned는 accuracy(93.56%)가 유사하나 inference confidence가 33~37%에 머무는 반면, CLIP fine-tuned는 79~87% confidence를 일관되게 산출하여 downstream preference vector 품질 관점에서 CLIP을 최종 채택하였다. OneFormer fine-tuning을 통해 mIoU 37.1%에서 45.6%로 향상(+8.5%p)을 확보하였다.
+
+3D 씬 렌더링 실험에서는 COLMAP Structure-from-Motion과 3D Gaussian Splatting(3DGS) 파이프라인을 직접 구축하여 2개 씬 학습 및 렌더링 결과를 확보하였으며, 웹 통합 호환성을 고려하여 Three.js procedural rendering으로 최종 전환하였다.
+
+분석 결과는 카테고리별 Three.js 3D 씬, CV 대시보드, 가상 탑승권 UI를 통해 시각화되며, 정량 분석과 Gemini 기반 정성적 해석을 함께 제공하는 설명 가능한 추천 경험을 구현한다.
 
 ---
 
@@ -180,37 +184,31 @@ SigLIP은 sigmoid loss 특성상 각 클래스를 독립적으로 평가하여 c
 
 ```mermaid
 flowchart LR
-    subgraph CLIP["CLIP 장면 분류 학습"]
-        A1["Pixabay 수집\n6클래스"] --> A2["Pseudo Labeling\nSigLIP->CLIP"]
-        A2 --> A3["CLIP Fine-tuning"] --> A4["Acc 93.48%\nConf 79~87%"]
-    end
+    A["Pixabay\n수집"] --> B["Pseudo\nLabeling"] --> C["CLIP\nFine-tuning"] --> R1(["Acc 93.48%\nConf 79~87%"])
+    D["ADE20K\nFoodSeg\nCityscapes"] --> E["통합 학습\njoint training"] --> R2(["mIoU\n37.1%->45.6%"])
+    F["CLIP 임베딩\n768차원"] --> G["MLP\n768->128->6"] --> R3(["mood\nplace\nstyle"])
+    H["RGB\n이미지"] --> I["밝기 채도\n색온도"] --> R4(["6개\n메트릭"])
 
-    subgraph ONE["OneFormer 분할 학습"]
-        B1["ADE20K\nFoodSeg\nCityscapes"] --> B2["통합 학습\njoint training"]
-        B2 --> B3["mIoU\n37.1%->45.6%"]
-    end
+    R1 --> PV
+    R2 --> PV
+    R3 --> PV
+    R4 --> PV
 
-    subgraph MLP["MLP 스타일 분류"]
-        C1["CLIP 임베딩\n768차원"] --> C2["768->512\n->256->128->6"]
-        C2 --> C3["mood\nplace\nstyle"]
-    end
+    PV(["Preference Vector"])
 
-    subgraph OCV["OpenCV 시각 분석"]
-        D1["RGB\n이미지"] --> D2["밝기 채도\n색온도 대비"]
-        D2 --> D3["6개\n메트릭"]
-    end
-
-    CLIP --> PV
-    ONE --> PV
-    MLP --> PV
-    OCV --> PV
-
-    PV(["Preference Vector\nscene+visual+semantic\n+style+lifestyle"])
-
-    style CLIP fill:#e6f1fb,stroke:#378add
-    style ONE fill:#e1f5ee,stroke:#1d9e75
-    style MLP fill:#eeedfe,stroke:#7f77dd
-    style OCV fill:#faeeda,stroke:#ba7517
+    style A fill:#e6f1fb,stroke:#378add
+    style B fill:#e6f1fb,stroke:#378add
+    style C fill:#e6f1fb,stroke:#378add
+    style R1 fill:#e6f1fb,stroke:#378add
+    style D fill:#e1f5ee,stroke:#1d9e75
+    style E fill:#e1f5ee,stroke:#1d9e75
+    style R2 fill:#e1f5ee,stroke:#1d9e75
+    style F fill:#eeedfe,stroke:#7f77dd
+    style G fill:#eeedfe,stroke:#7f77dd
+    style R3 fill:#eeedfe,stroke:#7f77dd
+    style H fill:#faeeda,stroke:#ba7517
+    style I fill:#faeeda,stroke:#ba7517
+    style R4 fill:#faeeda,stroke:#ba7517
     style PV fill:#f1efe8,stroke:#5f5e5a
 ```
 
