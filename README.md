@@ -152,27 +152,6 @@ Mask2Former를 사용할 경우 데이터셋마다 별도 모델 학습이 필�
 
 ### SigLIP vs CLIP 채택 배경
 
-본 시스템에서 Preference Vector는 분류 모델의 카테고리별 softmax 확률을 직접 사용한다.
-
-```python
-# Preference Vector 구성 예시
-scene = {
-    "beach": 0.87,   # CLIP: 명확한 신호
-    "nature": 0.05,
-    ...
-}
-# vs SigLIP
-scene = {
-    "beach": 0.34,   # SigLIP: 희석된 신호
-    "nature": 0.31,  # 균등 분포에 가까움
-    ...
-}
-```
-
-SigLIP은 sigmoid loss 특성상 각 클래스를 독립적으로 평가하여 confidence가 33~37%에 머문다. 이는 6개 카테고리가 거의 균등하게 분산(약 16.7%)되는 것과 유사하여 취향 신호가 희석된다.
-
-반면 CLIP은 softmax 기반으로 confidence가 79~87%를 달성하여 취향 신호를 명확하게 전달한다. 또한 낮은 confidence는 시스템의 `is_uncertain` 플래그를 활성화하여 랜덤 추천 fallback을 유발, 서비스 품질을 직접 저하시킨다.
-
 | 모델 | Val Accuracy | Inference Confidence | 채택 |
 |------|-------------|---------------------|------|
 | SigLIP fine-tuned | 93.56% | 33~37% ❌ | 미채택 |
@@ -304,7 +283,7 @@ SigLIP vs CLIP Confidence 비교:
 
 ---
 
-## Limitations & Engineering Decisions
+## Limitations & Future Work
 
 **주요 전환 결정 요약**
 
@@ -331,6 +310,14 @@ SigLIP vs CLIP Confidence 비교:
 
 6. **Cold-start**  
    업로드 사진 수(최소 5장) 및 품질에 따라 `is_uncertain` 플래그가 활성화되며, 이 경우 랜덤/보조 추천 fallback이 동작한다.
+
+### 향후 개선 방향
+- 실제 여행지 드론 영상으로 3DGS 재학습 및 웹 통합
+- 6개 카테고리를 세분화된 하위 테마로 확장
+  (예: beach -> 리조트형 vs 자연형)
+- MLP v3/v4 F1 수치 기반 최적 버전 확정
+- 사용자 피드백 기반 추천 개선 루프 구축
+- 모바일 앱 확장
 
 ---
 
