@@ -212,9 +212,7 @@ flowchart LR
 | SigLIP + Pseudo Labeling | 93.14% | pseudo label 기반 semi-supervised |
 | **CLIP Fine-tuned (최종 채택)** | **93.48%** | `openai/clip-vit-base-patch32` ✅ |
 
-**CLIP 선택 근거**
-
-SigLIP 계열은 validation accuracy 측면에서 CLIP fine-tuned와 유사한 수준(93%대)을 기록하였으나, **실제 inference 시 예측 confidence가 33~37%에 불과**하였다. 반면 fine-tuned CLIP은 **79~87% confidence**를 일관되게 산출하였다. scene confidence는 preference vector의 `confidence` 필드 및 `is_uncertain` 플래그에 직접 반영되며, downstream recommender의 destination scoring에 영향을 미친다.
+> CLIP 선택 근거: 배경 및 관련 연구 섹션 참고
 
 <p align="center">
   <img src="results/full_experiment_history.png.png" width="80%"/>
