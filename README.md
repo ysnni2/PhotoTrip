@@ -229,16 +229,16 @@ flowchart LR
 | 모델 | mIoU | 학습 데이터 | 비고 |
 |------|------|-----------|------|
 | OneFormer pretrained | 37.1% | ADE20K | 기준선 |
-| OneFormer fine-tuned | **45.6%** | ADE20K + FoodSeg103 | 1 epoch, joint training |
-| oneformer_top | [TBD] | 추가 학습 중 | — |
+| **OneFormer fine-tuned** | **45.6%** | ADE20K + FoodSeg103 + Cityscapes | **최종 채택 ✅** |
 
 - **모델**: `shi-labs/oneformer_ade20k_swin_large`
 - **목적**: ADE20K 클래스를 travel-relevant semantic ratio(water, sky, vegetation, building, food)로 집계
-- **inference latency**: [TBD] ms/image (GPU)
 
 <p align="center">
-  <img src="results/Oneformer_results.png.png" width="48%"/>
-  <img src="results/Oneformer_mIoU.png.png" width="48%"/>
+  <img src="results/Oneformer_results.png.png" width="80%"/>
+</p>
+<p align="center">
+  <img src="results/Oneformer_mIoU.png.png" width="50%"/>
 </p>
 
 ---
