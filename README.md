@@ -18,7 +18,7 @@ PhotoTrip은 사용자가 업로드한 일상 사진(5~7장)을 입력으로 받
 
 ```mermaid
 flowchart TD
-    INPUT["🖼️ 사진 업로드 5~7장\n일상 사진 입력"]
+    INPUT["사진 업로드 5~7장\n일상 사진 입력"]
     INPUT --> CLIP
     INPUT --> ONE
     INPUT --> OCV
@@ -33,18 +33,18 @@ flowchart TD
     ONE --> PV
     OCV --> PV
     SMLP --> PV
-    subgraph VECTOR["🧠 Preference Vector Builder"]
+    subgraph VECTOR["Preference Vector Builder"]
         PV["scene · visual · semantic\nstyle · lifestyle 통합"]
         PV --> ENS["앙상블 (N장 평균)\ntop_category · confidence · is_uncertain"]
     end
     ENS --> REC
     ENS --> GEM
-    subgraph OUTPUT["🎯 Output"]
-        REC["📍 추천 엔진\nTop-3 여행지 · 코사인 유사도"]
+    subgraph OUTPUT["Output"]
+        REC["📍추천 엔진\nTop-3 여행지 · 코사인 유사도"]
         GEM["💬 Gemini LLM\n취향 자연어 설명"]
         REC --> FE
         GEM --> FE
-        FE["🌐 Frontend\nThree.js 3D 씬 · CV Dashboard · 가상 탑승권"]
+        FE["🌐Frontend\nThree.js 3D 씬 · CV Dashboard · 가상 탑승권"]
     end
     style ANALYSIS fill:#e6f1fb,stroke:#378add
     style VECTOR fill:#e1f5ee,stroke:#1d9e75
@@ -116,15 +116,15 @@ flowchart TD
     subgraph CLIP["🔵 CLIP 장면 분류 학습"]
         A1[Pixabay 데이터 수집\n카테고리별 6클래스] --> A2[Pseudo Labeling\nSigLIP → CLIP 자동 라벨링]
         A2 --> A3[CLIP Fine-tuning\nopenai/clip-vit-base-patch32]
-        A3 --> A4["✅ Val Acc 93.48%\nConfidence 79~87%"]
+        A3 --> A4["Val Acc 93.48%\nConfidence 79~87%"]
     end
     subgraph ONE["🟢 OneFormer 분할 학습"]
         B1[ADE20K\nFoodSeg103\nCityscapes] --> B2[멀티데이터셋 통합 학습\ntask-conditioned joint training]
-        B2 --> B3["✅ mIoU 37.1% → 45.6%\n+8.5%p 향상"]
+        B2 --> B3["mIoU 37.1% → 45.6%\n+8.5%p 향상"]
     end
     subgraph MLP["🟣 MLP 스타일 분류 학습"]
         C1[CLIP 임베딩\n768차원 입력] --> C2[MLP\n768→512→256→128→6]
-        C2 --> C3["✅ mood / place / style\n카테고리별 분류"]
+        C2 --> C3["mood / place / style\n카테고리별 분류"]
     end
     CLIP ~~~ ONE ~~~ MLP
 ```
