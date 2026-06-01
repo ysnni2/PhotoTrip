@@ -22,46 +22,37 @@
 
 ```mermaid
 flowchart TD
-    INPUT["📷 사진 업로드 5~7장\n일상 사진 입력"]
-
+    INPUT["사진 업로드 5~7장\n일상 사진 입력"]
     INPUT --> CLIP
     INPUT --> ONE
     INPUT --> OCV
     INPUT --> SMLP
-
-    subgraph ANALYSIS["📊 Per-Image Analysis — 병렬 처리"]
-        CLIP["🔵 CLIP Fine-tuned\n장면 분류 · Acc 93.48% · Conf 79~87%\n→ scene scores"]
-        ONE["🟢 OneFormer\n의미론적 분할 · mIoU 45.6%\n→ semantic ratio"]
-        OCV["🟡 OpenCV\n밝기 · 채도 · 색온도 · 대비\n→ visual metrics"]
-        SMLP["🟣 Style MLP\n768→512→256→128→6 · BCE Loss\n→ mood · place · style"]
+    subgraph ANALYSIS["Per-Image Analysis - 병렬 처리"]
+        CLIP["CLIP Fine-tuned\n장면 분류 Acc 93.48% Conf 79~87%\noutput: scene scores"]
+        ONE["OneFormer\n의미론적 분할 mIoU 45.6%\noutput: semantic ratio"]
+        OCV["OpenCV\n밝기 채도 색온도 대비\noutput: visual metrics"]
+        SMLP["Style MLP\n768->512->256->128->6 BCE Loss\noutput: mood place style"]
     end
-
     CLIP --> PV
     ONE --> PV
     OCV --> PV
     SMLP --> PV
-
-    subgraph VECTOR["🧠 Preference Vector Builder"]
-        PV["scene · visual · semantic · style · lifestyle 통합\nN장 평균 앙상블 → top_category · confidence · is_uncertain"]
+    subgraph VECTOR["Preference Vector Builder"]
+        PV["scene + visual + semantic + style + lifestyle\nN장 평균 앙상블 - top_category confidence is_uncertain"]
     end
-
     PV --> REC
     PV --> GEM
-
-    subgraph OUTPUT["🎯 Output"]
-        REC["📍 추천 엔진\n코사인 유사도 · Top-3~5 여행지\ninterest tag 보너스"]
-        GEM["💬 Gemini LLM\n취향 자연어 설명 · Flying 챗봇"]
-
+    subgraph OUTPUT["Output"]
+        REC["추천 엔진\n코사인 유사도 Top-3~5 여행지"]
+        GEM["Gemini LLM\n취향 자연어 설명 Flying 챗봇"]
         REC --> FE
         GEM --> FE
-
-        subgraph FE["🌐 Frontend"]
-            T1["🎫 가상 탑승권\nTop-3 여행지 · Gemini 취향 설명"]
-            T2["🎡 Three.js 3D 씬\n6개 카테고리 인터랙티브\n(3DGS 실험 후 전환)"]
-            T3["📊 CV Dashboard\n분석 결과 · Photo별 상세"]
+        subgraph FE["Frontend"]
+            T1["가상 탑승권\nTop-3 여행지 Gemini 취향 설명"]
+            T2["Three.js 3D 씬\n6개 카테고리 인터랙티브"]
+            T3["CV Dashboard\n분석 결과 Photo별 상세"]
         end
     end
-
     style ANALYSIS fill:#e6f1fb,stroke:#378add
     style VECTOR fill:#e1f5ee,stroke:#1d9e75
     style OUTPUT fill:#faeeda,stroke:#ba7517
@@ -189,41 +180,25 @@ SigLIP은 sigmoid loss 특성상 각 클래스를 독립적으로 평가하여 c
 
 ```mermaid
 flowchart TD
-    subgraph CLIP["🔵 CLIP 장면 분류 학습"]
-<<<<<<< HEAD
-        A1[Pixabay 데이터 수집\n카테고리별 6클래스] --> A2[Pseudo Labeling\nSigLIP → CLIP 자동 라벨링]
-        A2 --> A3[CLIP Fine-tuning\nopenai/clip-vit-base-patch32]
-        A3 --> A4["Val Acc 93.48%\nConfidence 79~87%"]
-=======
-        A1["Pixabay 수집\n카테고리별 6클래스"] --> A2["Pseudo Labeling\nSigLIP → CLIP 자동 라벨링"]
+    subgraph CLIP["CLIP 장면 분류 학습"]
+        A1["Pixabay 수집\n카테고리별 6클래스"] --> A2["Pseudo Labeling\nSigLIP -> CLIP 자동 라벨링"]
         A2 --> A3["CLIP Fine-tuning\nclip-vit-base-patch32"]
-        A3 --> A4["✅ Val Acc 93.48%\nConfidence 79~87%"]
->>>>>>> 78e3057 (docs: README.md 학술 논문 스타일로 전면 재작성)
+        A3 --> A4["Val Acc 93.48%\nConfidence 79~87%"]
     end
 
-    subgraph ONE["🟢 OneFormer 분할 학습"]
-<<<<<<< HEAD
-        B1[ADE20K\nFoodSeg103\nCityscapes] --> B2[멀티데이터셋 통합 학습\ntask-conditioned joint training]
-        B2 --> B3["mIoU 37.1% → 45.6%\n+8.5%p 향상"]
-=======
-        B1["멀티 데이터셋\nADE20K · FoodSeg103 · Cityscapes"] --> B2["통합 학습\ntask-conditioned joint training"]
-        B2 --> B3["✅ mIoU 37.1% → 45.6%\n+8.5%p 향상"]
->>>>>>> 78e3057 (docs: README.md 학술 논문 스타일로 전면 재작성)
+    subgraph ONE["OneFormer 분할 학습"]
+        B1["멀티 데이터셋\nADE20K FoodSeg103 Cityscapes"] --> B2["통합 학습\ntask-conditioned joint training"]
+        B2 --> B3["mIoU 37.1% -> 45.6%\n+8.5%p 향상"]
     end
 
-    subgraph MLP["🟣 MLP 스타일 분류 학습"]
-<<<<<<< HEAD
-        C1[CLIP 임베딩\n768차원 입력] --> C2[MLP\n768→512→256→128→6]
-        C2 --> C3["mood / place / style\n카테고리별 분류"]
-=======
-        C1["CLIP 임베딩\n768차원 입력"] --> C2["MLP 구조\n768→512→256→128→6"]
-        C2 --> C3["✅ BCE Loss + class weights\nmood · place · style 분류"]
->>>>>>> 78e3057 (docs: README.md 학술 논문 스타일로 전면 재작성)
+    subgraph MLP["MLP 스타일 분류 학습"]
+        C1["CLIP 임베딩\n768차원 입력"] --> C2["MLP 구조\n768->512->256->128->6"]
+        C2 --> C3["BCE Loss + class weights\nmood place style 분류"]
     end
 
-    subgraph OCV["🟡 OpenCV 시각 특성 분석"]
-        D1["이미지 입력\nRGB 원본"] --> D2["시각 분석\n밝기 · 채도 · 색온도 · 대비"]
-        D2 --> D3["✅ 6개 시각 메트릭 추출\nwarm · person · animal ratio"]
+    subgraph OCV["OpenCV 시각 특성 분석"]
+        D1["이미지 입력\nRGB 원본"] --> D2["시각 분석\n밝기 채도 색온도 대비"]
+        D2 --> D3["6개 시각 메트릭 추출\nwarm person animal ratio"]
     end
 
     CLIP --> PV
@@ -231,7 +206,7 @@ flowchart TD
     MLP --> PV
     OCV --> PV
 
-    PV["🧠 Preference Vector 통합\nscene · visual · semantic · style · lifestyle"]
+    PV["Preference Vector 통합\nscene + visual + semantic + style + lifestyle"]
 
     style CLIP fill:#e6f1fb,stroke:#378add
     style ONE fill:#e1f5ee,stroke:#1d9e75
