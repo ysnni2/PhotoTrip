@@ -179,26 +179,25 @@ SigLIP은 sigmoid loss 특성상 각 클래스를 독립적으로 평가하여 c
 ## 모델 학습 구조
 
 ```mermaid
-flowchart TD
+flowchart LR
     subgraph CLIP["CLIP 장면 분류 학습"]
-        A1["Pixabay 수집\n카테고리별 6클래스"] --> A2["Pseudo Labeling\nSigLIP -> CLIP 자동 라벨링"]
-        A2 --> A3["CLIP Fine-tuning\nclip-vit-base-patch32"]
-        A3 --> A4["Val Acc 93.48%\nConfidence 79~87%"]
+        A1["Pixabay 수집\n6클래스"] --> A2["Pseudo Labeling\nSigLIP->CLIP"]
+        A2 --> A3["CLIP Fine-tuning"] --> A4["Acc 93.48%\nConf 79~87%"]
     end
 
     subgraph ONE["OneFormer 분할 학습"]
-        B1["멀티 데이터셋\nADE20K FoodSeg103 Cityscapes"] --> B2["통합 학습\ntask-conditioned joint training"]
-        B2 --> B3["mIoU 37.1% -> 45.6%\n+8.5%p 향상"]
+        B1["ADE20K\nFoodSeg\nCityscapes"] --> B2["통합 학습\njoint training"]
+        B2 --> B3["mIoU\n37.1%->45.6%"]
     end
 
-    subgraph MLP["MLP 스타일 분류 학습"]
-        C1["CLIP 임베딩\n768차원 입력"] --> C2["MLP 구조\n768->512->256->128->6"]
-        C2 --> C3["BCE Loss + class weights\nmood place style 분류"]
+    subgraph MLP["MLP 스타일 분류"]
+        C1["CLIP 임베딩\n768차원"] --> C2["768->512\n->256->128->6"]
+        C2 --> C3["mood\nplace\nstyle"]
     end
 
-    subgraph OCV["OpenCV 시각 특성 분석"]
-        D1["이미지 입력\nRGB 원본"] --> D2["시각 분석\n밝기 채도 색온도 대비"]
-        D2 --> D3["6개 시각 메트릭 추출\nwarm person animal ratio"]
+    subgraph OCV["OpenCV 시각 분석"]
+        D1["RGB\n이미지"] --> D2["밝기 채도\n색온도 대비"]
+        D2 --> D3["6개\n메트릭"]
     end
 
     CLIP --> PV
@@ -206,7 +205,7 @@ flowchart TD
     MLP --> PV
     OCV --> PV
 
-    PV["Preference Vector 통합\nscene + visual + semantic + style + lifestyle"]
+    PV(["Preference Vector\nscene+visual+semantic\n+style+lifestyle"])
 
     style CLIP fill:#e6f1fb,stroke:#378add
     style ONE fill:#e1f5ee,stroke:#1d9e75
