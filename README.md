@@ -6,11 +6,15 @@
 
 ## Abstract
 
-PhotoTrip은 사용자가 업로드한 일상 사진(5~7장)을 입력으로 받아, 컴퓨터 비전 파이프라인을 통해 여행 취향을 정량화하고 맞춤형 여행지를 추천하는 end-to-end AI 시스템이다. 여행 추천 시스템은 전통적으로 설문·클릭 로그·예약 이력 등 명시적 선호에 의존하지만, 실제 여행 취향은 일상 사진—카페, 식사, 공연, 풍경, 실내 공간 등—에 암묵적으로 내재되어 있다.
+기존 여행 추천 시스템은 설문·클릭 로그·예약 이력 등 명시적 신호에 의존하며, 사용자가 인지하지 못하는 잠재적 취향—일상 사진에 암묵적으로 내재된 장소 감성, 색감 선호, 분위기 취향—을 반영하기 어렵다는 근본적 한계를 지닌다.
 
-본 시스템은 (1) CLIP fine-tuning 기반 장면 분류, (2) OneFormer 멀티데이터셋 의미론적 분할, (3) OpenCV 기반 시각 특성 추출, (4) MLP 기반 스타일·라이프스타일 분석을 통합하여 **Preference Vector**를 구성하고, 이를 기반으로 여행지 랭킹 및 Gemini 기반 자연어 설명을 생성한다. 프론트엔드는 Three.js 기반 카테고리별 3D 씬과 가상 탑승권 UI를 제공하여, 분석 결과를 직관적인 여행 경험으로 시각화한다.
+본 연구는 사용자의 일상 사진(5~7장)으로부터 여행 취향을 자동으로 정량화하고 맞춤형 여행지를 추천하는 end-to-end AI 시스템 **PhotoTrip**을 제안한다.
 
-핵심 과제는 validation accuracy뿐 아니라 **예측 confidence의 calibration**이다. 낮은 confidence는 downstream preference vector 및 추천 품질 저하로 직결되며, 본 연구는 accuracy parity 조건 하에서 SigLIP(33~37%) 대비 CLIP(79~87%)의 calibration 우위를 실험적으로 검증하고 CLIP을 최종 채택하였다.
+시스템은 네 개의 분석 모듈을 병렬로 구동한다. **(1) 장면 분류**: CLIP ViT-B/32를 beach·nature·city·culture·festival·food 6-class로 fine-tuning하여 장면 범주와 예측 confidence를 추출한다. **(2) 의미론적 분할**: OneFormer의 task-conditioned joint training으로 ADE20K·FoodSeg103·Cityscapes를 단일 모델에서 통합 학습하여 픽셀 수준의 water·sky·vegetation·building·food 비율을 산출한다. **(3) 시각 특성 분석**: OpenCV로 밝기·채도·대비·색온도를 정량화한다. **(4) 스타일 분류**: BCE Loss with class weights와 Pseudo Labeling을 적용한 MLP로 분위기·라이프스타일 벡터를 생성한다. 네 모듈의 출력을 통합한 **Preference Vector**는 코사인 유사도 기반 추천 엔진에 입력되어 Top-3 여행지를 선정하고, Gemini LLM이 결과를 자연어로 설명한다.
+
+실험 결과, 장면 분류에서 CLIP zero-shot 64.27% 대비 fine-tuned 모델이 **93.48%**(+29.2%p)를 달성하였다. 모델 선택 과정에서 SigLIP fine-tuned는 accuracy(93.56%)가 유사하나 inference confidence가 33~37%에 머무는 반면, CLIP fine-tuned는 **79~87%** confidence를 일관되게 산출하여 downstream preference vector 품질 관점에서 CLIP을 최종 채택하였다. OneFormer fine-tuning을 통해 mIoU **37.1% → 45.6%**(+8.5%p)를 확보하였다.
+
+분석 결과는 카테고리별 Three.js 3D 씬, CV 대시보드, 가상 탑승권 UI를 통해 시각화되며, 정량 분석과 Gemini 기반 정성적 해석을 함께 제공하는 설명 가능한(explainable) 추천 경험을 구현한다.
 
 ---
 
@@ -18,66 +22,113 @@ PhotoTrip은 사용자가 업로드한 일상 사진(5~7장)을 입력으로 받
 
 ```mermaid
 flowchart TD
-    INPUT["사진 업로드 5~7장\n일상 사진 입력"]
+    INPUT["🖼️ 사진 업로드 5~7장\n일상 사진 입력"]
+
     INPUT --> CLIP
     INPUT --> ONE
     INPUT --> OCV
     INPUT --> SMLP
-    subgraph ANALYSIS["📊 Per-Image Analysis (병렬)"]
-        CLIP["🔵 CLIP Fine-tuned\n장면 분류 · 93.48%"]
-        ONE["🟢 OneFormer\n의미론적 분할 · 45.6% mIoU"]
-        OCV["🟡 OpenCV\n색감 · 밝기 · 채도"]
-        SMLP["🟣 Style MLP\n분위기 · 스타일 분석"]
+
+    subgraph ANALYSIS["📊 Per-Image Analysis — 병렬 처리"]
+        CLIP["🔵 CLIP Fine-tuned\n장면 분류 · Acc 93.48% · Conf 79~87%\n→ scene scores"]
+        ONE["🟢 OneFormer\n의미론적 분할 · mIoU 45.6%\n→ semantic ratio"]
+        OCV["🟡 OpenCV\n밝기 · 채도 · 색온도 · 대비\n→ visual metrics"]
+        SMLP["🟣 Style MLP\n768→512→256→128→6 · BCE Loss\n→ mood · place · style"]
     end
+
     CLIP --> PV
     ONE --> PV
     OCV --> PV
     SMLP --> PV
-    subgraph VECTOR["Preference Vector Builder"]
-        PV["scene · visual · semantic\nstyle · lifestyle 통합"]
-        PV --> ENS["앙상블 (N장 평균)\ntop_category · confidence · is_uncertain"]
+
+    subgraph VECTOR["🧠 Preference Vector Builder"]
+        PV["scene · visual · semantic · style · lifestyle 통합\nN장 평균 앙상블 → top_category · confidence · is_uncertain"]
     end
-    ENS --> REC
-    ENS --> GEM
-    subgraph OUTPUT["Output"]
-        REC["📍추천 엔진\nTop-3 여행지 · 코사인 유사도"]
-        GEM["💬 Gemini LLM\n취향 자연어 설명"]
+
+    PV --> REC
+    PV --> GEM
+
+    subgraph OUTPUT["🎯 Output"]
+        REC["📍 추천 엔진\n코사인 유사도 · Top-3~5 여행지\ninterest tag 보너스"]
+        GEM["💬 Gemini LLM\n취향 자연어 설명 · Flying 챗봇"]
+
         REC --> FE
         GEM --> FE
-        FE["🌐Frontend\nThree.js 3D 씬 · CV Dashboard · 가상 탑승권"]
+
+        subgraph FE["🌐 Frontend"]
+            T1["🎫 가상 탑승권\nTop-3 여행지 · Gemini 취향 설명"]
+            T2["🎡 Three.js 3D 씬\n6개 카테고리 인터랙티브\n(3DGS 실험 후 전환)"]
+            T3["📊 CV Dashboard\n분석 결과 · Photo별 상세"]
+        end
     end
+
     style ANALYSIS fill:#e6f1fb,stroke:#378add
     style VECTOR fill:#e1f5ee,stroke:#1d9e75
     style OUTPUT fill:#faeeda,stroke:#ba7517
+    style FE fill:#fff8ee,stroke:#ef9f27
 ```
 
-**기술 스택**
+### 카테고리별 분석 예시
+
+| 입력 사진 특성 | 분류 결과 | 추천 여행지 예시 |
+|--------------|---------|----------------|
+| 해변, 바다, 모래 | 🏖️ beach | 발리, 몰디브, 제주 |
+| 산, 숲, 자연 | 🌲 nature | 퀸스타운, 파타고니아, 설악산 |
+| 도시, 야경, 빌딩 | 🌆 city | 도쿄, 홍콩, 파리 |
+| 사원, 박물관, 문화유산 | 🏛️ culture | 교토, 로마, 이스탄불 |
+| 공연, 축제, 음악 | 🎪 festival | 밀라노, 에든버러, 라스베가스 |
+| 음식, 카페, 길거리 음식 | 🍜 food | 나폴리, 방콕, 오사카 |
+
+## 🛠️ 기술 스택
+
+![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![PyTorch](https://img.shields.io/badge/PyTorch-EE4C2C?style=for-the-badge&logo=pytorch&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)
+![OpenCV](https://img.shields.io/badge/OpenCV-5C3EE8?style=for-the-badge&logo=opencv&logoColor=white)
+![HuggingFace](https://img.shields.io/badge/HuggingFace-FFD21E?style=for-the-badge&logo=huggingface&logoColor=black)
+![Gemini](https://img.shields.io/badge/Gemini_API-4285F4?style=for-the-badge&logo=google&logoColor=white)
+![Three.js](https://img.shields.io/badge/Three.js-000000?style=for-the-badge&logo=three.js&logoColor=white)
 
 | 계층 | 기술 |
 |------|------|
-| Backend | FastAPI, PyTorch, Hugging Face Transformers |
-| 장면 분류 | CLIP ViT-B/32 (fine-tuned), `openai/clip-vit-base-patch32` |
-| 의미론적 분할 | OneFormer, `shi-labs/oneformer_ade20k_swin_large` |
+| Backend | FastAPI · PyTorch · HuggingFace Transformers |
+| 장면 분류 | CLIP ViT-B/32 fine-tuned |
+| 의미론적 분할 | OneFormer (swin_large) |
 | 시각 분석 | OpenCV |
-| 스타일·라이프스타일 | MLP head (BCE + class weights, Pseudo Labeling) |
+| 스타일 분류 | MLP · BCE Loss · Pseudo Labeling |
 | LLM | Google Gemini API |
-| Frontend | HTML/CSS/JS, Three.js r160 (ES modules, CDN) |
+| Frontend | Three.js · HTML/CSS/JS |
+| 학습 환경 | Google Colab · Kaggle (GPU) |
 
 ---
 
-## Key Contributions
+## 💡 Key Contributions
 
-1. **다중 이미지 앙상블 Preference Vector**  
-   사진별 CLIP 분류, OneFormer 분할 비율, OpenCV 시각 메트릭, Style MLP 점수를 통합하고, 다중 업로드 시 평균 앙상블하여 robust한 취향 표현을 구축한다.
+1. **멀티모달 Preference Vector 앙상블**  
+   CLIP 장면 분류 · OneFormer 분할 비율 · OpenCV 시각 메트릭 · MLP 스타일 점수를
+   통합한 Preference Vector 설계 및 N장 평균 앙상블로 robust한 취향 표현 구축
 
-2. **Accuracy–Confidence 트레이드오프 분석 기반 모델 선택**  
-   SigLIP 계열은 validation accuracy가 유사하나 실제 inference confidence가 33~37%에 머무는 반면, fine-tuned CLIP은 79~87% confidence를 달성한다. 본 프로젝트는 **accuracy parity 하에서 calibration 우위**를 근거로 CLIP을 최종 채택한다.
+2. **Accuracy–Confidence 트레이드오프 실험적 검증**  
+   SigLIP(33~37%) vs CLIP(79~87%) confidence 비교 실험을 통해
+   accuracy parity 조건 하에서 calibration 우위를 정량적으로 검증하고 CLIP 채택
 
-3. **Hybrid 추천 및 설명 파이프라인**  
-   규칙 기반 destination scoring과 Gemini API 기반 자연어 설명·대화(Flying 챗봇)를 결합하여, 정량 분석과 정성적 해석을 동시에 제공한다.
+3. **OneFormer 멀티데이터셋 통합 학습**  
+   카테고리별 이질적 도메인(ADE20K · FoodSeg103 · Cityscapes)을
+   Mask2Former 대신 OneFormer의 task-conditioned joint training으로
+   단일 모델 통합 학습 → Travel-class mIoU 37.1% → 45.6%
 
-4. **Three.js 기반 카테고리 3D 씬**  
-   COLMAP + 3D Gaussian Splatting(3DGS) 실험 후 웹 호환성을 고려하여 procedural Three.js 씬으로 전환하였으며, 카테고리별 immersive visualization을 구현한다.
+4. **Pseudo Labeling 자동 데이터 파이프라인**  
+   Pixabay API로 여행 사진 수집 후 SigLIP으로 자동 pseudo labeling,
+   confidence threshold 필터링으로 학습 데이터 자동 구축
+
+5. **MLP 기반 스타일·라이프스타일 분류**  
+   BCE Loss + class weights로 클래스 불균형 처리,
+   mood · place · style 3개 MLP 독립 학습 (v3/v4 실험)
+   CLIP 임베딩(768차원) → 6-class multilabel 분류
+
+6. **COLMAP + 3DGS 렌더링 실험**  
+   Structure-from-Motion(COLMAP) + 3D Gaussian Splatting 파이프라인으로
+   2개 씬 학습 및 렌더링 결과 확보, 웹 통합은 Three.js로 전환
 
 ---
 
@@ -94,18 +145,43 @@ flowchart TD
 
 ### OneFormer 채택 배경
 
-초기에는 Mask2Former를 고려하였으나, 카테고리별로 ADE20K, FoodSeg103, Cityscapes 등 서로 다른 도메인의 데이터셋을 통합 학습할 경우 Mask2Former는 태스크마다 개별 학습이 필요하여 학습 시간과 리소스 비용이 과도하게 증가한다. 반면 OneFormer는 task-conditioned joint training으로 단일 학습만으로 멀티 데이터셋 통합이 가능하여 채택하였다 (Jain et al., CVPR 2023).
+본 프로젝트는 6개 여행 카테고리(beach, nature, city, culture, festival, food)별로 서로 다른 도메인의 데이터셋을 사용한다.
 
-### SigLIP vs CLIP 배경
+| 카테고리 | 학습 데이터셋 | 도메인 |
+|---------|------------|--------|
+| 자연/도시/문화 | ADE20K | 실내외 범용 장면 |
+| 음식 | FoodSeg103 | 음식 특화 |
+| 도시/도로 | Cityscapes | 도시 주행 장면 |
 
-CLIP(Radford et al., 2021)은 4억 쌍의 이미지-텍스트 대조 학습으로 강력한 zero-shot 전이 성능을 제공한다. SigLIP(Zhai et al., ICCV 2023)은 sigmoid loss 기반으로 CLIP 대비 학습 안정성을 개선하였으나, 본 연구에서는 실제 추론 confidence 관점에서 CLIP이 우위임을 확인하였다.
+Mask2Former를 사용할 경우 데이터셋마다 별도 모델 학습이 필요하여 최소 3개 모델, 3배의 GPU 메모리·학습 시간이 요구된다. OneFormer의 task-conditioned joint training은 단일 모델로 3개 데이터셋을 통합 학습할 수 있어 채택하였으며, 실험 결과 Travel-class mIoU가 37.1% → 45.6%로 향상되었다 (Jain et al., CVPR 2023).
 
-| 모델 | Val Accuracy | Inference Confidence |
-|------|-------------|---------------------|
-| SigLIP fine-tuned | 93.56% | 33~37% |
-| **CLIP fine-tuned** | **93.48%** | **79~87%** |
+### SigLIP vs CLIP 채택 배경
 
-Preference Vector는 분류 모델의 카테고리별 softmax 확률을 직접 사용한다. SigLIP의 낮은 confidence는 모든 카테고리 점수가 균등하게 분산되어 취향 신호가 희석되는 문제를 야기하므로, accuracy parity 조건 하에서 calibration이 우수한 CLIP을 채택하였다.
+본 시스템에서 Preference Vector는 분류 모델의 카테고리별 softmax 확률을 직접 사용한다.
+
+```python
+# Preference Vector 구성 예시
+scene = {
+    "beach": 0.87,   # CLIP: 명확한 신호
+    "nature": 0.05,
+    ...
+}
+# vs SigLIP
+scene = {
+    "beach": 0.34,   # SigLIP: 희석된 신호
+    "nature": 0.31,  # 균등 분포에 가까움
+    ...
+}
+```
+
+SigLIP은 sigmoid loss 특성상 각 클래스를 독립적으로 평가하여 confidence가 33~37%에 머문다. 이는 6개 카테고리가 거의 균등하게 분산(약 16.7%)되는 것과 유사하여 취향 신호가 희석된다.
+
+반면 CLIP은 softmax 기반으로 confidence가 79~87%를 달성하여 취향 신호를 명확하게 전달한다. 또한 낮은 confidence는 시스템의 `is_uncertain` 플래그를 활성화하여 랜덤 추천 fallback을 유발, 서비스 품질을 직접 저하시킨다.
+
+| 모델 | Val Accuracy | Inference Confidence | 채택 |
+|------|-------------|---------------------|------|
+| SigLIP fine-tuned | 93.56% | 33~37% ❌ | 미채택 |
+| **CLIP fine-tuned** | **93.48%** | **79~87% ✅** | **채택** |
 
 ---
 
@@ -114,19 +190,54 @@ Preference Vector는 분류 모델의 카테고리별 softmax 확률을 직접 �
 ```mermaid
 flowchart TD
     subgraph CLIP["🔵 CLIP 장면 분류 학습"]
+<<<<<<< HEAD
         A1[Pixabay 데이터 수집\n카테고리별 6클래스] --> A2[Pseudo Labeling\nSigLIP → CLIP 자동 라벨링]
         A2 --> A3[CLIP Fine-tuning\nopenai/clip-vit-base-patch32]
         A3 --> A4["Val Acc 93.48%\nConfidence 79~87%"]
+=======
+        A1["Pixabay 수집\n카테고리별 6클래스"] --> A2["Pseudo Labeling\nSigLIP → CLIP 자동 라벨링"]
+        A2 --> A3["CLIP Fine-tuning\nclip-vit-base-patch32"]
+        A3 --> A4["✅ Val Acc 93.48%\nConfidence 79~87%"]
+>>>>>>> 78e3057 (docs: README.md 학술 논문 스타일로 전면 재작성)
     end
+
     subgraph ONE["🟢 OneFormer 분할 학습"]
+<<<<<<< HEAD
         B1[ADE20K\nFoodSeg103\nCityscapes] --> B2[멀티데이터셋 통합 학습\ntask-conditioned joint training]
         B2 --> B3["mIoU 37.1% → 45.6%\n+8.5%p 향상"]
+=======
+        B1["멀티 데이터셋\nADE20K · FoodSeg103 · Cityscapes"] --> B2["통합 학습\ntask-conditioned joint training"]
+        B2 --> B3["✅ mIoU 37.1% → 45.6%\n+8.5%p 향상"]
+>>>>>>> 78e3057 (docs: README.md 학술 논문 스타일로 전면 재작성)
     end
+
     subgraph MLP["🟣 MLP 스타일 분류 학습"]
+<<<<<<< HEAD
         C1[CLIP 임베딩\n768차원 입력] --> C2[MLP\n768→512→256→128→6]
         C2 --> C3["mood / place / style\n카테고리별 분류"]
+=======
+        C1["CLIP 임베딩\n768차원 입력"] --> C2["MLP 구조\n768→512→256→128→6"]
+        C2 --> C3["✅ BCE Loss + class weights\nmood · place · style 분류"]
+>>>>>>> 78e3057 (docs: README.md 학술 논문 스타일로 전면 재작성)
     end
-    CLIP ~~~ ONE ~~~ MLP
+
+    subgraph OCV["🟡 OpenCV 시각 특성 분석"]
+        D1["이미지 입력\nRGB 원본"] --> D2["시각 분석\n밝기 · 채도 · 색온도 · 대비"]
+        D2 --> D3["✅ 6개 시각 메트릭 추출\nwarm · person · animal ratio"]
+    end
+
+    CLIP --> PV
+    ONE --> PV
+    MLP --> PV
+    OCV --> PV
+
+    PV["🧠 Preference Vector 통합\nscene · visual · semantic · style · lifestyle"]
+
+    style CLIP fill:#e6f1fb,stroke:#378add
+    style ONE fill:#e1f5ee,stroke:#1d9e75
+    style MLP fill:#eeedfe,stroke:#7f77dd
+    style OCV fill:#faeeda,stroke:#ba7517
+    style PV fill:#f1efe8,stroke:#5f5e5a
 ```
 
 ---
