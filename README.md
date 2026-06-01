@@ -217,11 +217,11 @@ flowchart LR
 SigLIP 계열은 validation accuracy 측면에서 CLIP fine-tuned와 유사한 수준(93%대)을 기록하였으나, **실제 inference 시 예측 confidence가 33~37%에 불과**하였다. 반면 fine-tuned CLIP은 **79~87% confidence**를 일관되게 산출하였다. scene confidence는 preference vector의 `confidence` 필드 및 `is_uncertain` 플래그에 직접 반영되며, downstream recommender의 destination scoring에 영향을 미친다.
 
 <p align="center">
-  <img src="results/full_experiment_history.png" width="48%"/>
-  <img src="results/confusion_matrix_clip.png" width="48%"/>
+  <img src="results/full_experiment_history.png.png" width="48%"/>
+  <img src="results/confusion_matrix_clip.png.png" width="48%"/>
 </p>
 <p align="center">
-  <img src="results/confidence_comparison.png" width="60%"/>
+  <img src="results/confidence_comparison.png.png" width="60%"/>
 </p>
 
 ---
@@ -239,8 +239,8 @@ SigLIP 계열은 validation accuracy 측면에서 CLIP fine-tuned와 유사한 �
 - **inference latency**: [TBD] ms/image (GPU)
 
 <p align="center">
-  <img src="results/oneformer_results.png" width="48%"/>
-  <img src="results/oneformer_miou.png" width="48%"/>
+  <img src="results/Oneformer_results.png.png" width="48%"/>
+  <img src="results/Oneformer_mIoU.png.png" width="48%"/>
 </p>
 
 ---
