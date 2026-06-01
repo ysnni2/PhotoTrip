@@ -109,7 +109,7 @@ flowchart TD
 
 3. **OneFormer 멀티데이터셋 통합 학습**  
    카테고리별 이질적 도메인(ADE20K · FoodSeg103 · Cityscapes)을
-   Mask2Former 대신 OneFormer의 task-conditioned joint training으로
+   OneFormer의 task-conditioned joint training으로
    단일 모델 통합 학습 → Travel-class mIoU 37.1% → 45.6%
 
 4. **Pseudo Labeling 자동 데이터 파이프라인**  
@@ -154,8 +154,8 @@ Mask2Former를 사용할 경우 데이터셋마다 별도 모델 학습이 필�
 
 | 모델 | Val Accuracy | Inference Confidence | 채택 |
 |------|-------------|---------------------|------|
-| SigLIP fine-tuned | 93.56% | 33~37% ❌ | 미채택 |
-| **CLIP fine-tuned** | **93.48%** | **79~87% ✅** | **채택** |
+| SigLIP fine-tuned | 93.56% | 33~37%  | 미채택 |
+| **CLIP fine-tuned** | **93.48%** | **79~87% ** | **채택** |
 
 ---
 
