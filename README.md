@@ -1,4 +1,4 @@
-# PhotoTrip
+# 📸PhotoTrip
 
 **개인 사진으로 여행 취향을 분석하는 AI 시스템**
 
@@ -22,7 +22,7 @@
 
 ```mermaid
 flowchart TD
-    INPUT["🖼️ 사진 업로드 5~7장\n일상 사진 입력"]
+    INPUT["📷 사진 업로드 5~7장\n일상 사진 입력"]
 
     INPUT --> CLIP
     INPUT --> ONE
