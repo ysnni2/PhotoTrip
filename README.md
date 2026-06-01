@@ -12,9 +12,9 @@
 
 시스템은 네 개의 분석 모듈을 병렬로 구동한다. **(1) 장면 분류**: CLIP ViT-B/32를 beach·nature·city·culture·festival·food 6-class로 fine-tuning하여 장면 범주와 예측 confidence를 추출한다. **(2) 의미론적 분할**: OneFormer의 task-conditioned joint training으로 ADE20K·FoodSeg103·Cityscapes를 단일 모델에서 통합 학습하여 픽셀 수준의 water·sky·vegetation·building·food 비율을 산출한다. **(3) 시각 특성 분석**: OpenCV로 밝기·채도·대비·색온도를 정량화한다. **(4) 스타일 분류**: BCE Loss with class weights와 Pseudo Labeling을 적용한 MLP로 분위기·라이프스타일 벡터를 생성한다. 네 모듈의 출력을 통합한 **Preference Vector**는 코사인 유사도 기반 추천 엔진에 입력되어 Top-3 여행지를 선정하고, Gemini LLM이 결과를 자연어로 설명한다.
 
-실험 결과, 장면 분류에서 CLIP zero-shot 64.27% 대비 fine-tuned 모델이 **93.48%**(+29.2%p)를 달성하였다. 모델 선택 과정에서 SigLIP fine-tuned는 accuracy(93.56%)가 유사하나 inference confidence가 33~37%에 머무는 반면, CLIP fine-tuned는 **79~87%** confidence를 일관되게 산출하여 downstream preference vector 품질 관점에서 CLIP을 최종 채택하였다. OneFormer fine-tuning을 통해 mIoU **37.1% → 45.6%**(+8.5%p)를 확보하였다.
+실험 결과, 장면 분류에서 CLIP zero-shot 64.27% 대비 fine-tuned 모델이 **93.48%**(+29.2%p)를 달성하였다. 모델 선택 과정에서 SigLIP fine-tuned는 accuracy(93.56%)가 유사하나 inference confidence가 33~37%에 머무는 반면, CLIP fine-tuned는 **79~87%** confidence를 일관되게 산출하여 downstream preference vector 품질 관점에서 CLIP을 최종 채택하였다. OneFormer fine-tuning을 통해 mIoU **37.1% 에서 45.6%**(+8.5%p)를 확보하였다.
 
-분석 결과는 카테고리별 Three.js 3D 씬, CV 대시보드, 가상 탑승권 UI를 통해 시각화되며, 정량 분석과 Gemini 기반 정성적 해석을 함께 제공하는 설명 가능한(explainable) 추천 경험을 구현한다.
+분석 결과는 카테고리별 Three.js 3D 씬, CV 대시보드, 가상 탑승권 UI를 통해 시각화되며, 정량 분석과 Gemini기반 정성적 해석을 함께 제공하는 설명 가능한 추천 경험을 구현한다.
 
 ---
 
