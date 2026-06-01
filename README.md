@@ -184,10 +184,21 @@ SigLIP은 sigmoid loss 특성상 각 클래스를 독립적으로 평가하여 c
 
 ```mermaid
 flowchart LR
-    A["Pixabay\n수집"] --> B["Pseudo\nLabeling"] --> C["CLIP\nFine-tuning"] --> R1(["Acc 93.48%\nConf 79~87%"])
-    D["ADE20K\nFoodSeg\nCityscapes"] --> E["통합 학습\njoint training"] --> R2(["mIoU\n37.1%->45.6%"])
-    F["CLIP 임베딩\n768차원"] --> G["MLP\n768->128->6"] --> R3(["mood\nplace\nstyle"])
-    H["RGB\n이미지"] --> I["밝기 채도\n색온도"] --> R4(["6개\n메트릭"])
+    subgraph CLIP["🔵 CLIP 장면 분류"]
+        A["Pixabay\n수집"] --> B["Pseudo\nLabeling"] --> C["CLIP\nFine-tuning"] --> R1(["Acc 93.48%\nConf 79~87%"])
+    end
+
+    subgraph ONE["🟢 OneFormer 분할"]
+        D["ADE20K\nFoodSeg\nCityscapes"] --> E["통합 학습\njoint training"] --> R2(["mIoU\n37.1%->45.6%"])
+    end
+
+    subgraph MLP["🟣 MLP 스타일 분류"]
+        F["CLIP 임베딩\n768차원"] --> G["MLP\n768->128->6"] --> R3(["mood\nplace\nstyle"])
+    end
+
+    subgraph OCV["🟡 OpenCV 시각 분석"]
+        H["RGB\n이미지"] --> I["밝기 채도\n색온도"] --> R4(["6개\n메트릭"])
+    end
 
     R1 --> PV
     R2 --> PV
@@ -196,19 +207,10 @@ flowchart LR
 
     PV(["Preference Vector"])
 
-    style A fill:#e6f1fb,stroke:#378add
-    style B fill:#e6f1fb,stroke:#378add
-    style C fill:#e6f1fb,stroke:#378add
-    style R1 fill:#e6f1fb,stroke:#378add
-    style D fill:#e1f5ee,stroke:#1d9e75
-    style E fill:#e1f5ee,stroke:#1d9e75
-    style R2 fill:#e1f5ee,stroke:#1d9e75
-    style F fill:#eeedfe,stroke:#7f77dd
-    style G fill:#eeedfe,stroke:#7f77dd
-    style R3 fill:#eeedfe,stroke:#7f77dd
-    style H fill:#faeeda,stroke:#ba7517
-    style I fill:#faeeda,stroke:#ba7517
-    style R4 fill:#faeeda,stroke:#ba7517
+    style CLIP fill:#e6f1fb,stroke:#378add
+    style ONE fill:#e1f5ee,stroke:#1d9e75
+    style MLP fill:#eeedfe,stroke:#7f77dd
+    style OCV fill:#faeeda,stroke:#ba7517
     style PV fill:#f1efe8,stroke:#5f5e5a
 ```
 
