@@ -140,7 +140,7 @@ flowchart TD
 
 ### OneFormer 채택 배경
 
-본 프로젝트는 6개 여행 카테고리(beach, nature, city, culture, festival, food)별로 서로 다른 도메인의 데이터셋을 사용한다.
+본 프로젝트는 6개 여행 카테고리별로 서로 다른 도메인의 데이터셋을 사용한다.
 
 | 카테고리 | 학습 데이터셋 | 도메인 |
 |---------|------------|--------|
@@ -148,7 +148,7 @@ flowchart TD
 | 음식 | FoodSeg103 | 음식 특화 |
 | 도시/도로 | Cityscapes | 도시 주행 장면 |
 
-Mask2Former를 사용할 경우 데이터셋마다 별도 모델 학습이 필요하여 최소 3개 모델, 3배의 GPU 메모리·학습 시간이 요구된다. OneFormer의 task-conditioned joint training은 단일 모델로 3개 데이터셋을 통합 학습할 수 있어 채택하였으며, 실험 결과 Travel-class mIoU가 37.1% → 45.6%로 향상되었다 (Jain et al., CVPR 2023).
+Mask2Former를 사용할 경우 데이터셋마다 별도 모델 학습이 필요하여 최소 3개 모델, 3배의 GPU 메모리·학습 시간이 요구된다. OneFormer의 task-conditioned joint training은 단일 모델로 3개 데이터셋을 통합 학습할 수 있어 채택하였으며, 실험 결과 Travel-class mIoU가 37.1% -> 45.6%로 향상되었다 (Jain et al., CVPR 2023).
 
 ### SigLIP vs CLIP 채택 배경
 
@@ -156,6 +156,8 @@ Mask2Former를 사용할 경우 데이터셋마다 별도 모델 학습이 필�
 |------|-------------|---------------------|------|
 | SigLIP fine-tuned | 93.56% | 33~37%  | 미채택 |
 | **CLIP fine-tuned** | **93.48%** | **79~87% ** | **채택** |
+
+Preference Vector는 분류 모델의 카테고리별 softmax 확률을 직접 사용한다. SigLIP의 낮은 confidence는 취향 신호를 희석시키며 is_uncertain 플래그를 활성화하여 서비스 품질을 저하시킨다. accuracy parity 조건 하에서 calibration이 우수한 CLIP을 최종 채택하였다.
 
 ---
 
