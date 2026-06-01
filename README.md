@@ -14,7 +14,7 @@
 
 네 모듈의 출력을 통합한 Preference Vector는 코사인 유사도 기반 추천 엔진에 입력되어 Top-3 여행지를 선정하고, Gemini LLM이 결과를 자연어로 설명한다.
 
-실험 결과, 장면 분류에서 CLIP zero-shot 64.27% 대비 fine-tuned 모델이 93.48%(+29.2%p)를 달성하였다. 모델 선택 과정에서 SigLIP fine-tuned는 accuracy(93.56%)가 유사하나 inference confidence가 33~37%에 머무는 반면, CLIP fine-tuned는 79~87% confidence를 일관되게 산출하여 downstream preference vector 품질 관점에서 CLIP을 최종 채택하였다. OneFormer fine-tuning을 통해 mIoU 37.1%에서 45.6%로 향상(+8.5%p)을 확보하였다.
+실험 결과, 장면 분류에서 CLIP zero-shot 64.27% 대비 fine-tuned 모델이 93.48%(+29.2%p)를 달성하였다. 모델 선택 과정에서 SigLIP fine-tuned는 accuracy(93.56%)가 유사하나 inference confidence가 33~37%에 머무는 반면, CLIP fine-tuned는 79~87% confidence를 일관되게 산출하여 downstream preference vector 품질 관점에서 CLIP을 최종 채택하였다. OneFormer fine-tuning을 통해 mIoU 37.1% → 45.6%로 향상(+8.5%p)을 확보하였다.
 
 3D 씬 렌더링 실험에서는 COLMAP Structure-from-Motion과 3D Gaussian Splatting(3DGS) 파이프라인을 직접 구축하여 2개 씬 학습 및 렌더링 결과를 확보하였으며, 웹 통합 호환성을 고려하여 Three.js procedural rendering으로 최종 전환하였다.
 
@@ -104,7 +104,7 @@ flowchart TD
    통합한 Preference Vector 설계 및 N장 평균 앙상블로 robust한 취향 표현 구축
 
 2. **Accuracy–Confidence 트레이드오프 실험적 검증**  
-   SigLIP(33~37%) vs CLIP(79~87%) confidence 비교 실험을 통해
+   SigLIP(**33~37%**) vs CLIP(**79~87%**) confidence 비교 실험을 통해
    accuracy parity 조건 하에서 calibration 우위를 정량적으로 검증하고 CLIP 채택
 
 3. **OneFormer 멀티데이터셋 통합 학습**  
