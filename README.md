@@ -286,15 +286,23 @@ flowchart LR
 
 ---
 
-### 4. 3D 씬 렌더링
+### 4. 3D Scene Rendering Experiment
 
-| 단계 | 내용 |
-|------|------|
-| 초기 시도 | COLMAP + 3D Gaussian Splatting (3DGS) 파이프라인 |
-| 결과 | 2개 씬 학습 완료, 오프라인 렌더링 결과 확보 |
-| 전환 사유 | 웹 브라우저 통합 시 호환성·로딩 시간·GPU 의존성 문제 |
-| 최종 구현 | Three.js procedural scene (beach, nature, city, culture, food, festival) |
-| 정량 평가 | [TBD] |
+| Stage | Details |
+|-------|---------|
+| Pipeline | COLMAP Structure-from-Motion + 3D Gaussian Splatting |
+| Result | 2개 씬 학습 완료 및 렌더링 결과 확보 |
+| Limitation | 웹 브라우저 실시간 렌더링 불가, GPU 의존성 |
+| Final Choice | Three.js procedural rendering |
+| Reason | 웹 호환성, 실시간 렌더링, GPU 의존성 제거 |
+
+제한된 학습 이미지(20~30장) 환경에서 주요 객체의 3D 구조 재구성에 성공하였으나, 배경 영역 아티팩트 발생. 웹 실시간 서비스 통합의 현실적 한계로 Three.js 전환.
+
+<p align="center">
+  <img src="results/3dgs_scene1.png" width="48%"/>
+  <img src="results/3dgs_scene2.png" width="48%"/>
+</p>
+<p align="center"><em>3DGS 렌더링 결과 — 야자수 씬(좌), 오브젝트 씬(우)</em></p>
 
 ---
 
