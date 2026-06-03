@@ -115,10 +115,10 @@ flowchart TD
    CLIP(openai/clip-vit-base-patch32)을 동일 데이터셋에서 
    fine-tuning 후 val accuracy와 inference confidence를 직접 비교.
    SigLIP은 val accuracy 93.56%에도 불구하고 
-   실제 inference confidence가 33~37%에 머물러
+   실제 inference confidence가 33%에서 37%에 머물러
    Preference Vector 품질을 저하시킴을 확인.
    CLIP fine-tuned는 93.48% accuracy와 함께 
-   79~87% confidence를 달성하여 최종 채택.
+   79%에서 87% confidence를 달성하여 최종 채택.
    추가로 Pseudo Labeling · large 데이터 · festival 카테고리 추가 등
    총 5가지 실험 변형을 직접 설계 및 수행.
 
