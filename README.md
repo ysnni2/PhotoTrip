@@ -1,14 +1,8 @@
-# 📸PhotoTrip
+# 📸 PhotoTrip
 
 **개인 사진으로 여행 취향을 분석하는 AI 시스템**
-<sub>PhotoTrip은 사용자의 일상 사진 5~7장을 입력받아
-CLIP · OneFormer · OpenCV · MLP 4개 CV 모듈을 병렬로 구동하여
-장면 감성, 색감 선호, 공간 구성을 자동 분석하고
-Preference Vector로 정량화한 뒤,
-코사인 유사도 기반 추천 엔진으로 맞춤 여행지를 선정한다.
-Gemini LLM이 분석 결과를 자연어로 설명하고,
-Three.js 3D 씬과 가상 탑승권 UI로 시각화하여
-**"내 사진이 보여주는 나의 여행지"** 를 직관적으로 전달한다.</sub>
+
+**CLIP · OneFormer · OpenCV · MLP** 4개 CV 모듈을 병렬로 구동하여 일상 사진 5~7장에서 장면 감성, 색감 선호, 공간 구성을 자동 분석하고 **Preference Vector**로 정량화한 뒤, **코사인 유사도 기반 추천 엔진**으로 맞춤 여행지를 선정한다. Gemini LLM이 분석 결과를 자연어로 설명하고, Three.js 3D 씬과 가상 탑승권 UI로 시각화하여 **"내 사진이 보여주는 나의 여행지"** 를 직관적으로 전달한다.
 ---
 ## 📋 Table of Contents
 - [Abstract](#abstract)
