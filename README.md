@@ -99,31 +99,50 @@ flowchart TD
 
 ## 💡 Key Contributions
 
-1. **멀티모달 Preference Vector 앙상블**  
-   CLIP 장면 분류 · OneFormer 분할 비율 · OpenCV 시각 메트릭 · MLP 스타일 점수를
-   통합한 Preference Vector 설계 및 N장 평균 앙상블로 robust한 취향 표현 구축
+1. **멀티모달 Preference Vector 설계 및 앙상블**
+   장면 분류(CLIP) · 의미론적 분할(OneFormer) · 
+   시각 특성(OpenCV) · 스타일 분류(MLP) 4개 이질적 모듈의
+   출력을 단일 Preference Vector로 통합하는 구조를 직접 설계.
+   scene(6차원) · visual(6차원) · semantic(5차원) · 
+   style · lifestyle 을 하나의 벡터로 표현하며,
+   5~7장 업로드 시 per-image 벡터를 평균 앙상블하여
+   단일 사진의 노이즈에 robust한 취향 표현을 구축.
+   최종적으로 코사인 유사도 기반 추천 엔진에 입력되어
+   Top-3 여행지를 선정하는 end-to-end 파이프라인 완성.
+   
+2. **Accuracy–Confidence 트레이드오프 실험 설계**
+   SigLIP(google/siglip-large-patch16-256)과 
+   CLIP(openai/clip-vit-base-patch32)을 동일 데이터셋에서 
+   fine-tuning 후 val accuracy와 inference confidence를 직접 비교.
+   SigLIP은 val accuracy 93.56%에도 불구하고 
+   실제 inference confidence가 33~37%에 머물러
+   Preference Vector 품질을 저하시킴을 확인.
+   CLIP fine-tuned는 93.48% accuracy와 함께 
+   79~87% confidence를 달성하여 최종 채택.
+   추가로 Pseudo Labeling · large 데이터 · festival 카테고리 추가 등
+   총 5가지 실험 변형을 직접 설계 및 수행.
 
-2. **Accuracy–Confidence 트레이드오프 실험적 검증**  
-   SigLIP(**33~37%**) vs CLIP(**79~87%**) confidence 비교 실험을 통해
-   accuracy parity 조건 하에서 calibration 우위를 정량적으로 검증하고 CLIP 채택
+3. **OneFormer 멀티데이터셋 학습 파이프라인 설계**
+   카테고리별 이질적 도메인 데이터셋(ADE20K · FoodSeg103 · Cityscapes)을
+   단일 모델로 통합 학습하기 위해 Mask2Former 대신 OneFormer를
+   직접 선택·적용하였으며, 멀티데이터셋 학습 파이프라인을 구축.
+   Travel-class mIoU 37.1% → 45.6%(+8.5%p) 달성.
 
-3. **OneFormer 멀티데이터셋 통합 학습**  
-   카테고리별 이질적 도메인(ADE20K · FoodSeg103 · Cityscapes)을
-   OneFormer의 task-conditioned joint training으로
-   단일 모델 통합 학습 → Travel-class mIoU 37.1% → 45.6%
+4. **Pseudo Labeling 데이터 파이프라인 구축**
+   Pixabay API 수집 → SigLIP 자동 라벨링 →
+   confidence 필터링 전 과정을 직접 설계 및 구현.
 
-4. **Pseudo Labeling 자동 데이터 파이프라인**  
-   Pixabay API로 여행 사진 수집 후 SigLIP으로 자동 pseudo labeling,
-   confidence threshold 필터링으로 학습 데이터 자동 구축
+5. **MLP 스타일 분류 모델 설계 및 실험**
+   BCE Loss + class weights로 클래스 불균형을 처리하고,
+   mood · place · style 3개 MLP를 독립적으로 설계.
+   다수의 학습 실험을 통해 최적 모델 선정.
+   CLIP 임베딩(768차원) → 6-class multilabel 분류.
 
-5. **MLP 기반 스타일·라이프스타일 분류**  
-   BCE Loss + class weights로 클래스 불균형 처리,
-   mood · place · style 3개 MLP 독립 학습 (v3/v4 실험)
-   CLIP 임베딩(768차원) → 6-class multilabel 분류
-
-6. **COLMAP + 3DGS 렌더링 실험**  
-   Structure-from-Motion(COLMAP) + 3D Gaussian Splatting 파이프라인으로
-   2개 씬 학습 및 렌더링 결과 확보, 웹 통합은 Three.js로 전환
+6. **COLMAP + 3DGS 렌더링 파이프라인 구축 실험**
+   Structure-from-Motion(COLMAP) 기반 포인트 클라우드 생성부터
+   3D Gaussian Splatting 학습까지 직접 실험하여
+   2개 씬 렌더링 결과 확보.
+   웹 서비스 호환성 한계로 Three.js로 전환.
 
 ---
 
