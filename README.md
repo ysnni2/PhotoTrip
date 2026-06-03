@@ -169,14 +169,16 @@ flowchart TD
 
 Mask2Former를 사용할 경우 데이터셋마다 별도 모델 학습이 필요하여 최소 3개 모델, 3배의 GPU 메모리·학습 시간이 요구된다. OneFormer의 task-conditioned joint training은 단일 모델로 3개 데이터셋을 통합 학습할 수 있어 채택하였으며, 실험 결과 Travel-class mIoU가 37.1% -> 45.6%로 향상되었다 (Jain et al., CVPR 2023).
 
-### SigLIP vs CLIP 채택 배경
+### Vision-Language Models
 
-| 모델 | Val Accuracy | Inference Confidence | 채택 |
-|------|-------------|---------------------|------|
-| SigLIP fine-tuned | 93.56% | 33~37%  | 미채택 |
-| **CLIP fine-tuned** | **93.48%** | **79~87% ** | **채택** |
+| Model | Method | Val Accuracy | Inference Confidence |
+|-------|--------|-------------|---------------------|
+| SigLIP (Zhai et al., 2023) | Sigmoid loss | 93.56% | 33~37% ❌ |
+| **CLIP (Radford et al., 2021)** | **Contrastive learning** | **93.48%** | **79~87% ✅** |
 
-Preference Vector는 분류 모델의 카테고리별 softmax 확률을 직접 사용한다. SigLIP의 낮은 confidence는 취향 신호를 희석시키며 is_uncertain 플래그를 활성화하여 서비스 품질을 저하시킨다. accuracy parity 조건 하에서 calibration이 우수한 CLIP을 최종 채택하였다.
+SigLIP은 각 클래스를 독립적으로 평가하는 sigmoid loss 특성상 inference confidence가 33~37%에 머물러 Preference Vector 품질을 저하시킨다. CLIP의 softmax 기반 confidence(79~87%)가 취향 신호를 명확하게 전달하여 최종 채택.
+
+> For detailed experiments, see **Experiments & Results** section.
 
 ---
 
