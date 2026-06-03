@@ -3,6 +3,20 @@
 **개인 사진으로 여행 취향을 분석하는 AI 시스템**
 
 ---
+## 📋 목차
+- [Abstract](#abstract)
+- [Demo](#-demo)
+- [System Overview](#system-overview)
+- [기술 스택](#-기술-스택)
+- [Key Contributions](#-key-contributions)
+- [배경 및 관련 연구](#배경-및-관련-연구)
+- [모델 학습 구조](#모델-학습-구조)
+- [Experiments & Results](#experiments--results)
+- [Limitations & Future Work](#limitations--future-work)
+- [Installation & Usage](#-installation--usage)
+- [References](#references)
+
+---
 
 ## Abstract
 
@@ -242,7 +256,7 @@ flowchart LR
 | **CLIP Fine-tuned** | **93.48%** | **openai/clip-vit-base-patch32 ✅** |
 
 > **CLIP 채택 근거**: accuracy parity 조건 하에서
-> SigLIP(33~37%) 대비 CLIP(79~87%)의 월등한
+> SigLIP(33%에서37%) 대비 CLIP(79%에서87%)의 월등한
 > inference confidence가 Preference Vector 품질에 직결됨.
 
 <p align="center">
@@ -294,7 +308,7 @@ flowchart LR
 
 ---
 
-### 4. 3D Scene Rendering Experiment
+### 4. 3D 장면 렌더링 실험 (3D Scene Rendering Experiment)
 
 | Stage | Details |
 |-------|---------|
@@ -447,6 +461,20 @@ GOOGLE_API_KEY=your_gemini_api_key
 ### Model Weights
 
 아래 모델 파일을 `models/` 디렉터리에 배치한다.
+```bash
+models/
+best_clip.pth              # CLIP fine-tuned (장면 분류)
+best_siglip.pth            # SigLIP fine-tuned (실험용)
+mlp_mood_best.pth          # MLP mood 분류
+mlp_place_best.pth         # MLP place 분류
+mlp_style_best.pth         # MLP style 분류
+oneformer_top/             # OneFormer fine-tuned
+config.json
+model.safetensors
+processor_config.json
+tokenizer.json
+tokenizer_config.json
+```
 
 ### Run Server
 
