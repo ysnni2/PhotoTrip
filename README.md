@@ -228,20 +228,20 @@ flowchart LR
 
 ## Experiments & Results
 
-### 1. Scene Classification
+### 1. 장면 분류 (Scene Classification)
 
-6-class travel scene classification (beach, nature, city, culture, festival, food)
+6-class 여행 장면 분류 (beach, nature, city, culture, festival, food)
 
-| Model | Val Accuracy | Notes |
-|-------|-------------|-------|
-| CLIP Zero-shot | 64.27% | Prompt-based, no fine-tuning |
-| SigLIP baseline | 90.91% | google/siglip-large-patch16-256 |
-| SigLIP + large data | 90.52% | Slight drop with more data |
-| SigLIP + festival class | 93.56% | Added festival category |
-| SigLIP + Pseudo Labeling | 93.14% | Semi-supervised approach |
+| 모델 | Val Accuracy | 비고 |
+|------|-------------|------|
+| CLIP Zero-shot | 64.27% | 프롬프트 기반, fine-tuning 없음 |
+| SigLIP 기본 | 90.91% | google/siglip-large-patch16-256 |
+| SigLIP + large 데이터 | 90.52% | 데이터 규모 확대 시 소폭 하락 |
+| SigLIP + festival 카테고리 | 93.56% | festival 클래스 추가 |
+| SigLIP + Pseudo Labeling | 93.14% | pseudo label 기반 semi-supervised |
 | **CLIP Fine-tuned** | **93.48%** | **openai/clip-vit-base-patch32 ✅** |
 
-> **CLIP 채택 근거:** accuracy parity 조건 하에서
+> **CLIP 채택 근거**: accuracy parity 조건 하에서
 > SigLIP(33~37%) 대비 CLIP(79~87%)의 월등한
 > inference confidence가 Preference Vector 품질에 직결됨.
 
@@ -255,21 +255,21 @@ flowchart LR
 
 ---
 
-### 2. Semantic Segmentation
+### 2. 의미론적 분할 (Semantic Segmentation)
 
-| Model | mIoU | Training Data | Notes |
-|-------|------|--------------|-------|
-| OneFormer pretrained | 37.1% | ADE20K | Baseline |
-| **OneFormer fine-tuned** | **45.6%** | ADE20K + FoodSeg103 + Cityscapes | **Final model ✅** |
+| 모델 | mIoU | 학습 데이터 | 비고 |
+|------|------|-----------|------|
+| OneFormer pretrained | 37.1% | ADE20K | 기준선 |
+| **OneFormer fine-tuned** | **45.6%** | ADE20K + FoodSeg103 + Cityscapes | **최종 채택 ✅** |
 
-- **Model**: `shi-labs/oneformer_ade20k_swin_large`
-- **Purpose**: Extract travel-relevant semantic ratios (water, sky, vegetation, building, food) from ADE20K class predictions
-- **Training Strategy**: Task-conditioned joint training across 3 heterogeneous datasets in a single model
-- **Result**: Travel-class mIoU improved from 37.1% to 45.6% (+8.5%p)
+- **모델**: `shi-labs/oneformer_ade20k_swin_large`
+- **목적**: ADE20K 클래스를 travel-relevant semantic ratio (water, sky, vegetation, building, food)로 집계
+- **학습 전략**: 3개 이질적 도메인 데이터셋을 task-conditioned joint training으로 단일 모델 통합 학습
+- **결과**: Travel-class mIoU 37.1% → 45.6% (+8.5%p) 향상
 
-> **OneFormer 채택 근거:** 카테고리별 이질적 도메인 데이터셋을
+> **OneFormer 채택 근거**: 카테고리별 이질적 도메인 데이터셋을
 > 단일 모델로 통합 학습하기 위해 Mask2Former 대신 채택.
-> → 자세한 배경은 Related Work 참고.
+> 자세한 배경은 Related Work 참고.
 
 <p align="center">
   <img src="results/Oneformer_results.png.png" width="80%"/>
@@ -376,8 +376,8 @@ flowchart LR
    느끼는 "분위기"와 "스타일"을 단일 기준으로 정의하여
    라벨의 주관성 문제가 잔존한다.
    여행지 프로필은 객관적 시각 특성(색감·밝기·채도)으로
-   정의하였으나, 사용자별 스타일 인식 차이는
-   개인화 피드백으로 점진적 개선이 필요하다.
+   정의하였으나, 사용자별 스타일 인식 차이를 반영하기 위해
+   개인화 피드백 루프 구축이 필요하다.
 
 ### Future Work
 1. **VR 기반 여행지 프리뷰**
@@ -402,9 +402,9 @@ flowchart LR
    (예: beach → 리조트형 / 자연형 / 액티비티형)
    CV 분석 결과와 더 세분화된 여행지 프로필 매칭.
 
-5. **멀티 도메인 통합 벤치마크 구축**
-   travel-specific 통합 평가 기준 수립으로
-   멀티 도메인 학습 모델 정량 평가 체계화.
+5. **멀티 도메인 평가 기준 수립**
+   ADE20K · FoodSeg103 · Cityscapes 통합 학습 모델의
+   정량 평가를 위한 travel-specific 평가 기준 수립.
 
 6. **모델 경량화**
    모바일 환경을 위한 경량화
@@ -447,6 +447,44 @@ GOOGLE_API_KEY=your_gemini_api_key
 ### Model Weights
 
 아래 모델 파일을 `models/` 디렉터리에 배치한다.
+
+### Run Server
+
+```bash
+uvicorn backend.main:app --reload --port 8000
+```
+
+브라우저에서 `http://localhost:8000` 접속.
+
+### Usage Flow
+
+1. 메인 화면 바코드 클릭 → 업로드 화면 이동
+2. 일상 사진 **5~7장** 업로드
+3. **AI 분석 시작** 클릭 → 로딩
+4. 결과 화면:
+   - 좌측: Three.js 3D 씬 + CV Analysis 대시보드
+   - 우측: Gemini 취향 설명 + Flying 챗봇 + 가상 탑승권
+
+### Fine-tuning (Optional)
+
+```bash
+# CLIP 장면 분류 fine-tuning
+python classification/clip_finetune.py \
+    --train_dir data/train \
+    --val_dir data/val \
+    --epochs 10 \
+    --batch_size 32 \
+    --lr 1e-5
+
+# SigLIP fine-tuning (실험용)
+python classification/siglip_finetune.py \
+    --train_dir data/train \
+    --val_dir data/val \
+    --epochs 10
+
+# OneFormer fine-tuning
+# Kaggle 환경 권장 (GPU 메모리 24GB+)
+```
 
 ---
 
