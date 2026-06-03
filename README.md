@@ -178,9 +178,14 @@ flowchart TD
 | 2015 | FCN | 최초 end-to-end 픽셀 단위 분류 |
 | 2017 | DeepLab v3 | Atrous convolution, multi-scale context 도입 |
 | 2022 | Mask2Former | Universal segmentation 시도; 단, 태스크마다 개별 학습 필요 |
-| 2023 | OneFormer | Task-conditioned joint training으로 단일 학습만으로 멀티 태스크/데이터셋 통합 가능 |
+| 2023 | OneFormer | Task-conditioned joint training으로 단일 모델 멀티 태스크 가능 |
 
-### OneFormer 채택 배경
+### OneFormer 아키텍처 및 채택 배경
+
+OneFormer(Jain et al., CVPR 2023)는 task-conditioned joint training으로
+semantic · instance · panoptic segmentation을 단일 모델로 처리하는
+universal segmentation 모델이다. task token을 입력으로 받아
+하나의 모델로 여러 segmentation 태스크와 데이터셋을 동시에 학습할 수 있다.
 
 본 프로젝트는 6개 여행 카테고리별로 서로 다른 도메인의 데이터셋을 사용한다.
 
@@ -190,18 +195,20 @@ flowchart TD
 | 음식 | FoodSeg103 | 음식 특화 |
 | 도시/도로 | Cityscapes | 도시 주행 장면 |
 
-Mask2Former를 사용할 경우 데이터셋마다 별도 모델 학습이 필요하여 최소 3개 모델, 3배의 GPU 메모리·학습 시간이 요구된다. OneFormer의 task-conditioned joint training은 단일 모델로 3개 데이터셋을 통합 학습할 수 있어 채택하였으며, 실험 결과 Travel-class mIoU가 37.1% -> 45.6%로 향상되었다 (Jain et al., CVPR 2023).
+Mask2Former는 태스크마다 별도 모델 학습이 필요하여 최소 3개 모델,
+3배의 GPU 메모리·학습 시간이 요구된다. OneFormer의 joint training으로
+단일 모델 통합 학습이 가능하여 채택하였으며,
+Travel-class mIoU 37.1% → 45.6%로 향상되었다.
 
 ### Vision-Language Models
 
-| Model | Method | Val Accuracy | Inference Confidence |
-|-------|--------|-------------|---------------------|
-| SigLIP (Zhai et al., 2023) | Sigmoid loss | 93.56% | 33~37% ❌ |
-| **CLIP (Radford et al., 2021)** | **Contrastive learning** | **93.48%** | **79~87% ✅** |
+CLIP(Radford et al., 2021)은 4억 쌍의 이미지-텍스트 대조 학습으로
+강력한 zero-shot 전이 성능을 제공하며, softmax 기반 confidence로
+취향 신호를 명확하게 전달한다.
+SigLIP(Zhai et al., 2023)은 sigmoid loss로 학습 안정성을 개선하였으나,
+inference confidence가 33%에서 37%에 머물러 Preference Vector 품질을 저하시킨다.
 
-SigLIP은 각 클래스를 독립적으로 평가하는 sigmoid loss 특성상 inference confidence가 33~37%에 머물러 Preference Vector 품질을 저하시킨다. CLIP의 softmax 기반 confidence(79~87%)가 취향 신호를 명확하게 전달하여 최종 채택.
-
-> 자세한 실험 결과는 Experiments & Results 섹션 참고.
+자세한 실험 결과는 Experiments & Results 섹션 참고.
 
 ---
 
