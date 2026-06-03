@@ -519,31 +519,27 @@ python classification/siglip_finetune.py \
 
 ## References
 
-### 모델
+### 사용 모델
 
-1. Radford, A., et al. (2021). *Learning Transferable Visual Models From Natural Language Supervision.* ICML. (CLIP)
-2. Zhai, X., et al. (2023). *Sigmoid Loss for Language Image Pre-Training.* ICCV. (SigLIP)
-3. Jain, J., et al. (2023). *OneFormer: One Transformer to Rule Universal Image Segmentation.* CVPR.
-4. Cheng, B., et al. (2022). *Masked-attention Mask Transformer for Universal Image Segmentation.* CVPR. (Mask2Former)
+1. Radford, A., et al. (2021). *Learning Transferable Visual Models From Natural Language Supervision.* ICML. [(링크)](https://arxiv.org/abs/2103.00020)
+2. Zhai, X., et al. (2023). *Sigmoid Loss for Language Image Pre-Training.* ICCV. [(링크)](https://arxiv.org/abs/2303.15343)
+3. Jain, J., et al. (2023). *OneFormer: One Transformer to Rule Universal Image Segmentation.* CVPR. [(링크)](https://arxiv.org/abs/2211.06220)
+4. Cheng, B., et al. (2022). *Masked-attention Mask Transformer for Universal Image Segmentation.* CVPR. [(링크)](https://arxiv.org/abs/2112.01527)
 
 ### 3D 재구성
 
-5. Kerbl, B., et al. (2023). *3D Gaussian Splatting for Real-Time Radiance Field Rendering.* ACM Transactions on Graphics (SIGGRAPH).
-6. Schönberger, J. L., & Frahm, J.-M. (2016). *Structure-from-Motion Revisited.* CVPR. (COLMAP)
+5. Kerbl, B., et al. (2023). *3D Gaussian Splatting for Real-Time Radiance Field Rendering.* SIGGRAPH. [(링크)](https://arxiv.org/abs/2308.04079)
+6. Schönberger, J. L., & Frahm, J.-M. (2016). *Structure-from-Motion Revisited.* CVPR. [(링크)](https://openaccess.thecvf.com/content_cvpr_2016/html/Schonberger_Structure-From-Motion_Revisited_CVPR_2016_paper.html)
 
-### 데이터셋
+### 학습 데이터셋
 
-7. Zhou, B., et al. (2017). *Scene Parsing through ADE20K Dataset.* CVPR.
-8. Wu, X., Fu, X., et al. (2021). *A Large-Scale Benchmark for Food Image Segmentation.* ACM MM. (FoodSeg103)
-9. Cordts, M., et al. (2016). *The Cityscapes Dataset for Semantic Urban Scene Understanding.* CVPR.
-
-### 멀티도메인 학습
-
-10. Lambert, J., et al. (2020). *MSeg: A Composite Dataset for Multi-domain Semantic Segmentation.* CVPR.
+7. Zhou, B., et al. (2017). *Scene Parsing through ADE20K Dataset.* CVPR. [(링크)](https://arxiv.org/abs/1608.05442)
+8. Wu, X., Fu, X., et al. (2021). *A Large-Scale Benchmark for Food Image Segmentation.* ACM MM. [(링크)](https://arxiv.org/abs/2105.05409)
+9. Cordts, M., et al. (2016). *The Cityscapes Dataset for Semantic Urban Scene Understanding.* CVPR. [(링크)](https://arxiv.org/abs/1604.01685)
 
 ### API 및 도구
 
-11. Google DeepMind. *Gemini API 문서.* https://ai.google.dev/
+10. Google DeepMind. *Gemini API 문서.* https://ai.google.dev/
 
 ---
 
