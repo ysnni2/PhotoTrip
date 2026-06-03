@@ -88,7 +88,7 @@ flowchart TD
 | 공연, 축제, 음악 | 🎪 festival | 밀라노, 에든버러, 라스베가스 |
 | 음식, 카페, 길거리 음식 | 🍜 food | 나폴리, 방콕, 오사카 |
 
-## 🛠️ 기술 스택
+## 🛠️ Tech Stack
 
 ![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
 ![PyTorch](https://img.shields.io/badge/PyTorch-EE4C2C?style=for-the-badge&logo=pytorch&logoColor=white)
@@ -168,7 +168,7 @@ flowchart TD
 
 ---
 
-## 배경 및 관련 연구
+## 📚 Related Work
 
 ### Semantic Segmentation 발전
 
@@ -204,7 +204,7 @@ SigLIP은 각 클래스를 독립적으로 평가하는 sigmoid loss 특성상 i
 
 ---
 
-## 모델 학습 구조
+## 🧠 Model Architecture
 
 ```mermaid
 flowchart LR
