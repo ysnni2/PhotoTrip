@@ -247,15 +247,21 @@ flowchart LR
 
 ---
 
-### 2. 의미론적 분할 (Semantic Segmentation)
+### 2. Semantic Segmentation
 
-| 모델 | mIoU | 학습 데이터 | 비고 |
-|------|------|-----------|------|
-| OneFormer pretrained | 37.1% | ADE20K | 기준선 |
-| **OneFormer fine-tuned** | **45.6%** | ADE20K + FoodSeg103 + Cityscapes | **최종 채택 ✅** |
+| Model | mIoU | Training Data | Notes |
+|-------|------|--------------|-------|
+| OneFormer pretrained | 37.1% | ADE20K | Baseline |
+| **OneFormer fine-tuned** | **45.6%** | ADE20K + FoodSeg103 + Cityscapes | **Final model ✅** |
 
-- **모델**: `shi-labs/oneformer_ade20k_swin_large`
-- **목적**: ADE20K 클래스를 travel-relevant semantic ratio(water, sky, vegetation, building, food)로 집계
+- **Model**: `shi-labs/oneformer_ade20k_swin_large`
+- **Purpose**: Extract travel-relevant semantic ratios (water, sky, vegetation, building, food) from ADE20K class predictions
+- **Training Strategy**: Task-conditioned joint training across 3 heterogeneous datasets in a single model
+- **Result**: Travel-class mIoU improved from 37.1% to 45.6% (+8.5%p)
+
+> **OneFormer 채택 근거:** 카테고리별 이질적 도메인 데이터셋을
+> 단일 모델로 통합 학습하기 위해 Mask2Former 대신 채택.
+> → 자세한 배경은 Related Work 참고.
 
 <p align="center">
   <img src="results/Oneformer_results.png.png" width="80%"/>
