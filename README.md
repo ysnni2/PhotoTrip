@@ -220,20 +220,22 @@ flowchart LR
 
 ## Experiments & Results
 
-### 1. 장면 분류 (Scene Classification)
+### 1. Scene Classification
 
-6-class travel scene classification (beach, nature, city, culture, festival, food)에 대해 다음 모델을 비교하였다.
+6-class travel scene classification (beach, nature, city, culture, festival, food)
 
-| 모델 | Val Accuracy | 비고 |
-|------|-------------|------|
-| CLIP Zero-shot | 64.27% | 프롬프트 기반, fine-tuning 없음 |
-| SigLIP 기본 | 90.91% | `google/siglip-large-patch16-256` |
-| SigLIP + large 데이터 | 90.52% | 데이터 규모 확대 시 소폭 하락 |
-| SigLIP + festival 카테고리 | 93.56% | festival 클래스 추가 |
-| SigLIP + Pseudo Labeling | 93.14% | pseudo label 기반 semi-supervised |
-| **CLIP Fine-tuned (최종 채택)** | **93.48%** | `openai/clip-vit-base-patch32` ✅ |
+| Model | Val Accuracy | Notes |
+|-------|-------------|-------|
+| CLIP Zero-shot | 64.27% | Prompt-based, no fine-tuning |
+| SigLIP baseline | 90.91% | google/siglip-large-patch16-256 |
+| SigLIP + large data | 90.52% | Slight drop with more data |
+| SigLIP + festival class | 93.56% | Added festival category |
+| SigLIP + Pseudo Labeling | 93.14% | Semi-supervised approach |
+| **CLIP Fine-tuned** | **93.48%** | **openai/clip-vit-base-patch32 ✅** |
 
-> CLIP 선택 근거: 배경 및 관련 연구 섹션 참고
+> **CLIP 채택 근거:** accuracy parity 조건 하에서
+> SigLIP(33~37%) 대비 CLIP(79~87%)의 월등한
+> inference confidence가 Preference Vector 품질에 직결됨.
 
 <p align="center">
   <img src="results/full_experiment_history.png.png" width="80%"/>
