@@ -100,13 +100,21 @@ flowchart TD
 ## 💡 Key Contributions
 
 1. **멀티모달 Preference Vector 설계 및 앙상블**
-   장면 분류(CLIP) · 의미론적 분할(OneFormer) · 
+   장면 분류(CLIP) · 의미론적 분할(OneFormer) ·
    시각 특성(OpenCV) · 스타일 분류(MLP) 4개 이질적 모듈의
    출력을 단일 Preference Vector로 통합하는 구조를 직접 설계.
-   scene(6차원) · visual(6차원) · semantic(5차원) · 
+   scene(6차원) · visual(6차원) · semantic(5차원) ·
    style · lifestyle 을 하나의 벡터로 표현하며,
    5~7장 업로드 시 per-image 벡터를 평균 앙상블하여
    단일 사진의 노이즈에 robust한 취향 표현을 구축.
+
+   특히 OpenCV 색감 분석(밝기·채도·색온도·대비)과
+   Style MLP 출력을 사전 정의된 여행지 프로필의
+   시각적 특성과 코사인 유사도로 매칭함으로써,
+   CV 분석 결과가 직접 여행지 추천에 반영되는
+   end-to-end 파이프라인을 구현하였다.
+   (예: 따뜻한 색감 + vibrant 스타일 → 발리·방콕 추천)
+
    최종적으로 코사인 유사도 기반 추천 엔진에 입력되어
    Top-3 여행지를 선정하는 end-to-end 파이프라인 완성.
    
@@ -321,55 +329,103 @@ flowchart LR
 
 ## Limitations & Future Work
 
-**주요 전환 결정 요약**
+### Current Limitations
 
-| 결정 | 초기 시도 | 최종 선택 | 이유 |
-|------|---------|---------|------|
-| 장면 분류 | SigLIP fine-tuned | **CLIP fine-tuned** | inference confidence 33~37% vs 79~87%; preference vector 품질에 직결 |
-| Segmentation | Mask2Former | **OneFormer** | 멀티 데이터셋 통합 학습 효율; Mask2Former는 태스크별 개별 학습 필요 |
-| 3D 렌더링 | COLMAP + 3DGS | **Three.js** | 웹 통합 호환성, 실시간 렌더링, GPU 의존성 제거 |
+1. **여행 취향의 coarse-grained 표현**
+   본 시스템은 데이터 수집 가능성과 모델 학습 복잡도를
+   고려하여 의도적으로 6개 카테고리로 taxonomy를 설계하였다.
+   그러나 실제 사용자 취향은 카테고리 간 경계가 모호하며
+   세부 테마(예: 리조트형 vs 자연형 beach) 구분이 어렵다.
+   향후 계층적 분류 체계로 확장 가능하다.
 
-1. **Confidence over Raw Accuracy**  
-   SigLIP은 validation accuracy가 높으나 inference confidence가 낮아 production 배포에 부적합하다고 판단, CLIP fine-tuned를 채택하였다.
+2. **멀티 도메인 통합 평가 기준 부재**
+   ADE20K · FoodSeg103 · Cityscapes를 통합 학습한 모델의
+   정량 평가를 위한 단일 통합 벤치마크가 존재하지 않는다.
+   도메인별 개별 평가는 멀티 도메인 학습 성능을
+   완전히 반영하지 못하며, 이는 멀티 도메인 학습 연구의
+   공통적인 평가 기준 수립 과제이다.
 
-2. **Mask2Former → OneFormer**  
-   카테고리별로 서로 다른 도메인의 데이터셋(ADE20K, FoodSeg103 등)을 통합 학습할 때, Mask2Former는 태스크마다 개별 학습이 필요하여 학습 비용이 과도하게 증가한다. OneFormer의 task-conditioned joint training이 멀티 데이터셋 통합에 구조적으로 적합하다.
+3. **Pseudo Labeling 노이즈**
+   Pixabay API 기반 자동 수집 데이터는
+   confidence threshold 필터링에도 불구하고
+   도메인 편향 및 라벨 노이즈가 잔존할 수 있다.
+   Human-annotated 데이터와의 혼합 학습으로 개선 가능하다.
 
-3. **3DGS → Three.js**  
-   3DGS는 photorealistic novel-view synthesis에 유리하나, 웹 배포·실시간 상호작용·모바일 호환성 측면에서 Three.js procedural rendering이 더 적합하였다.
+4. **3DGS 웹 서비스 통합 한계**
+   COLMAP + 3DGS 파이프라인을 직접 구축하고
+   2개 씬 학습 및 렌더링 결과를 확보하였으나,
+   두 가지 한계를 확인하였다.
+   첫째, 제한된 학습 이미지(20~30장) 환경에서
+   배경 영역 아티팩트가 발생하여 목표한 수준의
+   photorealistic 렌더링 품질을 달성하지 못하였다.
+   충분한 멀티뷰 이미지(100장+)와 추가 학습으로 개선 가능하다.
+   둘째, 웹 브라우저 실시간 렌더링 불가, GPU 의존성,
+   대용량 모델 로딩 시간 등 현재 웹 서비스 환경의
+   기술적 제약으로 직접 통합이 어렵다고 판단하였다.
+   WebGL 기반 3DGS 뷰어(예: gsplat.js) 기술 성숙 시
+   재통합 가능하다.
 
-4. **Gemini API 의존**  
-   자연어 설명 및 챗봇은 외부 LLM API에 의존하며, API 키(`GOOGLE_API_KEY`) 및 네트워크 연결이 필요하다.
+5. **외부 API 의존성**
+   Gemini API 기반 자연어 설명은 외부 서비스 의존으로
+   API 장애 시 서비스 품질이 저하된다.
+   경량 온디바이스 LLM으로의 전환을 고려할 수 있다.
 
-5. **카테고리 한계**  
-   6-class scene taxonomy는 여행 도메인을 coarse-grained로만 표현한다. 세부 테마(예: hiking vs. beach resort) 구분은 추가 확장이 필요하다.
+6. **스타일 분류의 주관성 한계**
+   mood · place · style 분류는 본질적으로 주관적 개념이다.
+   Pseudo Labeling 기반 자동 라벨링은 개인마다 다르게
+   느끼는 "분위기"와 "스타일"을 단일 기준으로 정의하여
+   라벨의 주관성 문제가 잔존한다.
+   여행지 프로필은 객관적 시각 특성(색감·밝기·채도)으로
+   정의하였으나, 사용자별 스타일 인식 차이는
+   개인화 피드백으로 점진적 개선이 필요하다.
 
-6. **Cold-start**  
-   업로드 사진 수(최소 5장) 및 품질에 따라 `is_uncertain` 플래그가 활성화되며, 이 경우 랜덤/보조 추천 fallback이 동작한다.
+### Future Work
+1. **VR 기반 여행지 프리뷰**
+   추천된 여행지를 WebXR API + 3DGS 씬으로
+   VR 환경에서 직접 체험 가능하도록 확장.
+   실제 여행지 드론 영상 기반 3DGS 학습으로
+   몰입형 여행 미리보기 경험 구현.
 
-### 향후 개선 방향
-- 실제 여행지 드론 영상으로 3DGS 재학습 및 웹 통합
-- 6개 카테고리를 세분화된 하위 테마로 확장
-  (예: beach -> 리조트형 vs 자연형)
-- MLP v3/v4 F1 수치 기반 최적 버전 확정
-- 사용자 피드백 기반 추천 개선 루프 구축
-- 모바일 앱 확장
+2. **개인화 스타일 피드백 루프**
+   추천 결과에 대한 사용자 피드백을 수집하여
+   개인별 색감·분위기 선호를 Preference Vector에
+   지속적으로 반영. 스타일 라벨의 주관성 문제를
+   개인화로 점진적 해결.
+
+3. **3DGS 품질 개선 및 웹 통합**
+   실제 여행지 드론 영상(100장+) 기반 재학습으로
+   렌더링 품질 향상. gsplat.js 등 WebGL 기반
+   3DGS 뷰어 기술 성숙 시 웹 직접 통합.
+
+4. **계층적 카테고리 확장**
+   6개 → 세부 하위 테마로 확장
+   (예: beach → 리조트형 / 자연형 / 액티비티형)
+   CV 분석 결과와 더 세분화된 여행지 프로필 매칭.
+
+5. **멀티 도메인 통합 벤치마크 구축**
+   travel-specific 통합 평가 기준 수립으로
+   멀티 도메인 학습 모델 정량 평가 체계화.
+
+6. **모델 경량화**
+   모바일 환경을 위한 경량화
+   (CLIP → MobileCLIP, OneFormer → 경량 segmentation)
+   모바일에서도 실시간 CV 분석 가능하도록 확장.
 
 ---
 
-## Installation & Usage
+## 🚀 Installation & Usage
 
-### 요구 사항
+### Requirements
 
 - Python 3.10+
 - CUDA-capable GPU (권장)
-- Node.js 불필요 (정적 frontend, Three.js CDN)
+- Google Gemini API Key
 
-### 설치
+### Installation
 
 ```bash
-git clone <repository-url>
-cd cv_project
+git clone https://github.com/your-username/PhotoTrip.git
+cd PhotoTrip
 
 python -m venv venv
 # Windows
@@ -380,7 +436,7 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 환경 변수
+### Environment Variables
 
 프로젝트 루트에 `.env` 파일을 생성한다.
 
@@ -388,52 +444,9 @@ pip install -r requirements.txt
 GOOGLE_API_KEY=your_gemini_api_key
 ```
 
-### 모델 가중치
+### Model Weights
 
-Fine-tuned CLIP 가중치를 `models/best_clip.pth`에 배치한다.  
-(경로는 `backend/siglip_classifier.py`의 `DEFAULT_MODEL_PATH` 참조)
-
-```
-models/
-  best_clip.pth          # CLIP fine-tuned (최종 분류 모델)
-  best_siglip.pth        # SigLIP fine-tuned (실험용)
-  mlp_mood_best.pth
-  mlp_place_best.pth
-  mlp_style_best.pth
-  oneformer_top/         # OneFormer fine-tuned 체크포인트
-```
-
-### 서버 실행
-
-```bash
-uvicorn backend.main:app --reload --port 8000
-```
-
-브라우저에서 `http://localhost:8000` 접속.
-
-### 사용 흐름
-
-1. 메인 화면에서 **바코드(탑승권)** 클릭 → 업로드 화면 이동
-2. 일상 사진 **5~7장** 업로드
-3. **AI 분석 시작** → 로딩 → 결과 화면
-4. 좌측: 3D 씬 + CV Analysis (미니 카드, 전체/Photo별 분석)
-5. 우측: Gemini 요약, CV 상세 분석, Flying 챗봇, 탑승권 발급
-
-### Fine-tuning (선택)
-
-```bash
-# CLIP 장면 분류 fine-tuning
-python classification/clip_finetune.py \
-    --train_dir data/train \
-    --val_dir data/val \
-    --epochs 10 --batch_size 32 --lr 1e-5
-
-# SigLIP (실험용)
-python classification/siglip_finetune.py \
-    --train_dir data/train \
-    --val_dir data/val \
-    --epochs 10
-```
+아래 모델 파일을 `models/` 디렉터리에 배치한다.
 
 ---
 
