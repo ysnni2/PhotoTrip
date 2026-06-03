@@ -3,14 +3,14 @@
 **개인 사진으로 여행 취향을 분석하는 AI 시스템**
 
 ---
-## 📋 목차
+## 📋 Table of Contents
 - [Abstract](#abstract)
 - [Demo](#-demo)
 - [System Overview](#system-overview)
-- [기술 스택](#-기술-스택)
+- [Tech Stack](#️-tech-stack)
 - [Key Contributions](#-key-contributions)
-- [배경 및 관련 연구](#배경-및-관련-연구)
-- [모델 학습 구조](#모델-학습-구조)
+- [Related Work](#-related-work)
+- [Model Architecture](#-model-architecture)
 - [Experiments & Results](#experiments--results)
 - [Limitations & Future Work](#limitations--future-work)
 - [Installation & Usage](#-installation--usage)
@@ -200,7 +200,7 @@ Mask2Former를 사용할 경우 데이터셋마다 별도 모델 학습이 필�
 
 SigLIP은 각 클래스를 독립적으로 평가하는 sigmoid loss 특성상 inference confidence가 33~37%에 머물러 Preference Vector 품질을 저하시킨다. CLIP의 softmax 기반 confidence(79~87%)가 취향 신호를 명확하게 전달하여 최종 채택.
 
-> For detailed experiments, see **Experiments & Results** section.
+> 자세한 실험 결과는 Experiments & Results 섹션 참고.
 
 ---
 
@@ -300,23 +300,23 @@ flowchart LR
 |------|------|
 | 입력 | CLIP image embedding (768-dim) |
 | 구조 | MLP 768→512→256→128→6, multilabel sigmoid |
-| Loss | BCE Loss with class weights (희소 클래스 보정) |
+| 손실 함수 | BCE Loss with class weights (희소 클래스 보정) |
 | 데이터 | Pseudo Labeling pipeline (v3 generator) |
-| Sampler | Rare-class weighted sampler |
-| Val F1 (macro) | [TBD] |
-| Val F1 (micro) | [TBD] |
+| 샘플러 | Rare-class weighted sampler |
+| 검증 F1 (macro) | [TBD] |
+| 검증 F1 (micro) | [TBD] |
 
 ---
 
 ### 4. 3D 장면 렌더링 실험 (3D Scene Rendering Experiment)
 
-| Stage | Details |
-|-------|---------|
-| Pipeline | COLMAP Structure-from-Motion + 3D Gaussian Splatting |
-| Result | 2개 씬 학습 완료 및 렌더링 결과 확보 |
-| Limitation | 웹 브라우저 실시간 렌더링 불가, GPU 의존성 |
-| Final Choice | Three.js procedural rendering |
-| Reason | 웹 호환성, 실시간 렌더링, GPU 의존성 제거 |
+| 단계 | 내용 |
+|------|------|
+| 파이프라인 | COLMAP Structure-from-Motion + 3D Gaussian Splatting |
+| 결과 | 2개 씬 학습 완료 및 렌더링 결과 확보 |
+| 한계 | 웹 브라우저 실시간 렌더링 불가, GPU 의존성 |
+| 최종 선택 | Three.js procedural rendering |
+| 전환 이유 | 웹 호환성, 실시간 렌더링, GPU 의존성 제거 |
 
 제한된 학습 이미지(20~30장) 환경에서 주요 객체의 3D 구조 재구성에 성공하였으나, 배경 영역 아티팩트 발생. 웹 실시간 서비스 통합의 현실적 한계로 Three.js 전환.
 
@@ -330,14 +330,14 @@ flowchart LR
 
 ### 5. 종합 결과
 
-| 항목 | 수치 / 상태 |
-|------|------------|
-| Scene Classification (CLIP FT) | Val Acc **93.48%** · Confidence **79~87%** |
-| Segmentation (OneFormer FT) | mIoU **45.6%** (+8.5%p vs pretrained) |
-| MLP (mood / place / style) | Val F1 [TBD] |
-| Multi-image Ensemble | 5~7장 per-image vector 평균 앙상블 |
-| Recommendation | Top-3~5 destinations, category-aware scoring |
-| End-to-end Latency | [TBD] s / 7 images (GPU) |
+| 모듈 | 모델 | 성능 |
+|------|------|------|
+| 장면 분류 | CLIP ViT-B/32 fine-tuned | Val Acc 93.48% · Confidence 79~87% |
+| 의미론적 분할 | OneFormer swin-large | Travel-class mIoU 45.6% (+8.5%p) |
+| 스타일 분류 | MLP (768→512→256→128→6) | BCE Loss + class weights 적용 |
+| 시각 특성 | OpenCV | 밝기·채도·색온도·대비 6개 메트릭 |
+| 추천 엔진 | 코사인 유사도 | Top-3~5 여행지 선정 |
+| 앙상블 | per-image 평균 | 5~7장 입력 기준 |
 
 ---
 
