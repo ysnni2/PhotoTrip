@@ -519,13 +519,40 @@ python classification/siglip_finetune.py \
 
 ## References
 
-1. Radford, A., Kim, J. W., Hallacy, C., Ramesh, A., Goh, G., Agarwal, S., ... & Sutskever, I. (2021). *Learning Transferable Visual Models From Natural Language Supervision.* ICML. (CLIP)
-2. Zhai, X., Mustafa, B., Kolesnikov, A., & Beyer, L. (2023). *Sigmoid Loss for Language Image Pre-Training.* ICCV. (SigLIP)
-3. Jain, J., Li, J., Chiu, M. T., Hassani, A., Orlov, N., & Shi, H. (2023). *OneFormer: One Transformer to Rule Universal Image Segmentation.* CVPR.
-4. Cheng, B., Misra, I., Schwing, A. G., Kirillov, A., & Girdhar, R. (2022). *Masked-attention Mask Transformer for Universal Image Segmentation (Mask2Former).* CVPR.
-5. Kerbl, B., Kopanas, G., Leimkühler, T., & Drettakis, G. (2023). *3D Gaussian Splatting for Real-Time Radiance Field Rendering.* ACM Transactions on Graphics (SIGGRAPH).
+### 모델
+
+1. Radford, A., et al. (2021). *Learning Transferable Visual Models From Natural Language Supervision.* ICML. (CLIP)
+2. Zhai, X., et al. (2023). *Sigmoid Loss for Language Image Pre-Training.* ICCV. (SigLIP)
+3. Jain, J., et al. (2023). *OneFormer: One Transformer to Rule Universal Image Segmentation.* CVPR.
+4. Cheng, B., et al. (2022). *Masked-attention Mask Transformer for Universal Image Segmentation.* CVPR. (Mask2Former)
+
+### 3D 재구성
+
+5. Kerbl, B., et al. (2023). *3D Gaussian Splatting for Real-Time Radiance Field Rendering.* ACM Transactions on Graphics (SIGGRAPH).
 6. Schönberger, J. L., & Frahm, J.-M. (2016). *Structure-from-Motion Revisited.* CVPR. (COLMAP)
-7. Google DeepMind. *Gemini API Documentation.* https://ai.google.dev/
+
+### 데이터셋
+
+7. Zhou, B., et al. (2017). *Scene Parsing through ADE20K Dataset.* CVPR.
+8. Wu, X., Fu, X., et al. (2021). *A Large-Scale Benchmark for Food Image Segmentation.* ACM MM. (FoodSeg103)
+9. Cordts, M., et al. (2016). *The Cityscapes Dataset for Semantic Urban Scene Understanding.* CVPR.
+
+### 멀티도메인 학습
+
+10. Lambert, J., et al. (2020). *MSeg: A Composite Dataset for Multi-domain Semantic Segmentation.* CVPR.
+
+### API 및 도구
+
+11. Google DeepMind. *Gemini API 문서.* https://ai.google.dev/
+
+---
+
+## 감사의 글 (Acknowledgements)
+
+- **3D 씬 시각화**: Canva AI 활용
+- **학습 환경**: Google Colab · Kaggle (GPU 지원)
+- **데이터 수집**: Pixabay API (Pseudo Labeling 학습 데이터)
+- **3DGS 학습**: YouTube 드론 영상 활용
 
 ---
 
