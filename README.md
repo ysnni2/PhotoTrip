@@ -10,6 +10,7 @@
 ## 📋 Table of Contents
 - [Demo](#-demo)
 - [Why PhotoTrip?](#-why-is-phototrip-different)
+- [Why A Single Model Is Not Enough?](#-why-a-single-model-is-not-enough)
 - [Preference Vector](#-preference-vector)
 - [System Architecture](#️-system-architecture)
 - [Tech Stack](#️-tech-stack)
@@ -25,6 +26,10 @@
 ---
 
 ## 🎥 Demo
+
+<p align="center">
+  <img src="results/demo.gif" width="90%">
+</p>
 
 ```
 입력                    멀티모달 분석               출력
@@ -45,8 +50,8 @@
 | CLIP Confidence | **79~87%** |
 | OneFormer Fine-tuning | **45.6 mIoU** (+8.5%p) |
 | Recommendation Engine | Top-3 Personalized Destination |
-| 3D Rendering | Three.js Interactive Scene |
-| 3DGS Experiment | COLMAP + 3DGS 구축 완료 |
+| Frontend Visualization | Three.js Interactive Scene |
+| End-to-End Pipeline | Upload → Analysis → Recommendation → Visualization |
 
 <p align="center">
 <img src="results/full_experiment_history.png.png" width="80%">
@@ -121,14 +126,15 @@ Style MLP는 분위기를 추정할 수 있지만 **공간 구조**는 파악하
 | OpenCV | 밝기 / 채도 / 색온도 | 장소 의미, 맥락 |
 | Style MLP | 분위기 / 라이프스타일 벡터 | 공간 구조, 장소 범주 |
 
-PhotoTrip은 네 모듈을 통합하여 **단일 모델이 표현할 수 없는 여행 취향**을 분석한다.
+PhotoTrip은 **Scene + Semantic + Visual + Style** 네 가지 정보를 통합하여  
+단일 모델이 표현할 수 없는 여행 취향을 분석한다.
 
-| Module | 추출 정보 | 성능 |
-|--------|----------|------|
-| CLIP | Scene Category | 93.48% Accuracy |
-| OneFormer | Semantic Composition | 45.6 mIoU |
-| OpenCV | Brightness / Saturation / Color Temperature | 6 Visual Metrics |
-| Style MLP | Mood / Lifestyle | Multi-label Vector |
+| Module | 추출 정보 | 성능 | 단독 사용 시 한계 |
+|--------|----------|------|----------------|
+| CLIP | Scene Category | 93.48% Accuracy | 발리 ≠ 제주 구분 불가 |
+| OneFormer | Semantic Composition | 45.6 mIoU | 감성적 선호 표현 불가 |
+| OpenCV | Brightness / Saturation / Color Temperature | 6 Visual Metrics | 장소 의미 이해 불가 |
+| Style MLP | Mood / Lifestyle | Multi-label Vector | 공간 구조 파악 불가 |
 
 ---
 
@@ -139,6 +145,9 @@ PhotoTrip의 핵심 기여는
 CLIP · OneFormer · OpenCV · Style MLP의 출력을
 
 하나의 **Preference Vector**로 통합하는 것이다.
+
+기존 연구가 장면 분류 결과를 제공하는 데 집중했다면,  
+PhotoTrip은 **사용자의 취향을 벡터 공간에 표현**한다.
 
 ### Example
 
@@ -173,25 +182,6 @@ CLIP · OneFormer · OpenCV · Style MLP의 출력을
 
 > "따뜻한 색감과 활기찬 분위기를 선호하는 경향이 강합니다.  
 > 바다와 음식이 어우러지는 리조트형 여행지가 잘 맞을 것 같습니다."
-
----
-
-기존 연구가 장면 분류 결과를 제공하는 데 집중했다면,  
-PhotoTrip은 **사용자의 취향을 벡터 공간에 표현**한다.
-
----
-
-## 🌴 Why Multi-Modal?
-
-| 모듈 단독 사용 | 가능한 것 | 한계 |
-|---|---|---|
-| CLIP 단독 | 장소 분류 | 발리 ≠ 제주 구분 불가 |
-| OneFormer 단독 | 픽셀 구성 파악 | 분위기 정보 없음 |
-| OpenCV 단독 | 색감 측정 | 맥락 정보 없음 |
-| MLP 단독 | 분위기 추론 | 장소 정보 없음 |
-
-PhotoTrip은 **Scene + Semantic + Visual + Style** 정보를 통합하여  
-다차원 취향 표현을 수행한다.
 
 ---
 
@@ -447,6 +437,15 @@ flowchart LR
 | 데이터 | Pseudo Labeling pipeline (v3 generator) |
 | 샘플러 | Rare-class weighted sampler |
 
+### Style MLP Results
+
+| Metric | Score |
+|--------|-------|
+| Macro F1 | — |
+| Micro F1 | — |
+
+> MLP 학습 완료 후 수치 업데이트 예정.
+
 ---
 
 ### 4. 종합 결과
@@ -531,33 +530,40 @@ flowchart LR
 
 ### Future Work
 
-**Learnable Preference Embedding**
+**1. Learnable Preference Embedding**
 
 현재 시스템은 사람이 설계한 Preference Vector를 사용한다.  
 향후에는 사용자 이미지와 여행지 이미지를 동일한 임베딩 공간으로 학습하여  
 수작업 특징 설계 없이 여행 취향을 직접 학습하는  
 Learnable Preference Embedding으로 확장할 수 있다.
 
-**Personalized Feedback Loop**
+**2. Personalized Feedback Loop**
 
 사용자 피드백을 통해 Preference Vector를 지속적으로 업데이트하여  
 개인화 성능을 향상할 수 있다.  
 스타일 라벨의 주관성 문제를 개인화로 점진적으로 해결 가능하다.
 
-**Large-Scale Destination Retrieval**
+**3. Large-Scale Destination Retrieval**
 
 사전 정의 여행지 대신 대규모 여행지 이미지 데이터베이스를 활용한  
 Retrieval 기반 추천으로 확장할 수 있다.
 
-**계층적 카테고리 확장**
+**4. 계층적 카테고리 확장**
 
 6개 → 세부 하위 테마로 확장  
 (예: beach → 리조트형 / 자연형 / 액티비티형)
 
-**3DGS 웹 통합**
+**5. 3DGS 웹 통합**
 
 gsplat.js 등 WebGL 기반 3DGS 뷰어 기술 성숙 시  
 실제 여행지 드론 영상(100장+) 기반 재학습으로 웹 직접 통합.
+
+---
+
+PhotoTrip의 핵심 기여는 새로운 비전 모델의 제안이 아니라,  
+장면 의미(CLIP) · 공간 구성(OneFormer) · 시각 특성(OpenCV) · 분위기 선호(MLP)를  
+Preference Vector로 통합하여 사용자의 잠재적 여행 취향을  
+정량화한 **멀티모달 취향 추론 프레임워크**에 있다.
 
 ---
 
