@@ -498,35 +498,74 @@ flowchart LR
 
 ## Limitations & Future Work
 
-### Current Limitations
+### Limitations
 
-1. **여행 취향의 coarse-grained 표현**  
-   6개 카테고리로 의도적으로 taxonomy를 설계하였으나,  
-   실제 사용자 취향은 카테고리 간 경계가 모호하며  
-   세부 테마(예: 리조트형 vs 자연형 beach) 구분이 어렵다.
+**1. Coarse-Grained Travel Preference Representation**
 
-2. **멀티 도메인 통합 평가 기준 부재**  
-   ADE20K · FoodSeg103 · Cityscapes 통합 학습 모델의  
-   정량 평가를 위한 단일 통합 벤치마크가 존재하지 않는다.
+본 시스템은 데이터 수집 가능성과 모델 복잡도를 고려하여 beach, nature, city, culture, festival, food의 6개 카테고리 기반 taxonomy를 사용한다.
 
-3. **Pseudo Labeling 노이즈**  
-   confidence threshold 필터링에도 불구하고  
-   도메인 편향 및 라벨 노이즈가 잔존할 수 있다.  
-   Human-annotated 데이터와의 혼합 학습으로 개선 가능하다.
+그러나 실제 여행 취향은 카테고리 간 경계가 명확하지 않으며, 동일한 카테고리 내에서도 다양한 세부 선호가 존재한다.
 
-4. **3DGS 웹 서비스 통합 한계**  
-   제한된 학습 이미지(20~30장) 환경에서 배경 아티팩트 발생.  
-   웹 브라우저 실시간 렌더링 불가, GPU 의존성 등  
-   현재 기술적 제약으로 직접 통합이 어렵다.  
-   WebGL 기반 3DGS 뷰어(예: gsplat.js) 기술 성숙 시 재통합 가능하다.
+예를 들어 beach 선호 사용자는 리조트 중심 휴양형, 자연 경관 중심 탐방형, 액티비티 중심 체험형 등 서로 다른 취향을 가질 수 있다.
 
-5. **외부 API 의존성**  
-   Gemini API 장애 시 서비스 품질이 저하된다.  
-   경량 온디바이스 LLM으로의 전환을 고려할 수 있다.
+현재 시스템은 이러한 세부 취향을 충분히 구분하지 못한다.
 
-6. **스타일 분류의 주관성 한계**  
-   mood · place · style은 본질적으로 주관적 개념이다.  
-   개인화 피드백 루프 구축이 필요하다.
+---
+
+**2. Multi-Domain Evaluation Limitation**
+
+OneFormer는 ADE20K, FoodSeg103, Cityscapes를 통합하여 학습되었으나, 여행 취향 분석을 위한 통합 평가 벤치마크는 존재하지 않는다.
+
+따라서 각 데이터셋 기반 개별 성능 평가는 가능하지만, 멀티 도메인 환경에서의 종합적인 성능을 정량적으로 평가하는 데 한계가 있다.
+
+---
+
+**3. Pseudo Labeling Noise**
+
+스타일 분류 학습 데이터는 Pixabay 이미지와 자동 라벨링 기반으로 구축되었다.
+
+Confidence 기반 필터링을 적용하였음에도 불구하고 데이터 편향 및 라벨 노이즈가 일부 잔존할 수 있다.
+
+향후 Human-Annotated 데이터와의 혼합 학습을 통해 데이터 품질을 개선할 수 있다.
+
+---
+
+**4. Limitation of Hand-Crafted Preference Vector**
+
+현재 Preference Vector는 Scene, Semantic, Visual, Style 정보를 기반으로 사람이 직접 설계한 특징 공간을 사용한다.
+
+이는 해석 가능성이 높다는 장점이 있으나, 실제 사용자의 잠재적 취향을 완전히 표현하지 못할 가능성이 있다.
+
+향후에는 사용자 이미지와 여행지 이미지를 동일한 임베딩 공간에 정렬하는 Learnable Preference Embedding을 통해 보다 일반화된 취향 표현을 학습할 수 있다.
+
+---
+
+**5. 3DGS Integration Constraint**
+
+COLMAP과 3D Gaussian Splatting 기반 재구성 실험을 통해 실제 3D 장면 생성 가능성을 확인하였다.
+
+그러나 제한된 학습 이미지 환경에서는 배경 아티팩트가 발생하였으며, 웹 브라우저 실시간 렌더링, GPU 의존성, 모델 로딩 시간 등의 제약으로 인해 현재 서비스에는 직접 적용하지 않았다.
+
+이에 따라 최종 서비스는 Three.js 기반 인터랙티브 시각화를 채택하였다.
+
+---
+
+**6. Dependency on External APIs**
+
+Gemini API 기반 자연어 설명 기능은 외부 서비스 의존성을 가진다.
+
+API 장애 또는 정책 변경 시 서비스 품질에 영향을 받을 수 있으며, 향후 경량 온디바이스 LLM을 활용한 독립적 추론 구조로 확장 가능하다.
+
+---
+
+**7. Subjectivity of Style Labels** 
+
+분위기(mood), 라이프스타일(style), 장소 감성(place)은 본질적으로 주관적인 개념이다.
+
+동일한 이미지에 대해서도 사용자마다 서로 다른 인식을 가질 수 있으며, 현재의 자동 라벨링 기반 접근은 이러한 개인차를 충분히 반영하지 못한다.
+
+향후 사용자 피드백 기반 개인화 루프를 통해 이 문제를 완화할 수 있다.
+
 
 ### Future Work
 
