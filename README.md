@@ -30,12 +30,12 @@
 <p align="center">
   <img src="results/demo.gif" width="90%">
 </p> 
-https://github.com/user-attachments/assets/45d3d391-dde3-41f9-a6ee-d80ff77b4c9f
-https://github.com/user-attachments/assets/aa2ad316-7270-4293-bfdf-e43aabe4dada
-https://github.com/user-attachments/assets/5ef5fe29-4734-4f77-87b2-511de3855b48
-https://github.com/user-attachments/assets/a79cddb6-0e5d-4cad-ab43-86cdc3fb5185
-https://github.com/user-attachments/assets/96f4ace8-f7e2-4662-9a4c-6044df3dc3ec
-
+city_demo : 
+nature_demo : https://github.com/user-attachments/assets/45d3d391-dde3-41f9-a6ee-d80ff77b4c9f
+culture_demo : https://github.com/user-attachments/assets/aa2ad316-7270-4293-bfdf-e43aabe4dada
+food_demo : https://github.com/user-attachments/assets/5ef5fe29-4734-4f77-87b2-511de3855b48
+beach_demo : https://github.com/user-attachments/assets/a79cddb6-0e5d-4cad-ab43-86cdc3fb5185
+festival_demo :https://github.com/user-attachments/assets/96f4ace8-f7e2-4662-9a4c-6044df3dc3ec
 ---
 
 ## 🏆 Key Results
