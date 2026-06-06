@@ -1,6 +1,6 @@
 # 📸 PhotoTrip
 ## From Everyday Photos to Travel Preferences
-### 일상 사진 속 잠재적 시각 선호를 분석하여 여행 취향을 추론하는 멀티모달 AI 시스템
+### 내 갤러리 속 잠재적 시각 선호를 분석하여 여행 취향을 추론하는 멀티모달 AI 시스템
 
 > CLIP · OneFormer · OpenCV · Style MLP를 통합하여 사용자의 잠재적 시각 취향을 분석하고,  
 > Preference Vector 기반 맞춤 여행지를 추천하는 End-to-End AI 서비스
@@ -29,17 +29,8 @@
 
 <p align="center">
   <img src="results/demo.gif" width="90%">
-</p>
-
-```
-입력                    멀티모달 분석               출력
-
-📷 카페 · 음식          CLIP Fine-tuned            Preference Vector 생성
-   노을 · 바다    →→→   OneFormer           →→→    여행지 Top-3 추천
-      사진              OpenCV                     Gemini 취향 설명
-                        Style MLP                  Three.js 3D 시각화
-```
-
+</p> 
+C:\Users\seori\Videos\nature_demo.mp4
 ---
 
 ## 🏆 Key Results
