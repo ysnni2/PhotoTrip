@@ -1,5 +1,4 @@
 # 📸 PhotoTrip
-## From Everyday Photos to Travel Preferences
 ### 내 갤러리 속 잠재적 시각 선호를 분석하여 여행 취향을 추론하는 멀티모달 AI 시스템
 
 > CLIP · OneFormer · OpenCV · Preference MLP를 통합하여 사용자의 잠재적 시각 취향을 분석하고,  
