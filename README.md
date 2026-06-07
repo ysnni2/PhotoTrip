@@ -1,8 +1,7 @@
 # 📸 PhotoTrip
-## From Everyday Photos to Travel Preferences
-### 일상 사진 속 잠재적 시각 선호를 분석하여 여행 취향을 추론하는 멀티모달 AI 시스템
+### 내 갤러리 속 잠재적 시각 선호를 분석하여 여행 취향을 추론하는 멀티모달 AI 시스템
 
-> CLIP · OneFormer · OpenCV · Style MLP를 통합하여 사용자의 잠재적 시각 취향을 분석하고,  
+> CLIP · OneFormer · OpenCV · Preference MLP를 통합하여 사용자의 잠재적 시각 취향을 분석하고,  
 > Preference Vector 기반 맞춤 여행지를 추천하는 End-to-End AI 서비스
 
 ---
@@ -21,6 +20,7 @@
 - [3D Reconstruction Experiment](#-3d-reconstruction-experiment)
 - [Limitations & Future Work](#-limitations--future-work)
 - [Installation & Usage](#-installation--usage)
+- [Conclusion](#-conclusion)
 - [References](#references)
 
 ---
@@ -31,14 +31,14 @@
   <img src="results/demo.gif" width="90%">
 </p>
 
-```
-입력                    멀티모달 분석               출력
-
-📷 카페 · 음식          CLIP Fine-tuned            Preference Vector 생성
-   노을 · 바다    →→→   OneFormer           →→→    여행지 Top-3 추천
-      사진              OpenCV                     Gemini 취향 설명
-                        Style MLP                  Three.js 3D 시각화
-```
+| Category | Demo |
+|----------|------|
+| 🏙️ City | [Video](https://github.com/user-attachments/assets/2e39bb36-876f-4b46-a000-fc9914e87034) |
+| 🏛️ Culture | [Video](https://github.com/user-attachments/assets/aa2ad316-7270-4293-bfdf-e43aabe4dada) |
+| 🌿 Nature | [Video](https://github.com/user-attachments/assets/45d3d391-dde3-41f9-a6ee-d80ff77b4c9f) |
+| 🍕 Food | [Video](https://github.com/user-attachments/assets/5ef5fe29-4734-4f77-87b2-511de3855b48) |
+| 🌊 Beach | [Video](https://github.com/user-attachments/assets/a79cddb6-0e5d-4cad-ab43-86cdc3fb5185) |
+| 🎆 Festival | [Video](https://github.com/user-attachments/assets/96f4ace8-f7e2-4662-9a4c-6044df3dc3ec) |
 
 ---
 
@@ -49,6 +49,7 @@
 | CLIP Fine-tuning | **93.48% Accuracy** |
 | CLIP Confidence | **79~87%** |
 | OneFormer Fine-tuning | **45.6 mIoU** (+8.5%p) |
+| Preference MLP | **Macro F1 0.9450** |
 | Recommendation Engine | Top-3 Personalized Destination |
 | Frontend Visualization | Three.js Interactive Scene |
 | End-to-End Pipeline | Upload → Analysis → Recommendation → Visualization |
@@ -117,14 +118,14 @@
 
 OpenCV는 색감을 정량화할 수 있지만 **장소 의미**를 이해하지 못한다.
 
-Style MLP는 분위기를 추정할 수 있지만 **공간 구조**는 파악하지 못한다.
+Preference MLP는 분위기를 추정할 수 있지만 **공간 구조**는 파악하지 못한다.
 
 | Module | 제공하는 정보 | 제공하지 못하는 정보 |
 |--------|------------|------------------|
 | CLIP | 장면 카테고리 (beach / city / ...) | 색감, 분위기, 공간 비율 |
 | OneFormer | 픽셀 단위 의미 구성 비율 | 감성적 선호, 분위기 |
 | OpenCV | 밝기 / 채도 / 색온도 | 장소 의미, 맥락 |
-| Style MLP | 분위기 / 라이프스타일 벡터 | 공간 구조, 장소 범주 |
+| Preference MLP | 분위기 / 라이프스타일 벡터 | 공간 구조, 장소 범주 |
 
 PhotoTrip은 **Scene + Semantic + Visual + Style** 네 가지 정보를 통합하여  
 단일 모델이 표현할 수 없는 여행 취향을 분석한다.
@@ -134,7 +135,7 @@ PhotoTrip은 **Scene + Semantic + Visual + Style** 네 가지 정보를 통합�
 | CLIP | Scene Category | 93.48% Accuracy | 발리 ≠ 제주 구분 불가 |
 | OneFormer | Semantic Composition | 45.6 mIoU | 감성적 선호 표현 불가 |
 | OpenCV | Brightness / Saturation / Color Temperature | 6 Visual Metrics | 장소 의미 이해 불가 |
-| Style MLP | Mood / Lifestyle | Multi-label Vector | 공간 구조 파악 불가 |
+| Preference MLP | Mood / Lifestyle | Macro F1 0.9450 | 공간 구조 파악 불가 |
 
 ---
 
@@ -142,7 +143,7 @@ PhotoTrip은 **Scene + Semantic + Visual + Style** 네 가지 정보를 통합�
 
 PhotoTrip의 핵심 기여는
 
-CLIP · OneFormer · OpenCV · Style MLP의 출력을
+CLIP · OneFormer · OpenCV · Preference MLP의 출력을
 
 하나의 **Preference Vector**로 통합하는 것이다.
 
@@ -198,7 +199,7 @@ flowchart TD
         CLIP["CLIP Fine-tuned\n장면 분류 Acc 93.48% Conf 79~87%\noutput: scene scores"]
         ONE["OneFormer\n의미론적 분할 mIoU 45.6%\noutput: semantic ratio"]
         OCV["OpenCV\n밝기 채도 색온도 대비\noutput: visual metrics"]
-        SMLP["Style MLP\n768->512->256->128->6 BCE Loss\noutput: mood place style"]
+        SMLP["Preference MLP\n768->512->256->128->6 BCE Loss\noutput: mood place style"]
     end
     CLIP --> PV
     ONE --> PV
@@ -247,7 +248,7 @@ flowchart TD
 | 장면 분류 | CLIP ViT-B/32 fine-tuned |
 | 의미론적 분할 | OneFormer (swin_large) |
 | 시각 분석 | OpenCV |
-| 스타일 분류 | MLP · BCE Loss · Pseudo Labeling |
+| 분위기·취향 분류 | Preference MLP · BCE Loss · Pseudo Labeling |
 | LLM | Google Gemini API |
 | Frontend | Three.js · HTML/CSS/JS |
 | 학습 환경 | Google Colab · Kaggle (GPU) |
@@ -258,13 +259,13 @@ flowchart TD
 
 1. **멀티모달 Preference Vector 설계 및 앙상블**
 
-   CLIP · OneFormer · OpenCV · MLP 4개 이질적 모듈의 출력을  
+   CLIP · OneFormer · OpenCV · Preference MLP 4개 이질적 모듈의 출력을  
    단일 Preference Vector로 통합하는 구조를 직접 설계.  
    scene(6차원) · visual(6차원) · semantic(5차원) · style · lifestyle을  
    하나의 벡터로 표현하며, 5~7장 입력 시 per-image 벡터를  
    평균 앙상블하여 노이즈에 robust한 취향 표현을 구축.
 
-   OpenCV 색감 분석(밝기·채도·색온도·대비)과 Style MLP 출력을  
+   OpenCV 색감 분석(밝기·채도·색온도·대비)과 Preference MLP 출력을  
    여행지 프로필과 코사인 유사도로 매칭함으로써,  
    CV 분석 결과가 직접 추천에 반영되는 end-to-end 파이프라인 완성.  
    *(예: 따뜻한 색감 + vibrant 스타일 → 발리·방콕 추천)*
@@ -275,7 +276,7 @@ flowchart TD
    val accuracy와 inference confidence를 직접 비교.  
    SigLIP은 accuracy 93.56%에도 confidence가 33~37%에 머물러  
    Preference Vector 품질을 저하시킴을 확인.  
-   CLIP fine-tuned는 93.48% accuracy + 79~87% confidence로 최종 채택.  
+   CLIP fine-tuned는 93.48% accuracy + 79%에서 87% confidence로 최종 채택.  
    총 5가지 실험 변형(Pseudo Labeling, large 데이터, festival 추가 등)을 직접 설계·수행.
 
 3. **OneFormer 멀티데이터셋 학습 파이프라인 설계**
@@ -289,11 +290,12 @@ flowchart TD
    Pixabay API 수집 → SigLIP 자동 라벨링 →  
    confidence 필터링 전 과정을 직접 설계 및 구현.
 
-5. **MLP 스타일 분류 모델 설계 및 실험**
+5. **Preference MLP 설계 및 실험**
 
    BCE Loss + class weights로 클래스 불균형을 처리하고,  
-   mood · place · style 3개 MLP를 독립적으로 설계.  
-   CLIP 임베딩(768차원) → 6-class multilabel 분류.
+   mood · place · style 3개 Preference MLP를 독립적으로 설계.  
+   CLIP 임베딩(768차원) → 6-class multilabel 분류.  
+   Place Preference MLP Macro F1 **0.9450** 달성.
 
 6. **COLMAP + 3DGS 렌더링 파이프라인 구축 실험**
 
@@ -354,7 +356,7 @@ flowchart LR
         D["ADE20K\nFoodSeg\nCityscapes"] --> E["통합 학습\njoint training"] --> R2(["mIoU\n37.1%→45.6%"])
     end
 
-    subgraph MLP["🟣 MLP 스타일 분류"]
+    subgraph MLP["🟣 Preference MLP"]
         F["CLIP 임베딩\n768차원"] --> G["MLP\n768→128→6"] --> R3(["mood\nplace\nstyle"])
     end
 
@@ -427,7 +429,7 @@ flowchart LR
 
 ---
 
-### 3. Preference Vector 학습 (Style MLP)
+### 3. Preference MLP
 
 | 항목 | 설정 |
 |------|------|
@@ -437,14 +439,24 @@ flowchart LR
 | 데이터 | Pseudo Labeling pipeline (v3 generator) |
 | 샘플러 | Rare-class weighted sampler |
 
-### Style MLP Results
+### Preference MLP Results
 
-| Metric | Score |
-|--------|-------|
-| Macro F1 | — |
-| Micro F1 | — |
+| Category | F1 Score |
+|----------|----------|
+| Nature | 0.97 |
+| Food | 0.97 |
+| Beach | 0.95 |
+| Festival | 0.95 |
+| Culture | 0.93 |
+| City | 0.91 |
+| **Macro F1** | **0.9450** |
+| **Micro F1** | **0.9457** |
+| **Weighted F1** | **0.9460** |
 
-> MLP 학습 완료 후 수치 업데이트 예정.
+<p align="center">
+  <img width="1200" height="750" alt="mlp_f1_score png" src="https://github.com/user-attachments/assets/23381cd7-015e-4116-ab70-eb62747b1bff" />
+</p>
+
 
 ---
 
@@ -454,7 +466,7 @@ flowchart LR
 |------|------|------|
 | 장면 분류 | CLIP ViT-B/32 fine-tuned | Val Acc 93.48% · Confidence 79~87% |
 | 의미론적 분할 | OneFormer swin-large | Travel-class mIoU 45.6% (+8.5%p) |
-| 스타일 분류 | MLP (768→512→256→128→6) | BCE Loss + class weights 적용 |
+| 분위기·취향 분류 | Preference MLP (768→512→256→128→6) | Macro F1 0.9450 · Weighted F1 0.9460 |
 | 시각 특성 | OpenCV | 밝기·채도·색온도·대비 6개 메트릭 |
 | 추천 엔진 | 코사인 유사도 | Top-3~5 여행지 선정 |
 | 앙상블 | per-image 평균 | 5~7장 입력 기준 |
@@ -542,7 +554,7 @@ Confidence 기반 필터링을 적용하였음에도 불구하고 데이터 편�
 
 **5. 3DGS Integration Constraint**
 
-COLMAP과 3D Gaussian Splatting 기반 재구성 실험을 통해 실제 3D 장면 생성 가능성을 확인하였다.
+COLMAP과 3D Gaussian Splatting 기반 재구성 실험을 통해 카테고리별 3D 생성 가능성과 실제 여행지 3D 장면 생성 가능성을 확인하였다.
 
 그러나 제한된 학습 이미지 환경에서는 배경 아티팩트가 발생하였으며, 웹 브라우저 실시간 렌더링, GPU 의존성, 모델 로딩 시간 등의 제약으로 인해 현재 서비스에는 직접 적용하지 않았다.
 
@@ -558,7 +570,7 @@ API 장애 또는 정책 변경 시 서비스 품질에 영향을 받을 수 있
 
 ---
 
-**7. Subjectivity of Style Labels** 
+**7. Subjectivity of Style Labels**
 
 분위기(mood), 라이프스타일(style), 장소 감성(place)은 본질적으로 주관적인 개념이다.
 
@@ -566,6 +578,7 @@ API 장애 또는 정책 변경 시 서비스 품질에 영향을 받을 수 있
 
 향후 사용자 피드백 기반 개인화 루프를 통해 이 문제를 완화할 수 있다.
 
+---
 
 ### Future Work
 
@@ -596,13 +609,6 @@ Retrieval 기반 추천으로 확장할 수 있다.
 
 gsplat.js 등 WebGL 기반 3DGS 뷰어 기술 성숙 시  
 실제 여행지 드론 영상(100장+) 기반 재학습으로 웹 직접 통합.
-
----
-
-PhotoTrip의 핵심 기여는 새로운 비전 모델의 제안이 아니라,  
-장면 의미(CLIP) · 공간 구성(OneFormer) · 시각 특성(OpenCV) · 분위기 선호(MLP)를  
-Preference Vector로 통합하여 사용자의 잠재적 여행 취향을  
-정량화한 **멀티모달 취향 추론 프레임워크**에 있다.
 
 ---
 
@@ -645,9 +651,9 @@ GOOGLE_API_KEY=your_gemini_api_key
 models/
 ├── best_clip.pth              # CLIP fine-tuned (장면 분류)
 ├── best_siglip.pth            # SigLIP fine-tuned (실험용)
-├── mlp_mood_best.pth          # MLP mood 분류
-├── mlp_place_best.pth         # MLP place 분류
-├── mlp_style_best.pth         # MLP style 분류
+├── mlp_mood_best.pth          # Preference MLP mood 분류
+├── mlp_place_best.pth         # Preference MLP place 분류
+├── mlp_style_best.pth         # Preference MLP style 분류
 └── oneformer_top/             # OneFormer fine-tuned
     ├── config.json
     ├── model.safetensors
@@ -693,6 +699,24 @@ python classification/siglip_finetune.py \
 # OneFormer fine-tuning
 # Kaggle 환경 권장 (GPU 메모리 24GB+)
 ```
+
+---
+
+## 📝 Conclusion
+
+PhotoTrip의 핵심 기여는 새로운 비전 모델의 제안이 아니라,  
+장면 의미(CLIP) · 공간 구성(OneFormer) · 시각 특성(OpenCV) · 분위기 선호(Preference MLP)를  
+Preference Vector로 통합하여 사용자의 잠재적 여행 취향을  
+정량화한 **멀티모달 취향 추론 프레임워크**에 있다.
+
+기존 여행 추천 시스템이 명시적 행동 데이터에 의존했다면,  
+PhotoTrip은 사용자의 일상 사진으로부터 잠재적 시각 취향을 추론하고,  
+이를 설명 가능한 형태의 Preference Vector로 표현한다.
+
+단일 모델이 포착할 수 없는 장소 의미 · 공간 구성 · 색감 · 분위기를  
+네 가지 이질적 모듈의 출력으로 분산 표현하고,  
+이를 하나의 벡터로 통합함으로써  
+사용자의 잠재적 여행 취향을 정량화하는 새로운 접근을 제시한다.
 
 ---
 
