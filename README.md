@@ -665,7 +665,7 @@ models/
 ### Run Server
 
 ```bash
-uvicorn backend.main:app --reload --port 8000
+python -m uvicorn backend.main:app --reload --port 8000
 ```
 
 브라우저에서 `http://localhost:8000` 접속.
