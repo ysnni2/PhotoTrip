@@ -149,6 +149,22 @@ CLIP · OneFormer · OpenCV · Preference MLP의 출력을
 
 기존 연구가 장면 분류 결과를 제공하는 데 집중했다면,  
 PhotoTrip은 **사용자의 취향을 벡터 공간에 표현**한다.
+Preference Vector는 총 **44차원**으로 구성되며, 각 차원이 명확한 의미를 갖는
+해석 가능한(interpretable) 표현 공간을 형성한다.
+
+| 그룹 | 구성 요소 | 차원 |
+|------|-----------|------|
+| scene | beach / nature / city / culture / festival / food | 6 |
+| visual | brightness / saturation / contrast / warm_tone / person_ratio / animal_ratio | 6 |
+| semantic | water / sky / vegetation / building / food | 5 |
+| style (MLP) | calm / cozy / romantic / energetic / local / aesthetic | 6 |
+| place (zero-shot) | beach / nature / city / food / festival / culture | 6 |
+| mood (zero-shot) | calm / cozy / romantic / energetic / local / aesthetic | 6 |
+| interest (zero-shot) | anime / disney / sports / cafe / shopping / nightlife / art / history / local_market | 9 |
+| **합계** | | **44** |
+
+여행지 프로필은 각 목적지의 특성을 동일한 44차원 축으로 수작업 정의한 벡터이며,
+사용자 Preference Vector와 코사인 유사도로 매칭한다.
 
 ### Example
 
@@ -270,6 +286,11 @@ flowchart TD
    CV 분석 결과가 직접 추천에 반영되는 end-to-end 파이프라인 완성.  
    *(예: 따뜻한 색감 + vibrant 스타일 → 발리·방콕 추천)*
 
+   scene 분류는 여행 특화 카테고리 정확도가 중요하므로 CLIP fine-tuning을 적용하였으며,
+   place · mood · interest 벡터는 CLIP의 강력한 zero-shot 전이 능력을 활용하였다.
+   라이프스타일 개념은 CLIP 사전학습 분포와 충분히 겹치므로
+   한정된 레이블 환경에서 zero-shot이 더 안정적인 선호 신호를 제공한다.
+   
 2. **Accuracy–Confidence 트레이드오프 실험 설계**
 
    SigLIP과 CLIP을 동일 데이터셋에서 fine-tuning 후  
