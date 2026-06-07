@@ -455,8 +455,9 @@ flowchart LR
 | **Weighted F1** | **0.9460** |
 
 <p align="center">
-  <img src="results/mlp_f1_score.png.png" width="70%"/>
+  <img width="1200" height="750" alt="mlp_f1_score png" src="https://github.com/user-attachments/assets/23381cd7-015e-4116-ab70-eb62747b1bff" />
 </p>
+
 
 ---
 
@@ -554,7 +555,7 @@ Confidence 기반 필터링을 적용하였음에도 불구하고 데이터 편�
 
 **5. 3DGS Integration Constraint**
 
-COLMAP과 3D Gaussian Splatting 기반 재구성 실험을 통해 실제 3D 장면 생성 가능성을 확인하였다.
+COLMAP과 3D Gaussian Splatting 기반 재구성 실험을 통해 카테고리별 3D 생성 가능성과 실제 여행지 3D 장면 생성 가능성을 확인하였다.
 
 그러나 제한된 학습 이미지 환경에서는 배경 아티팩트가 발생하였으며, 웹 브라우저 실시간 렌더링, GPU 의존성, 모델 로딩 시간 등의 제약으로 인해 현재 서비스에는 직접 적용하지 않았다.
 
