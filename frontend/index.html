@@ -856,6 +856,75 @@
         "이스탄불 (미식)": "IST",
         "Kyoto (indoor)": "UKY",
         "Kyoto (culture)": "UKY",
+        하쿠바: "NGO",
+        장가계: "DYG",
+        마추픽추: "CUZ",
+        인터라켄: "BRN",
+        롬복: "LOP",
+        파타고니아: "PUQ",
+        아이슬란드: "KEF",
+        설악산: "YNY",
+        요세미티: "MMH",
+        하와이: "HNL",
+        크라비: "KBV",
+        칸쿤: "CUN",
+        리우: "GIG",
+        세이셸: "SEZ",
+        "필리핀 팔라완": "PPS",
+        산토리니: "JTR",
+        두브로브니크: "DBV",
+        골드코스트: "OOL",
+        밴쿠버: "YVR",
+        베르겐: "BGO",
+        레이캬비크: "KEF",
+        밴프: "YYC",
+        포카라: "PKR",
+        "스코틀랜드 하이랜드": "INV",
+        "스위스 융프라우": "ZRH",
+        런던: "LHR",
+        두바이: "DXB",
+        암스테르담: "AMS",
+        서울: "ICN",
+        시카고: "ORD",
+        상하이: "PVG",
+        시드니: "SYD",
+        토론토: "YYZ",
+        베를린: "BER",
+        로스앤젤레스: "LAX",
+        카이로: "CAI",
+        아테네: "ATH",
+        마라케시: "RAK",
+        바라나시: "VNS",
+        페트라: "AMM",
+        쿠스코: "CUZ",
+        라사: "LXA",
+        예루살렘: "TLV",
+        플로렌스: "FLR",
+        부다페스트: "BUD",
+        "체코 프라하": "PRG",
+        "리우 카니발": "GIG",
+        "인도 홀리축제": "DEL",
+        "스페인 토마토축제": "VLC",
+        옥토버페스트: "MUC",
+        "교토 기온마츠리": "UKY",
+        "태국 송끄란": "BKK",
+        살바도르: "SSA",
+        "에든버러 페스티벌": "EDI",
+        "시안 춘절": "XIY",
+        라스베가스: "LAS",
+        "뮌헨 옥토버페스트": "MUC",
+        리마: "LIM",
+        리옹: "LYS",
+        "도쿄 츠키지": "NRT",
+        부에노스아이레스: "EZE",
+        타이페이: "TPE",
+        호치민: "SGN",
+        뭄바이: "BOM",
+        "서울 (미식)": "ICN",
+        "홍콩 (미식)": "HKG",
+        "마라케시 (미식)": "RAK",
+        "싱가포르 (미식)": "SIN",
+        "바르셀로나 (미식)": "BCN",
       };
 
       const SCENE_LABELS = {
@@ -1583,7 +1652,7 @@
         const box = document.getElementById("chat-messages");
         const bubble = document.createElement("div");
         bubble.className = `chat-bubble chat-bubble--${role}`;
-        bubble.textContent = text;
+        bubble.innerHTML = escapeHtml(text).replace(/\n/g, "<br>");
         box.appendChild(bubble);
         box.scrollTop = box.scrollHeight;
       }
@@ -1665,9 +1734,7 @@
       function buildInitialChatMessage(data) {
         const text = (data?.gemini_text || "").trim();
         if (!text) return extractGeminiOneLiner("");
-        const one = extractGeminiOneLiner(text);
-        if (one && one.length >= 8) return one;
-        return text.length > 600 ? `${text.slice(0, 600)}…` : text;
+        return text;
       }
 
       function renderGeminiSummary(data) {
@@ -1728,7 +1795,11 @@
         const box = document.getElementById("chat-messages");
         box.innerHTML = "";
         if (initialAiText) {
-          appendChatMessage("ai", initialAiText);
+          const bubble = document.createElement("div");
+          bubble.className = "chat-bubble chat-bubble--ai";
+          bubble.innerHTML = formatGeminiMarkdown(initialAiText);
+          box.appendChild(bubble);
+          box.scrollTop = box.scrollHeight;
         }
       }
 
