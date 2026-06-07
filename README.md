@@ -34,11 +34,11 @@
 
 | Category | Demo |
 |----------|------|
-| 🌊 Beach | [Video](https://github.com/user-attachments/assets/a79cddb6-0e5d-4cad-ab43-86cdc3fb5185) |
-| 🌿 Nature | [Video](https://github.com/user-attachments/assets/45d3d391-dde3-41f9-a6ee-d80ff77b4c9f) |
-| 🏙️ City | Coming Soon |
+| 🏙️ City | [Video](https://github.com/user-attachments/assets/2e39bb36-876f-4b46-a000-fc9914e87034) |
 | 🏛️ Culture | [Video](https://github.com/user-attachments/assets/aa2ad316-7270-4293-bfdf-e43aabe4dada) |
+| 🌿 Nature | [Video](https://github.com/user-attachments/assets/45d3d391-dde3-41f9-a6ee-d80ff77b4c9f) |
 | 🍕 Food | [Video](https://github.com/user-attachments/assets/5ef5fe29-4734-4f77-87b2-511de3855b48) |
+| 🌊 Beach | [Video](https://github.com/user-attachments/assets/a79cddb6-0e5d-4cad-ab43-86cdc3fb5185) |
 | 🎆 Festival | [Video](https://github.com/user-attachments/assets/96f4ace8-f7e2-4662-9a4c-6044df3dc3ec) |
 
 ---
@@ -277,7 +277,7 @@ flowchart TD
    val accuracy와 inference confidence를 직접 비교.  
    SigLIP은 accuracy 93.56%에도 confidence가 33~37%에 머물러  
    Preference Vector 품질을 저하시킴을 확인.  
-   CLIP fine-tuned는 93.48% accuracy + 79~87% confidence로 최종 채택.  
+   CLIP fine-tuned는 93.48% accuracy + 79%에서 87% confidence로 최종 채택.  
    총 5가지 실험 변형(Pseudo Labeling, large 데이터, festival 추가 등)을 직접 설계·수행.
 
 3. **OneFormer 멀티데이터셋 학습 파이프라인 설계**
@@ -455,7 +455,7 @@ flowchart LR
 | **Weighted F1** | **0.9460** |
 
 <p align="center">
-  <img src="results/mlp_f1_score.png" width="70%"/>
+  <img src="results/mlp_f1_score.png.png" width="70%"/>
 </p>
 
 ---
