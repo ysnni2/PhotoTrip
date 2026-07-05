@@ -24,8 +24,7 @@
 
 <br/><br/>
 
-> ☁️ **No questionnaire. No booking history.**  
-> PhotoTrip infers your travel preference only from your everyday photos.
+> ☁️ **PhotoTrip은 오직 일상 사진만으로 여행 취향을 추론합니다.**
 
 </div>
 
@@ -45,7 +44,7 @@
 <h3>📷</h3>
 <b>Upload</b>
 <br/>
-5–7 daily photos
+일상 사진 5~7장
 </td>
 <td align="center" width="60">
 <h2>→</h2>
@@ -54,7 +53,7 @@
 <h3>🧠</h3>
 <b>Analyze</b>
 <br/>
-Multimodal AI
+멀티모달 AI 분석
 </td>
 <td align="center" width="60">
 <h2>→</h2>
@@ -63,7 +62,7 @@ Multimodal AI
 <h3>🌎</h3>
 <b>Recommend</b>
 <br/>
-Personalized trip
+맞춤 여행지 추천
 </td>
 <td align="center" width="60">
 <h2>→</h2>
@@ -72,7 +71,7 @@ Personalized trip
 <h3>🎮</h3>
 <b>Explore</b>
 <br/>
-3D scene
+3D 씬 탐색
 </td>
 </tr>
 </table>
@@ -101,9 +100,9 @@ Personalized trip
 
 <br/>
 
-📝 Survey  
-🛒 Booking History  
-🖱 Click Log  
+📝 설문조사  
+🛒 예약 이력  
+🖱 클릭 로그  
 
 <br/>
 
@@ -121,9 +120,9 @@ Personalized trip
 
 <br/>
 
-📷 Everyday Photos  
-🧠 Visual Preference  
-🌎 Personalized Destination  
+📷 일상 사진  
+🧠 시각적 선호  
+🌎 맞춤 여행지  
 
 <br/>
 
@@ -165,7 +164,7 @@ CLIP, OneFormer, OpenCV, Preference MLP를 함께 사용하여
 
 <br/>
 
-<b>Scene · Semantic · Visual · Style</b>
+<b>장면 · 의미 · 시각 · 스타일</b>
 
 </td>
 <td width="50%" valign="top">
@@ -177,7 +176,7 @@ CLIP, OneFormer, OpenCV, Preference MLP를 함께 사용하여
 
 <br/>
 
-<b>44-D Interpretable Representation</b>
+<b>44차원 해석 가능한 표현</b>
 
 </td>
 </tr>
@@ -192,7 +191,7 @@ CLIP, OneFormer, OpenCV, Preference MLP를 함께 사용하여
 
 <br/>
 
-<b>Cosine Similarity Matching</b>
+<b>코사인 유사도 기반 매칭</b>
 
 </td>
 <td width="50%" valign="top">
@@ -204,7 +203,7 @@ Three.js 기반 인터랙티브 3D 씬으로 시각화합니다.
 
 <br/>
 
-<b>Three.js Travel Visualization</b>
+<b>Three.js 여행지 시각화</b>
 
 </td>
 </tr>
@@ -250,7 +249,7 @@ Three.js 기반 인터랙티브 3D 씬으로 시각화합니다.
 
 <b>CLIP Accuracy</b>
 
-Scene Classification
+장면 분류
 
 </td>
 <td align="center" width="33%">
@@ -259,7 +258,7 @@ Scene Classification
 
 <b>OneFormer mIoU</b>
 
-Semantic Segmentation
+의미론적 분할
 
 </td>
 <td align="center" width="33%">
@@ -297,55 +296,56 @@ Preference MLP
 
 ## 🌊 Core Idea
 
-### Travel preference is not a single category.
+### 여행 취향은 단일 카테고리가 아닙니다.
 
-It is a combination of
+다음 요소들의 조합입니다:
 
-**scene meaning, semantic composition, color mood, and lifestyle preference.**
+**장면 의미, 공간 구성, 색감 분위기, 라이프스타일 선호.**
 
-PhotoTrip integrates these heterogeneous signals into one  
-**interpretable Preference Vector**.
+PhotoTrip은 이 이질적인 신호들을 하나의  
+**해석 가능한 Preference Vector**로 통합합니다.
 
 </div>
 
 <br/>
+
 ---
 
 <br/>
 
 # 🧠 Why A Single Model Is Not Enough?
 
-Travel preference is far more complex than simple scene classification.
+여행 취향은 단순한 장면 분류보다 훨씬 복잡합니다.
 
-A single computer vision model can understand **only one aspect** of an image.
+단일 컴퓨터 비전 모델은 이미지의 **한 가지 측면**만 이해할 수 있습니다.
 
-PhotoTrip combines multiple complementary models to capture a user's **latent visual preference**.
+PhotoTrip은 여러 보완적인 모델을 결합하여 사용자의 **잠재적 시각 선호**를 포착합니다.
 
 <br/>
 
 <div align="center">
 
-| Model | ✅ Strength | ❌ Limitation |
+| Model | ✅ 강점 | ❌ 한계 |
 |:------:|:---------------------------|:-----------------------------|
-| **🧠 CLIP** | Scene Category Recognition | Cannot understand color, mood, or composition |
-| **🌿 OneFormer** | Semantic Scene Composition | Cannot infer user preference |
-| **🎨 OpenCV** | Color & Visual Statistics | Cannot understand scene semantics |
-| **😊 Preference MLP** | Lifestyle & Mood Prediction | Cannot capture spatial structure |
+| **🧠 CLIP** | 장면 카테고리 인식 | 색감, 분위기, 구성 이해 불가 |
+| **🌿 OneFormer** | 의미론적 장면 구성 | 사용자 선호 추론 불가 |
+| **🎨 OpenCV** | 색상 및 시각 통계 | 장면 의미 이해 불가 |
+| **😊 Preference MLP** | 라이프스타일 및 분위기 예측 | 공간 구조 파악 불가 |
 
 </div>
 
 <br/>
 
-Instead of relying on a single prediction,
+단일 예측에 의존하는 대신,
 
-PhotoTrip integrates
+PhotoTrip은 다음을 통합합니다:
 
-- 🌄 Scene Information
-- 🌿 Semantic Composition
-- 🎨 Visual Characteristics
-- 😊 Lifestyle Preference
+- 🌄 장면 정보
+- 🌿 의미론적 구성
+- 🎨 시각적 특성
+- 😊 라이프스타일 선호
 
-into a single **Preference Vector**.
+이를 하나의 **Preference Vector**로 표현합니다.
 
 ---
 
@@ -356,7 +356,7 @@ into a single **Preference Vector**.
 ```mermaid
 flowchart TD
 
-    A["📷 Upload 5–7 Photos"]
+    A["📷 사진 5~7장 업로드"]
 
     A --> B1["🧠 CLIP"]
     A --> B2["🌿 OneFormer"]
@@ -368,13 +368,13 @@ flowchart TD
     B3 --> C
     B4 --> C
 
-    C --> D["🌎 Cosine Similarity"]
+    C --> D["🌎 코사인 유사도"]
 
     D --> E["🤖 Gemini"]
 
     D --> F["🎮 Three.js"]
 
-    E --> G["🎫 Boarding Pass"]
+    E --> G["🎫 탑승권"]
 
     F --> G
 
@@ -400,15 +400,15 @@ flowchart TD
 
 <div align="center">
 
-### The Core Representation of PhotoTrip
+### PhotoTrip의 핵심 표현
 
-PhotoTrip does not simply classify images.
+PhotoTrip은 단순히 이미지를 분류하지 않습니다.
 
-Instead, it transforms multiple AI outputs into an
+대신, 여러 AI 출력을 다음으로 변환합니다:
 
-# **44-Dimensional Interpretable Preference Vector**
+# **44차원 해석 가능한 Preference Vector**
 
-which represents the user's hidden travel preference.
+이는 사용자의 숨겨진 여행 선호를 표현합니다.
 
 </div>
 
@@ -416,22 +416,22 @@ which represents the user's hidden travel preference.
 
 <div align="center">
 
-| Feature Group | Dimension | Description |
+| Feature Group | 차원 | 설명 |
 |:-------------|:---------:|:------------|
 | 🌄 Scene | **6** | beach, city, nature, culture, food, festival |
 | 🎨 Visual | **6** | brightness, saturation, contrast, warm tone ... |
 | 🌿 Semantic | **5** | water, vegetation, building, sky, food |
 | 😊 Style | **6** | cozy, energetic, romantic ... |
-| 📍 Place | **6** | preferred travel place |
-| 🌤 Mood | **6** | emotional tendency |
+| 📍 Place | **6** | 선호 여행지 유형 |
+| 🌤 Mood | **6** | 감성적 성향 |
 | ⭐ Interest | **9** | shopping, anime, sports, café ... |
-| **Total** | **44** | Unified Preference Representation |
+| **합계** | **44** | 통합 선호 표현 |
 
 </div>
 
 <br/>
 
-### Example Preference Vector
+### Preference Vector 예시
 
 ```json
 {
@@ -448,19 +448,19 @@ which represents the user's hidden travel preference.
 
 ↓
 
-### 🌎 Recommendation
+### 🌎 추천 결과
 
-| Rank | Destination |
+| 순위 | 여행지 |
 |:---:|:-------------|
-| 🥇 | Bali |
-| 🥈 | Phuket |
-| 🥉 | Cebu |
+| 🥇 | 발리 |
+| 🥈 | 푸켓 |
+| 🥉 | 세부 |
 
 ↓
 
-### 🤖 AI Explanation
+### 🤖 AI 설명
 
-> "You tend to prefer warm colors, vibrant environments, and destinations where beaches and local food coexist."
+> "따뜻한 색감과 활기찬 환경을 선호하며, 해변과 현지 음식이 어우러지는 여행지가 잘 맞을 것 같습니다."
 
 <br/>
 
@@ -472,9 +472,9 @@ which represents the user's hidden travel preference.
 
 <div align="center">
 
-| 📷 Input | 🧠 AI Analysis | ✨ Preference Vector | 🌎 Recommendation | 🎮 Visualization |
+| 📷 입력 | 🧠 AI 분석 | ✨ Preference Vector | 🌎 추천 | 🎮 시각화 |
 |:---------:|:-------------:|:--------------------:|:----------------:|:----------------:|
-| Daily Photos | CLIP + OneFormer + OpenCV + MLP | 44-D Representation | Cosine Similarity | Three.js + Gemini |
+| 일상 사진 | CLIP + OneFormer + OpenCV + MLP | 44차원 표현 | 코사인 유사도 | Three.js + Gemini |
 
 </div>
 
@@ -555,6 +555,7 @@ GPU Training
 <br/>
 
 ---
+
 ---
 
 <br/>
@@ -563,12 +564,12 @@ GPU Training
 
 <div align="center">
 
-### What Makes PhotoTrip Different?
+### PhotoTrip이 다른 이유
 
-PhotoTrip is not about proposing a new vision model.
+PhotoTrip은 새로운 비전 모델을 제안하는 것이 아닙니다.
 
-It is about **integrating heterogeneous AI models**
-into a single interpretable travel preference representation.
+**이질적인 AI 모델들을 통합**하여  
+단일 해석 가능한 여행 선호 표현으로 만드는 것입니다.
 
 </div>
 
@@ -576,13 +577,13 @@ into a single interpretable travel preference representation.
 
 <div align="center">
 
-| ✨ Contribution | Description |
+| ✨ 기여 | 설명 |
 |:----------------|:------------|
-| 🧠 Multimodal Preference Vector | Unified representation from CLIP, OneFormer, OpenCV and Preference MLP |
-| 🌎 Personalized Recommendation | Cosine similarity retrieval using handcrafted destination profiles |
-| 🎯 Accuracy–Confidence Analysis | Compared CLIP and SigLIP beyond accuracy |
-| 🌿 Multi-Dataset OneFormer Training | Unified semantic segmentation across travel domains |
-| 🤖 Explainable AI | Gemini generates human-readable travel explanations |
+| 🧠 멀티모달 Preference Vector | CLIP, OneFormer, OpenCV, Preference MLP의 통합 표현 |
+| 🌎 개인화 추천 | 수작업으로 설계한 여행지 프로필과의 코사인 유사도 매칭 |
+| 🎯 정확도-신뢰도 분석 | 정확도를 넘어 CLIP과 SigLIP의 신뢰도까지 비교 |
+| 🌿 멀티 데이터셋 OneFormer 학습 | 여행 도메인 전반의 통합 의미론적 분할 |
+| 🤖 설명 가능한 AI | Gemini가 사람이 읽을 수 있는 여행 설명 생성 |
 
 </div>
 
@@ -594,24 +595,23 @@ into a single interpretable travel preference representation.
 
 ## 🧠 1. Multimodal Preference Vector
 
-Unlike conventional recommendation systems,
+기존 추천 시스템과 달리,
 
-PhotoTrip does not rely on a single model.
+PhotoTrip은 단일 모델에 의존하지 않습니다.
 
-Instead,
+대신,
 
-it combines
+다음을 결합합니다:
 
-- 🧠 Scene Category (CLIP)
-- 🌿 Semantic Composition (OneFormer)
-- 🎨 Visual Statistics (OpenCV)
-- 😊 Lifestyle Preference (Preference MLP)
+- 🧠 장면 카테고리 (CLIP)
+- 🌿 의미론적 구성 (OneFormer)
+- 🎨 시각적 통계 (OpenCV)
+- 😊 라이프스타일 선호 (Preference MLP)
 
-into one **44-dimensional Preference Vector**.
+이를 하나의 **44차원 Preference Vector**로 통합합니다.
 
-This representation becomes the user's travel profile
-and is directly matched with destination profiles
-using cosine similarity.
+이 표현이 사용자의 여행 프로필이 되고,  
+코사인 유사도를 통해 여행지 프로필과 직접 매칭됩니다.
 
 ---
 
@@ -619,28 +619,27 @@ using cosine similarity.
 
 ## 🎯 2. Accuracy vs Confidence
 
-Most studies compare only **accuracy**.
+대부분의 연구는 **정확도**만 비교합니다.
 
-PhotoTrip additionally compares
+PhotoTrip은 추가로 다음을 비교합니다:
 
-> **Inference Confidence**
+> **추론 신뢰도**
 
-because confidence directly affects
-Preference Vector quality.
+신뢰도가 Preference Vector의 품질에 직접 영향을 미치기 때문입니다.
 
 <div align="center">
 
-| Model | Accuracy | Confidence |
+| 모델 | 정확도 | 신뢰도 |
 |:------:|:--------:|:----------:|
-| SigLIP | **93.56%** | **33–37%** |
-| CLIP Fine-tuned ✅ | **93.48%** | **79–87%** |
+| SigLIP | **93.56%** | **33~37%** |
+| CLIP Fine-tuned ✅ | **93.48%** | **79~87%** |
 
 </div>
 
-Although both models achieve similar accuracy,
+두 모델 모두 비슷한 정확도를 달성하지만,
 
-CLIP provides significantly higher confidence,
-resulting in more stable preference estimation.
+CLIP은 훨씬 높은 신뢰도를 제공하여  
+더 안정적인 선호 추정이 가능합니다.
 
 <br/>
 
@@ -654,26 +653,23 @@ resulting in more stable preference estimation.
 
 ## 🌿 3. OneFormer Multi-Dataset Training
 
-Instead of training multiple segmentation models,
+여러 분할 모델을 학습하는 대신,
 
-PhotoTrip trains **a single OneFormer**
-using three different datasets.
+PhotoTrip은 세 가지 데이터셋으로 **단일 OneFormer**를 학습합니다.
 
 <div align="center">
 
-| Dataset | Domain |
+| 데이터셋 | 도메인 |
 |:--------:|:--------|
-| ADE20K | Indoor / Outdoor Scenes |
-| FoodSeg103 | Food Images |
-| Cityscapes | Urban Environment |
+| ADE20K | 실내/외 범용 장면 |
+| FoodSeg103 | 음식 이미지 |
+| Cityscapes | 도시 환경 |
 
 </div>
 
-This unified training strategy improved
+이 통합 학습 전략으로
 
-**Travel-class mIoU**
-
-from
+**여행 클래스 mIoU**가 다음과 같이 향상되었습니다:
 
 > **37.1 → 45.6 (+8.5%p)**
 
@@ -689,30 +685,29 @@ from
 
 ## 😊 4. Preference MLP
 
-A dedicated multilabel classifier predicts
+CLIP 이미지 임베딩에서 다음을 예측하는  
+전용 멀티레이블 분류기입니다:
 
-- Mood
-- Style
-- Lifestyle
-
-from CLIP image embeddings.
+- 분위기 (Mood)
+- 스타일 (Style)
+- 라이프스타일 (Lifestyle)
 
 <div align="center">
 
-| Input | Architecture | Output |
+| 입력 | 구조 | 출력 |
 |:------:|:------------:|:------:|
-| CLIP Embedding (768-dim) | 768 → 512 → 256 → 128 → 6 | Multilabel Preference |
+| CLIP 임베딩 (768차원) | 768 → 512 → 256 → 128 → 6 | 멀티레이블 선호 |
 
 </div>
 
-Training Strategy
+학습 전략
 
 - BCE Loss
-- Class Weight
-- Rare Class Sampler
+- 클래스 가중치
+- 희소 클래스 샘플러
 - Pseudo Labeling
 
-Final Performance
+최종 성능
 
 <div align="center">
 
@@ -732,20 +727,20 @@ Final Performance
 
 <div align="center">
 
-## Overall Performance
+## 종합 성능
 
 </div>
 
 <div align="center">
 
-| Module | Performance |
+| 모듈 | 성능 |
 |:------:|:------------|
-| 🧠 CLIP Fine-tuned | **93.48% Accuracy** |
+| 🧠 CLIP Fine-tuned | **93.48% 정확도** |
 | 🌿 OneFormer | **45.6 mIoU** |
 | 😊 Preference MLP | **Macro F1 0.9450** |
-| 🎨 OpenCV | 6 Visual Metrics |
-| 🌎 Recommendation | Top-3 Personalized Destinations |
-| 🎮 Three.js | Interactive Visualization |
+| 🎨 OpenCV | 6가지 시각 메트릭 |
+| 🌎 추천 엔진 | Top-3 맞춤 여행지 |
+| 🎮 Three.js | 인터랙티브 시각화 |
 
 </div>
 
@@ -796,7 +791,7 @@ Final Performance
 
 <div align="center">
 
-### End-to-End AI Travel Recommendation Service
+### 엔드투엔드 AI 여행 추천 서비스
 
 </div>
 
@@ -804,30 +799,30 @@ Final Performance
 
 <div align="center">
 
-| Layer | Technology |
+| 레이어 | 기술 |
 |:------:|:-----------|
 | ⚙ Backend | FastAPI · PyTorch |
-| 🧠 AI Models | CLIP · OneFormer · OpenCV · Preference MLP |
+| 🧠 AI 모델 | CLIP · OneFormer · OpenCV · Preference MLP |
 | 🤖 LLM | Google Gemini API |
 | 🎮 Frontend | Three.js · HTML · CSS · JavaScript |
-| ✈ Visualization | CV Dashboard · Boarding Pass · Interactive 3D Scene |
+| ✈ 시각화 | CV 대시보드 · 탑승권 · 인터랙티브 3D 씬 |
 
 </div>
 
 <br/>
 
-PhotoTrip connects multiple AI models into a single end-to-end pipeline.
+PhotoTrip은 여러 AI 모델을 단일 엔드투엔드 파이프라인으로 연결합니다.
 
-Instead of returning only classification results,
+분류 결과만 반환하는 대신,
 
-the system visualizes the recommendation through
+다음을 통해 추천 결과를 시각화합니다:
 
-- 📊 CV Dashboard
-- 🤖 Gemini Explanation
-- 🎫 Boarding Pass
-- 🎮 Interactive Three.js Scene
+- 📊 CV 대시보드
+- 🤖 Gemini 설명
+- 🎫 탑승권
+- 🎮 인터랙티브 Three.js 씬
 
-to provide a complete travel recommendation experience.
+완전한 여행 추천 경험을 제공합니다.
 
 ---
 
@@ -835,15 +830,15 @@ to provide a complete travel recommendation experience.
 
 # ⚠️ Limitations
 
-Although PhotoTrip demonstrates strong performance,
+PhotoTrip은 강력한 성능을 보여주지만,
 
-several limitations remain.
+몇 가지 한계가 남아 있습니다.
 
 ---
 
-### 1️⃣ Coarse-Grained Travel Categories
+### 1️⃣ 거친 여행 카테고리 분류
 
-The current taxonomy consists of
+현재 분류 체계는 다음으로 구성됩니다:
 
 - Beach
 - Nature
@@ -852,120 +847,99 @@ The current taxonomy consists of
 - Festival
 - Food
 
-Although practical,
+실용적이지만,
 
-real travel preference is much more diverse.
+실제 여행 선호는 훨씬 다양합니다.
 
-For example,
+예를 들어,
 
-users who prefer beaches may actually prefer
+해변을 선호하는 사용자는 실제로 다음 중 하나를 원할 수 있습니다:
 
-- Luxury Resorts
-- Natural Landscapes
-- Water Activities
+- 럭셔리 리조트
+- 자연 경관 탐방
+- 수상 액티비티
 
-which cannot yet be distinguished.
+현재는 이를 구분하기 어렵습니다.
 
 ---
 
-### 2️⃣ Multi-Domain Evaluation
+### 2️⃣ 멀티 도메인 평가 한계
 
-OneFormer was trained using
+OneFormer는 다음 데이터셋으로 학습되었습니다:
 
 - ADE20K
 - FoodSeg103
 - Cityscapes
 
-However,
+그러나,
 
-there is currently no benchmark specifically designed for
+여행 선호 분석을 위한 멀티 도메인 전용 벤치마크가 현재 존재하지 않습니다.
 
-travel preference analysis across multiple domains.
+따라서,
 
-As a result,
-
-evaluation is performed independently on each dataset.
+각 데이터셋별로 독립적으로 성능을 평가합니다.
 
 ---
 
-### 3️⃣ Pseudo Label Noise
+### 3️⃣ Pseudo Label 노이즈
 
-Preference MLP training data was generated
+Preference MLP 학습 데이터는
 
-using automatic pseudo labeling.
+자동 pseudo labeling으로 생성되었습니다.
 
-Although confidence filtering was applied,
+신뢰도 기반 필터링을 적용했지만,
 
-label noise and dataset bias may still remain.
+레이블 노이즈와 데이터 편향이 일부 남아 있을 수 있습니다.
 
-Future versions may combine
+향후 버전에서는
 
-human annotated data
-
-with pseudo labeled data.
+사람이 직접 레이블링한 데이터와 pseudo 레이블 데이터를 혼합하여 데이터 품질을 개선할 수 있습니다.
 
 ---
 
-### 4️⃣ Handcrafted Preference Vector
+### 4️⃣ 수작업 설계 Preference Vector
 
-The current Preference Vector
-
-is manually designed using
+현재 Preference Vector는 다음을 기반으로 수동 설계되었습니다:
 
 - Scene
 - Semantic
 - Visual
 - Style
 
-features.
+해석 가능하다는 장점이 있지만,
 
-Although interpretable,
+사용자의 잠재적 선호를 완전히 표현하지 못할 수 있습니다.
 
-it may not fully represent
-
-the user's latent preference.
-
-A learnable preference embedding
-
-would allow more generalized representation.
+학습 가능한 선호 임베딩을 통해  
+더 일반화된 표현이 가능합니다.
 
 ---
 
-### 5️⃣ External API Dependency
+### 5️⃣ 외부 API 의존성
 
-Natural language explanation
+자연어 설명 기능은
 
-depends on
+Google Gemini API에 의존합니다.
 
-Google Gemini API.
+향후 버전에서는
 
-Future versions may adopt
-
-lightweight local language models
-
-to reduce external dependency.
+경량 로컬 언어 모델을 활용하여  
+외부 의존성을 줄일 수 있습니다.
 
 ---
 
-### 6️⃣ Subjectivity of Style Labels
+### 6️⃣ 스타일 레이블의 주관성
 
-Lifestyle
+라이프스타일, 분위기, 스타일은
 
-Mood
+본질적으로 주관적입니다.
 
-Style
+동일한 이미지도
 
-are inherently subjective.
+사용자마다 다르게 해석될 수 있습니다.
 
-The same image
-
-may be interpreted differently
-
-by different users.
-
-Future work includes
-
-user feedback based personalization.
+향후 연구에서는  
+사용자 피드백 기반 개인화를 통해 이 문제를 해결합니다.
 
 ---
 
@@ -975,7 +949,7 @@ user feedback based personalization.
 
 <div align="center">
 
-### Future Directions
+### 향후 개선 방향
 
 </div>
 
@@ -989,11 +963,9 @@ user feedback based personalization.
 
 ### 🧠 Learnable Preference Embedding
 
-Replace handcrafted features
+수작업 특징을
 
-with
-
-end-to-end learned preference embeddings.
+엔드투엔드로 학습된 선호 임베딩으로 대체합니다.
 
 </td>
 
@@ -1001,11 +973,9 @@ end-to-end learned preference embeddings.
 
 ### 🔄 Personalized Feedback Loop
 
-Continuously improve
+사용자 피드백을 활용하여
 
-Preference Vector
-
-using user feedback.
+Preference Vector를 지속적으로 개선합니다.
 
 </td>
 
@@ -1017,15 +987,10 @@ using user feedback.
 
 ### 🌎 Large-scale Destination Retrieval
 
-Expand from
+사전 정의된 여행지에서
 
-predefined destinations
-
-to
-
-large-scale retrieval
-
-using destination image databases.
+여행지 이미지 데이터베이스를 활용한  
+대규모 검색 방식으로 확장합니다.
 
 </td>
 
@@ -1033,33 +998,17 @@ using destination image databases.
 
 ### 🏖 Fine-grained Travel Categories
 
-Expand
+카테고리를 세분화합니다:
 
-Beach
+Beach → 럭셔리 리조트
 
-↓
+Nature → 국립공원
 
-Luxury Resort
+City → 야경
 
-Nature
+Food → 현지 맛집
 
-↓
-
-National Park
-
-City
-
-↓
-
-Night View
-
-Food
-
-↓
-
-Local Restaurant
-
-and other detailed travel themes.
+등 세부 여행 테마로 확장합니다.
 
 </td>
 
@@ -1073,17 +1022,13 @@ and other detailed travel themes.
 
 ## ✨ Vision
 
-PhotoTrip aims to become
+PhotoTrip은
 
-an explainable AI travel recommendation system
+사람들이 **어디로 여행하는지**뿐만 아니라,
 
-that understands
+**왜 그 장소에 시각적으로 끌리는지**를 이해하는
 
-not only **where people travel,**
-
-but also
-
-**why they are visually attracted to those places.**
+설명 가능한 AI 여행 추천 시스템이 되고자 합니다.
 
 </div>
 
@@ -1098,7 +1043,7 @@ but also
 
 <div align="center">
 
-### Get PhotoTrip Running in Minutes
+### 몇 분 안에 PhotoTrip 실행하기
 
 </div>
 
@@ -1137,7 +1082,7 @@ pip install -r requirements.txt
 
 ## ④ Configure Environment
 
-Create a `.env` file in the project root.
+프로젝트 루트에 `.env` 파일을 생성합니다.
 
 ```env
 GOOGLE_API_KEY=your_gemini_api_key
@@ -1147,7 +1092,7 @@ GOOGLE_API_KEY=your_gemini_api_key
 
 ## ⑤ Prepare Model Weights
 
-Place the trained models inside
+학습된 모델을 다음 위치에 배치합니다:
 
 ```text
 models/
@@ -1173,7 +1118,7 @@ models/
 python -m uvicorn backend.main:app --reload --port 8000
 ```
 
-Open
+브라우저에서 접속:
 
 ```text
 http://localhost:8000
@@ -1185,32 +1130,32 @@ http://localhost:8000
 
 <div align="center">
 
-### Your Travel Journey
+### 나만의 여행 여정
 
 </div>
 
 <br/>
 
 ```text
-📷 Upload 5–7 Photos
+📷 사진 5~7장 업로드
         │
         ▼
-🧠 AI Analysis
+🧠 AI 분석
         │
         ▼
-✨ Preference Vector
+✨ Preference Vector 생성
         │
         ▼
-🌎 Personalized Recommendation
+🌎 맞춤 여행지 추천
         │
         ▼
-🤖 Gemini Explanation
+🤖 Gemini 설명
         │
         ▼
-🎮 Three.js Scene
+🎮 Three.js 씬
         │
         ▼
-🎫 Boarding Pass
+🎫 탑승권
 ```
 
 ---
@@ -1270,9 +1215,9 @@ PhotoTrip/
 
 # 🙏 Acknowledgements
 
-This project was developed as a Computer Vision course project.
+이 프로젝트는 컴퓨터 비전 수업 프로젝트로 개발되었습니다.
 
-Special thanks to
+다음에 감사드립니다:
 
 - Google Colab
 - Kaggle GPU
@@ -1280,7 +1225,7 @@ Special thanks to
 - HuggingFace
 - Google Gemini API
 
-for supporting model training and deployment.
+모델 학습 및 배포를 지원해 주셔서 감사합니다.
 
 ---
 
@@ -1292,7 +1237,7 @@ for supporting model training and deployment.
 
 ### 📸 PhotoTrip
 
-**Discover Your Travel Style From Everyday Photos**
+**일상 사진으로 나만의 여행 스타일을 발견하세요**
 
 <br/>
 
