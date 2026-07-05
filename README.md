@@ -1,8 +1,23 @@
-# 📸 PhotoTrip
-### 내 갤러리 속 잠재적 시각 선호를 분석하여 여행 취향을 추론하는 멀티모달 AI 시스템
+<div align="center">
 
-> CLIP · OneFormer · OpenCV · Preference MLP를 통합하여 사용자의 잠재적 시각 취향을 분석하고,  
-> Preference Vector 기반 맞춤 여행지를 추천하는 End-to-End AI 서비스
+<!-- Sky Blue Header Banner -->
+<img width="100%" src="https://capsule-render.vercel.app/api?type=waving&color=0,87CEEB,38BDF8,7DD3FC&height=200&section=header&text=📸%20PhotoTrip&fontSize=60&fontColor=ffffff&fontAlignY=38&desc=내%20갤러리%20속%20잠재적%20시각%20선호를%20분석하여%20여행%20취향을%20추론하는%20멀티모달%20AI%20시스템&descAlignY=60&descSize=16&descColor=e0f2fe"/>
+
+<br/>
+
+<!-- Badges -->
+![Python](https://img.shields.io/badge/Python_3.10+-38BDF8?style=for-the-badge&logo=python&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-0EA5E9?style=for-the-badge&logo=fastapi&logoColor=white)
+![PyTorch](https://img.shields.io/badge/PyTorch-0369A1?style=for-the-badge&logo=pytorch&logoColor=white)
+![HuggingFace](https://img.shields.io/badge/HuggingFace-7DD3FC?style=for-the-badge&logo=huggingface&logoColor=white)
+![Three.js](https://img.shields.io/badge/Three.js-0C4A6E?style=for-the-badge&logo=three.js&logoColor=white)
+
+<br/>
+
+> **CLIP · OneFormer · OpenCV · Preference MLP**를 통합하여 사용자의 잠재적 시각 취향을 분석하고,  
+> **Preference Vector** 기반 맞춤 여행지를 추천하는 End-to-End AI 서비스
+
+</div>
 
 ---
 
@@ -17,7 +32,6 @@
 - [Related Work](#-related-work)
 - [Model Architecture](#-model-architecture)
 - [Experiments & Results](#-experiments--results)
-- [3D Reconstruction Experiment](#-3d-reconstruction-experiment)
 - [Limitations & Future Work](#-limitations--future-work)
 - [Installation & Usage](#-installation--usage)
 - [Conclusion](#-conclusion)
@@ -44,15 +58,19 @@
 
 ## 🏆 Key Results
 
+<div align="center">
+
 | 모듈 | 결과 |
-|------|------|
-| CLIP Fine-tuning | **93.48% Accuracy** |
-| CLIP Confidence | **79~87%** |
-| OneFormer Fine-tuning | **45.6 mIoU** (+8.5%p) |
-| Preference MLP | **Macro F1 0.9450** |
+|:----:|:----:|
+| CLIP Fine-tuning | ![](https://img.shields.io/badge/Accuracy-93.48%25-38BDF8?style=flat-square) |
+| CLIP Confidence | ![](https://img.shields.io/badge/Confidence-79~87%25-7DD3FC?style=flat-square) |
+| OneFormer Fine-tuning | ![](https://img.shields.io/badge/mIoU-45.6%25_(+8.5%25p)-0EA5E9?style=flat-square) |
+| Preference MLP | ![](https://img.shields.io/badge/Macro_F1-0.9450-0369A1?style=flat-square) |
 | Recommendation Engine | Top-3 Personalized Destination |
 | Frontend Visualization | Three.js Interactive Scene |
 | End-to-End Pipeline | Upload → Analysis → Recommendation → Visualization |
+
+</div>
 
 <p align="center">
 <img src="results/full_experiment_history.png.png" width="80%">
@@ -148,12 +166,12 @@ CLIP · OneFormer · OpenCV · Preference MLP의 출력을
 하나의 **Preference Vector**로 통합하는 것이다.
 
 기존 연구가 장면 분류 결과를 제공하는 데 집중했다면,  
-PhotoTrip은 **사용자의 취향을 벡터 공간에 표현**한다.
-Preference Vector는 총 **44차원**으로 구성되며, 각 차원이 명확한 의미를 갖는
+PhotoTrip은 **사용자의 취향을 벡터 공간에 표현**한다.  
+Preference Vector는 총 **44차원**으로 구성되며, 각 차원이 명확한 의미를 갖는  
 해석 가능한(interpretable) 표현 공간을 형성한다.
 
 | 그룹 | 구성 요소 | 차원 |
-|------|-----------|------|
+|:----:|-----------|:----:|
 | scene | beach / nature / city / culture / festival / food | 6 |
 | visual | brightness / saturation / contrast / warm_tone / person_ratio / animal_ratio | 6 |
 | semantic | water / sky / vegetation / building / food | 5 |
@@ -163,7 +181,7 @@ Preference Vector는 총 **44차원**으로 구성되며, 각 차원이 명확�
 | interest (zero-shot) | anime / disney / sports / cafe / shopping / nightlife / art / history / local_market | 9 |
 | **합계** | | **44** |
 
-여행지 프로필은 각 목적지의 특성을 동일한 44차원 축으로 수작업 정의한 벡터이며,
+여행지 프로필은 각 목적지의 특성을 동일한 44차원 축으로 수작업 정의한 벡터이며,  
 사용자 Preference Vector와 코사인 유사도로 매칭한다.
 
 ### Example
@@ -237,7 +255,7 @@ flowchart TD
             T3["CV Dashboard\n분석 결과 Photo별 상세"]
         end
     end
-    style ANALYSIS fill:#e6f1fb,stroke:#378add
+    style ANALYSIS fill:#e0f2fe,stroke:#38BDF8
     style VECTOR fill:#e1f5ee,stroke:#1d9e75
     style OUTPUT fill:#faeeda,stroke:#ba7517
     style FE fill:#fff8ee,stroke:#ef9f27
@@ -258,16 +276,20 @@ flowchart TD
 
 ## 🛠️ Tech Stack
 
+<div align="center">
+
 | 계층 | 기술 |
-|------|------|
-| Backend | FastAPI · PyTorch · HuggingFace Transformers |
-| 장면 분류 | CLIP ViT-B/32 fine-tuned |
-| 의미론적 분할 | OneFormer (swin_large) |
-| 시각 분석 | OpenCV |
-| 분위기·취향 분류 | Preference MLP · BCE Loss · Pseudo Labeling |
-| LLM | Google Gemini API |
-| Frontend | Three.js · HTML/CSS/JS |
-| 학습 환경 | Google Colab · Kaggle (GPU) |
+|:----:|------|
+| ![](https://img.shields.io/badge/Backend-0369A1?style=flat-square) | FastAPI · PyTorch · HuggingFace Transformers |
+| ![](https://img.shields.io/badge/장면_분류-0EA5E9?style=flat-square) | CLIP ViT-B/32 fine-tuned |
+| ![](https://img.shields.io/badge/의미론적_분할-38BDF8?style=flat-square) | OneFormer (swin_large) |
+| ![](https://img.shields.io/badge/시각_분석-7DD3FC?style=flat-square) | OpenCV |
+| ![](https://img.shields.io/badge/분위기_취향-BAE6FD?style=flat-square&logoColor=black) | Preference MLP · BCE Loss · Pseudo Labeling |
+| ![](https://img.shields.io/badge/LLM-0C4A6E?style=flat-square) | Google Gemini API |
+| ![](https://img.shields.io/badge/Frontend-1E40AF?style=flat-square) | Three.js · HTML/CSS/JS |
+| ![](https://img.shields.io/badge/학습환경-075985?style=flat-square) | Google Colab · Kaggle (GPU) |
+
+</div>
 
 ---
 
@@ -286,11 +308,11 @@ flowchart TD
    CV 분석 결과가 직접 추천에 반영되는 end-to-end 파이프라인 완성.  
    *(예: 따뜻한 색감 + vibrant 스타일 → 발리·방콕 추천)*
 
-   scene 분류는 여행 특화 카테고리 정확도가 중요하므로 CLIP fine-tuning을 적용하였으며,
-   place · mood · interest 벡터는 CLIP의 강력한 zero-shot 전이 능력을 활용하였다.
-   라이프스타일 개념은 CLIP 사전학습 분포와 충분히 겹치므로
+   scene 분류는 여행 특화 카테고리 정확도가 중요하므로 CLIP fine-tuning을 적용하였으며,  
+   place · mood · interest 벡터는 CLIP의 강력한 zero-shot 전이 능력을 활용하였다.  
+   라이프스타일 개념은 CLIP 사전학습 분포와 충분히 겹치므로  
    한정된 레이블 환경에서 zero-shot이 더 안정적인 선호 신호를 제공한다.
-   
+
 2. **Accuracy–Confidence 트레이드오프 실험 설계**
 
    SigLIP과 CLIP을 동일 데이터셋에서 fine-tuning 후  
@@ -318,13 +340,6 @@ flowchart TD
    CLIP 임베딩(768차원) → 6-class multilabel 분류.  
    Place Preference MLP Macro F1 **0.9450** 달성.
 
-6. **COLMAP + 3DGS 렌더링 파이프라인 구축 실험**
-
-   Structure-from-Motion(COLMAP) 기반 포인트 클라우드 생성부터  
-   3D Gaussian Splatting 학습까지 직접 실험하여  
-   2개 씬 렌더링 결과 확보.  
-   웹 서비스 호환성 한계로 Three.js로 전환.
-
 ---
 
 ## 📚 Related Work
@@ -332,7 +347,7 @@ flowchart TD
 ### Semantic Segmentation 발전
 
 | 연도 | 모델 | 주요 기여 |
-|------|------|----------|
+|:----:|:----:|----------|
 | 2015 | FCN | 최초 end-to-end 픽셀 단위 분류 |
 | 2017 | DeepLab v3 | Atrous convolution, multi-scale context 도입 |
 | 2022 | Mask2Former | Universal segmentation 시도; 단, 태스크마다 개별 학습 필요 |
@@ -392,11 +407,11 @@ flowchart LR
 
     PV(["Preference Vector"])
 
-    style CLIP fill:#e6f1fb,stroke:#378add
+    style CLIP fill:#e0f2fe,stroke:#38BDF8
     style ONE fill:#e1f5ee,stroke:#1d9e75
     style MLP fill:#eeedfe,stroke:#7f77dd
     style OCV fill:#faeeda,stroke:#ba7517
-    style PV fill:#f1efe8,stroke:#5f5e5a
+    style PV fill:#f0f9ff,stroke:#0EA5E9
 ```
 
 ---
@@ -408,7 +423,7 @@ flowchart LR
 6-class 여행 장면 분류: beach · nature · city · culture · festival · food
 
 | 모델 | Val Accuracy | 비고 |
-|------|-------------|------|
+|------|:-----------:|------|
 | CLIP Zero-shot | 64.27% | 프롬프트 기반, fine-tuning 없음 |
 | SigLIP 기본 | 90.91% | google/siglip-large-patch16-256 |
 | SigLIP + large 데이터 | 90.52% | 데이터 규모 확대 시 소폭 하락 |
@@ -433,7 +448,7 @@ flowchart LR
 ### 2. 의미론적 분할 (Semantic Segmentation)
 
 | 모델 | mIoU | 학습 데이터 | 비고 |
-|------|------|-----------|------|
+|------|:----:|-----------|------|
 | OneFormer pretrained | 37.1% | ADE20K | 기준선 |
 | **OneFormer fine-tuned** | **45.6%** | ADE20K + FoodSeg103 + Cityscapes | **최종 채택 ✅** |
 
@@ -462,8 +477,10 @@ flowchart LR
 
 ### Preference MLP Results
 
+<div align="center">
+
 | Category | F1 Score |
-|----------|----------|
+|:--------:|:--------:|
 | Nature | 0.97 |
 | Food | 0.97 |
 | Beach | 0.95 |
@@ -474,10 +491,11 @@ flowchart LR
 | **Micro F1** | **0.9457** |
 | **Weighted F1** | **0.9460** |
 
+</div>
+
 <p align="center">
   <img width="1200" height="750" alt="mlp_f1_score png" src="https://github.com/user-attachments/assets/23381cd7-015e-4116-ab70-eb62747b1bff" />
 </p>
-
 
 ---
 
@@ -494,30 +512,6 @@ flowchart LR
 
 ---
 
-## 🚀 3D Reconstruction Experiment
-
-초기 버전에서는 COLMAP + 3D Gaussian Splatting 기반  
-실제 여행지 재구성을 시도하였다.
-
-<p align="center">
-<img src="results/3dgs_scene1.png" width="48%">
-<img src="results/3dgs_scene2.png" width="48%">
-</p>
-<p align="center"><em>3DGS 렌더링 결과 — 야자수 씬(좌), 오브젝트 씬(우)</em></p>
-
-| 항목 | 내용 |
-|------|------|
-| 파이프라인 | COLMAP Structure-from-Motion + 3D Gaussian Splatting |
-| 결과 | 2개 씬 학습 완료 및 렌더링 결과 확보 |
-| 한계 | 웹 브라우저 실시간 렌더링 불가, GPU 의존성 |
-| 최종 선택 | Three.js procedural rendering |
-| 전환 이유 | 웹 호환성, 실시간 렌더링, GPU 의존성 제거 |
-
-제한된 학습 이미지(20~30장) 환경에서 주요 객체의 3D 구조 재구성에 성공하였으나,  
-배경 영역 아티팩트 발생. 웹 실시간 서비스 통합의 현실적 한계로 Three.js 전환.
-
----
-
 ## 🌐 System Implementation
 
 | 계층 | 기술 |
@@ -529,7 +523,7 @@ flowchart LR
 
 ---
 
-## Limitations & Future Work
+## ⚠️ Limitations & Future Work
 
 ### Limitations
 
@@ -573,17 +567,7 @@ Confidence 기반 필터링을 적용하였음에도 불구하고 데이터 편�
 
 ---
 
-**5. 3DGS Integration Constraint**
-
-COLMAP과 3D Gaussian Splatting 기반 재구성 실험을 통해 카테고리별 3D 생성 가능성과 실제 여행지 3D 장면 생성 가능성을 확인하였다.
-
-그러나 제한된 학습 이미지 환경에서는 배경 아티팩트가 발생하였으며, 웹 브라우저 실시간 렌더링, GPU 의존성, 모델 로딩 시간 등의 제약으로 인해 현재 서비스에는 직접 적용하지 않았다.
-
-이에 따라 최종 서비스는 Three.js 기반 인터랙티브 시각화를 채택하였다.
-
----
-
-**6. Dependency on External APIs**
+**5. Dependency on External APIs**
 
 Gemini API 기반 자연어 설명 기능은 외부 서비스 의존성을 가진다.
 
@@ -591,7 +575,7 @@ API 장애 또는 정책 변경 시 서비스 품질에 영향을 받을 수 있
 
 ---
 
-**7. Subjectivity of Style Labels**
+**6. Subjectivity of Style Labels**
 
 분위기(mood), 라이프스타일(style), 장소 감성(place)은 본질적으로 주관적인 개념이다.
 
@@ -625,11 +609,6 @@ Retrieval 기반 추천으로 확장할 수 있다.
 
 6개 → 세부 하위 테마로 확장  
 (예: beach → 리조트형 / 자연형 / 액티비티형)
-
-**5. 3DGS 웹 통합**
-
-gsplat.js 등 WebGL 기반 3DGS 뷰어 기술 성숙 시  
-실제 여행지 드론 영상(100장+) 기반 재학습으로 웹 직접 통합.
 
 ---
 
@@ -750,20 +729,15 @@ PhotoTrip은 사용자의 일상 사진으로부터 잠재적 시각 취향을 �
 3. Jain, J., et al. (2023). *OneFormer: One Transformer to Rule Universal Image Segmentation.* CVPR. [(링크)](https://arxiv.org/abs/2211.06220)
 4. Cheng, B., et al. (2022). *Masked-attention Mask Transformer for Universal Image Segmentation.* CVPR. [(링크)](https://arxiv.org/abs/2112.01527)
 
-### 3D 재구성
-
-5. Kerbl, B., et al. (2023). *3D Gaussian Splatting for Real-Time Radiance Field Rendering.* SIGGRAPH. [(링크)](https://arxiv.org/abs/2308.04079)
-6. Schönberger, J. L., & Frahm, J.-M. (2016). *Structure-from-Motion Revisited.* CVPR. [(링크)](https://openaccess.thecvf.com/content_cvpr_2016/html/Schonberger_Structure-From-Motion_Revisited_CVPR_2016_paper.html)
-
 ### 학습 데이터셋
 
-7. Zhou, B., et al. (2017). *Scene Parsing through ADE20K Dataset.* CVPR. [(링크)](https://arxiv.org/abs/1608.05442)
-8. Wu, X., Fu, X., et al. (2021). *A Large-Scale Benchmark for Food Image Segmentation.* ACM MM. [(링크)](https://arxiv.org/abs/2105.05409)
-9. Cordts, M., et al. (2016). *The Cityscapes Dataset for Semantic Urban Scene Understanding.* CVPR. [(링크)](https://arxiv.org/abs/1604.01685)
+5. Zhou, B., et al. (2017). *Scene Parsing through ADE20K Dataset.* CVPR. [(링크)](https://arxiv.org/abs/1608.05442)
+6. Wu, X., Fu, X., et al. (2021). *A Large-Scale Benchmark for Food Image Segmentation.* ACM MM. [(링크)](https://arxiv.org/abs/2105.05409)
+7. Cordts, M., et al. (2016). *The Cityscapes Dataset for Semantic Urban Scene Understanding.* CVPR. [(링크)](https://arxiv.org/abs/1604.01685)
 
 ### API 및 도구
 
-10. Google DeepMind. *Gemini API 문서.* https://ai.google.dev/
+8. Google DeepMind. *Gemini API 문서.* https://ai.google.dev/
 
 ---
 
@@ -772,8 +746,14 @@ PhotoTrip은 사용자의 일상 사진으로부터 잠재적 시각 취향을 �
 - **3D 씬 시각화**: Canva AI 활용
 - **학습 환경**: Google Colab · Kaggle (GPU 지원)
 - **데이터 수집**: Pixabay API (Pseudo Labeling 학습 데이터)
-- **3DGS 학습**: YouTube 드론 영상 활용
 
 ---
 
-*PhotoTrip — Computer Vision Course Project*
+<div align="center">
+
+<img width="100%" src="https://capsule-render.vercel.app/api?type=waving&color=0,7DD3FC,38BDF8,87CEEB&height=120&section=footer"/>
+
+*PhotoTrip — Computer Vision Course Project*  
+*사진 한 장이 여행의 시작이 됩니다* ✈️
+
+</div>
