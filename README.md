@@ -1,23 +1,23 @@
 <div align="center">
 
-<!-- Sky Blue Header Banner -->
-<img width="100%" src="https://capsule-render.vercel.app/api?type=waving&color=0,87CEEB,38BDF8,7DD3FC&height=200&section=header&text=📸%20PhotoTrip&fontSize=60&fontColor=ffffff&fontAlignY=38&desc=내%20갤러리%20속%20잠재적%20시각%20선호를%20분석하여%20여행%20취향을%20추론하는%20멀티모달%20AI%20시스템&descAlignY=60&descSize=16&descColor=e0f2fe"/>
+<img width="100%" src="https://capsule-render.vercel.app/api?type=waving&color=0,BAE6FD,38BDF8,0EA5E9&height=220&section=header&text=📸%20PhotoTrip&fontSize=64&fontColor=ffffff&fontAlignY=36&fontFamily=Noto+Sans+KR&desc=내%20갤러리%20속%20잠재적%20시각%20선호를%20분석하여%20여행%20취향을%20추론하는%20멀티모달%20AI%20시스템&descAlignY=58&descSize=15&descColor=e0f2fe&descAlign=50"/>
 
 <br/>
 
-<!-- Badges -->
 ![Python](https://img.shields.io/badge/Python_3.10+-38BDF8?style=for-the-badge&logo=python&logoColor=white)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0EA5E9?style=for-the-badge&logo=fastapi&logoColor=white)
 ![PyTorch](https://img.shields.io/badge/PyTorch-0369A1?style=for-the-badge&logo=pytorch&logoColor=white)
-![HuggingFace](https://img.shields.io/badge/HuggingFace-7DD3FC?style=for-the-badge&logo=huggingface&logoColor=white)
+![HuggingFace](https://img.shields.io/badge/HuggingFace-7DD3FC?style=for-the-badge&logo=huggingface&logoColor=0C4A6E)
 ![Three.js](https://img.shields.io/badge/Three.js-0C4A6E?style=for-the-badge&logo=three.js&logoColor=white)
 
 <br/>
 
-> **CLIP · OneFormer · OpenCV · Preference MLP**를 통합하여 사용자의 잠재적 시각 취향을 분석하고,  
+> **CLIP · OneFormer · OpenCV · Preference MLP** 를 통합하여 사용자의 잠재적 시각 취향을 분석하고,
 > **Preference Vector** 기반 맞춤 여행지를 추천하는 End-to-End AI 서비스
 
 </div>
+
+<br/>
 
 ---
 
@@ -32,7 +32,7 @@
 - [Related Work](#-related-work)
 - [Model Architecture](#-model-architecture)
 - [Experiments & Results](#-experiments--results)
-- [Limitations & Future Work](#-limitations--future-work)
+- [Limitations & Future Work](#️-limitations--future-work)
 - [Installation & Usage](#-installation--usage)
 - [Conclusion](#-conclusion)
 - [References](#references)
@@ -45,37 +45,122 @@
   <img src="results/demo.gif" width="90%">
 </p>
 
-| Category | Demo |
-|----------|------|
-| 🏙️ City | [Video](https://github.com/user-attachments/assets/2e39bb36-876f-4b46-a000-fc9914e87034) |
-| 🏛️ Culture | [Video](https://github.com/user-attachments/assets/aa2ad316-7270-4293-bfdf-e43aabe4dada) |
-| 🌿 Nature | [Video](https://github.com/user-attachments/assets/45d3d391-dde3-41f9-a6ee-d80ff77b4c9f) |
-| 🍕 Food | [Video](https://github.com/user-attachments/assets/5ef5fe29-4734-4f77-87b2-511de3855b48) |
-| 🌊 Beach | [Video](https://github.com/user-attachments/assets/a79cddb6-0e5d-4cad-ab43-86cdc3fb5185) |
-| 🎆 Festival | [Video](https://github.com/user-attachments/assets/96f4ace8-f7e2-4662-9a4c-6044df3dc3ec) |
+<div align="center">
+
+| &nbsp;&nbsp;&nbsp;Category&nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Demo&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
+|:---:|:---:|
+| 🏙️ &nbsp;City | [▶ Video](https://github.com/user-attachments/assets/2e39bb36-876f-4b46-a000-fc9914e87034) |
+| 🏛️ &nbsp;Culture | [▶ Video](https://github.com/user-attachments/assets/aa2ad316-7270-4293-bfdf-e43aabe4dada) |
+| 🌿 &nbsp;Nature | [▶ Video](https://github.com/user-attachments/assets/45d3d391-dde3-41f9-a6ee-d80ff77b4c9f) |
+| 🍕 &nbsp;Food | [▶ Video](https://github.com/user-attachments/assets/5ef5fe29-4734-4f77-87b2-511de3855b48) |
+| 🌊 &nbsp;Beach | [▶ Video](https://github.com/user-attachments/assets/a79cddb6-0e5d-4cad-ab43-86cdc3fb5185) |
+| 🎆 &nbsp;Festival | [▶ Video](https://github.com/user-attachments/assets/96f4ace8-f7e2-4662-9a4c-6044df3dc3ec) |
+
+</div>
 
 ---
 
 ## 🏆 Key Results
 
-<div align="center">
+<br/>
 
-| 모듈 | 결과 |
-|:----:|:----:|
-| CLIP Fine-tuning | ![](https://img.shields.io/badge/Accuracy-93.48%25-38BDF8?style=flat-square) |
-| CLIP Confidence | ![](https://img.shields.io/badge/Confidence-79~87%25-7DD3FC?style=flat-square) |
-| OneFormer Fine-tuning | ![](https://img.shields.io/badge/mIoU-45.6%25_(+8.5%25p)-0EA5E9?style=flat-square) |
-| Preference MLP | ![](https://img.shields.io/badge/Macro_F1-0.9450-0369A1?style=flat-square) |
-| Recommendation Engine | Top-3 Personalized Destination |
-| Frontend Visualization | Three.js Interactive Scene |
-| End-to-End Pipeline | Upload → Analysis → Recommendation → Visualization |
+<!-- ══════════ BOARDING PASS ══════════ -->
+<table align="center" width="86%" cellspacing="0" cellpadding="0">
+<tr>
+<td align="center" bgcolor="#0369A1">
+<br/>
+<table width="94%" align="center" cellspacing="0" cellpadding="0">
+<tr>
+<td align="left" width="50%">
+&nbsp;&nbsp;<b><font color="#BAE6FD" size="2">✈ PHOTOTRIP AI</font></b>
+</td>
+<td align="right" width="50%">
+<b><font color="#BAE6FD" size="2">BOARDING PASS &nbsp;&nbsp;</font></b>
+</td>
+</tr>
+</table>
+<br/>
 
-</div>
+<table width="94%" align="center" cellspacing="4" cellpadding="0">
+<tr>
+<td align="center" bgcolor="#BAE6FD" width="50%">
+<br/>
+<font size="1" color="#0369A1">FROM</font><br/>
+<b>일상 사진 5~7장</b><br/>
+<font size="1">📱 Daily Gallery</font>
+<br/><br/>
+</td>
+<td align="center" bgcolor="#BAE6FD" width="50%">
+<br/>
+<font size="1" color="#0369A1">DESTINATION</font><br/>
+<b>맞춤 여행지 Top-3</b><br/>
+<font size="1">✈️ Personalized Trip</font>
+<br/><br/>
+</td>
+</tr>
+</table>
+
+<br/>
+<table width="94%" align="center"><tr><td align="center"><font color="#7DD3FC">╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌</font></td></tr></table>
+<br/>
+
+<table width="94%" align="center" cellspacing="4" cellpadding="0">
+<tr>
+<td align="center" bgcolor="#E0F2FE" width="33%">
+<br/>
+<font size="1" color="#0369A1">🎯 CLIP Fine-tuning</font><br/>
+<b>93.48%</b><br/>
+<font size="1">Accuracy</font>
+<br/><br/>
+</td>
+<td align="center" bgcolor="#E0F2FE" width="33%">
+<br/>
+<font size="1" color="#0369A1">🧠 Preference MLP</font><br/>
+<b>0.9450</b><br/>
+<font size="1">Macro F1</font>
+<br/><br/>
+</td>
+<td align="center" bgcolor="#E0F2FE" width="33%">
+<br/>
+<font size="1" color="#0369A1">🗺️ OneFormer</font><br/>
+<b>45.6 mIoU</b><br/>
+<font size="1">+8.5%p ↑</font>
+<br/><br/>
+</td>
+</tr>
+</table>
+
+<br/>
+<table width="94%" align="center"><tr><td align="center"><font color="#7DD3FC">╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌</font></td></tr></table>
+<br/>
+
+<table width="94%" align="center" cellspacing="4" cellpadding="0">
+<tr>
+<td align="center" bgcolor="#BAE6FD" width="50%">
+<br/>
+<font size="1" color="#0369A1">🔁 END-TO-END PIPELINE</font><br/>
+<b>Upload → Analyze → Recommend → Visualize</b>
+<br/><br/>
+</td>
+<td align="center" bgcolor="#BAE6FD" width="50%">
+<br/>
+<font size="1" color="#0369A1">🌐 FRONTEND</font><br/>
+<b>Three.js Interactive 3D Scene</b>
+<br/><br/>
+</td>
+</tr>
+</table>
+<br/>
+</td>
+</tr>
+</table>
+<!-- ══════════════════════════════════ -->
+
+<br/>
 
 <p align="center">
 <img src="results/full_experiment_history.png.png" width="80%">
 </p>
-
 <p align="center">
 <img src="results/confidence_comparison.png.png" width="48%">
 <img src="results/Oneformer_mIoU.png.png" width="48%">
@@ -85,34 +170,34 @@
 
 ## 💡 Why Is PhotoTrip Different?
 
-기존 여행 추천 시스템은
+기존 여행 추천 시스템은 **설문조사 · 클릭 로그 · 예약 이력** 등의 명시적 행동 데이터에 의존한다.
 
-- 설문조사
-- 클릭 로그
-- 예약 이력
+반면 PhotoTrip은 사용자가 무의식적으로 촬영한 일상 사진 속에서
 
-등의 **명시적 행동 데이터**에 의존한다.
-
-반면 PhotoTrip은
-
-사용자가 무의식적으로 촬영한 일상 사진 속에서
-
-- 장소 선호
-- 공간 구성 선호
-- 색감 선호
-- 분위기 선호
+- 🏝️ 장소 선호
+- 🔲 공간 구성 선호
+- 🎨 색감 선호
+- 🌤️ 분위기 선호
 
 를 추론한다.
 
----
+<br/>
 
-핵심은 새로운 모델이 아니다.
+<div align="center">
+<table width="70%" cellspacing="0" cellpadding="0">
+<tr>
+<td align="center" bgcolor="#0EA5E9">
+<br/>
+<b><font color="white" size="3">&nbsp;&nbsp;"사용자의 시각적 취향을 어떻게 표현할 것인가?"&nbsp;&nbsp;</font></b>
+<br/><br/>
+</td>
+</tr>
+</table>
+</div>
 
-핵심은
+<br/>
 
-**"사용자의 시각적 취향을 어떻게 표현할 것인가?"**
-
-이다.
+핵심은 새로운 모델이 아니라, **표현 방법**이다.
 
 ---
 
@@ -120,69 +205,144 @@
 
 여행 취향은 단일 컴퓨터 비전 모델로 표현할 수 없다.
 
-예를 들어 CLIP은 beach인지 city인지는 높은 정확도로 분류할 수 있다.
+CLIP은 beach/city를 높은 정확도로 분류할 수 있다. 그러나 **바다의 비율 · 색감 · 분위기 · 공간 구성**은 알 수 없다.
 
-그러나
+<br/>
 
-- 바다가 사진에서 차지하는 **비율**
-- **따뜻한 색감** 여부
-- **활기찬 분위기** 여부
-- **공간 구성** 특성
+<div align="center">
+<table width="92%" cellspacing="4" cellpadding="0">
+<tr>
+<td align="center" bgcolor="#0369A1" width="25%"><br/><b><font color="white">Module</font></b><br/><br/></td>
+<td align="center" bgcolor="#0369A1" width="37%"><br/><b><font color="white">✅ 제공하는 정보</font></b><br/><br/></td>
+<td align="center" bgcolor="#0369A1" width="37%"><br/><b><font color="white">❌ 제공하지 못하는 정보</font></b><br/><br/></td>
+</tr>
+<tr>
+<td align="center" bgcolor="#E0F2FE"><br/>🔵 CLIP<br/><br/></td>
+<td align="center" bgcolor="#F0F9FF"><br/>장면 카테고리 (beach / city / ...)<br/><br/></td>
+<td align="center" bgcolor="#FFF1F2"><br/>색감, 분위기, 공간 비율<br/><br/></td>
+</tr>
+<tr>
+<td align="center" bgcolor="#E0F2FE"><br/>🟢 OneFormer<br/><br/></td>
+<td align="center" bgcolor="#F0F9FF"><br/>픽셀 단위 의미 구성 비율<br/><br/></td>
+<td align="center" bgcolor="#FFF1F2"><br/>감성적 선호, 분위기<br/><br/></td>
+</tr>
+<tr>
+<td align="center" bgcolor="#E0F2FE"><br/>🟡 OpenCV<br/><br/></td>
+<td align="center" bgcolor="#F0F9FF"><br/>밝기 / 채도 / 색온도<br/><br/></td>
+<td align="center" bgcolor="#FFF1F2"><br/>장소 의미, 맥락<br/><br/></td>
+</tr>
+<tr>
+<td align="center" bgcolor="#E0F2FE"><br/>🟣 Pref. MLP<br/><br/></td>
+<td align="center" bgcolor="#F0F9FF"><br/>분위기 / 라이프스타일 벡터<br/><br/></td>
+<td align="center" bgcolor="#FFF1F2"><br/>공간 구조, 장소 범주<br/><br/></td>
+</tr>
+</table>
+</div>
 
-은 알 수 없다.
+<br/>
 
-반대로 OneFormer는 `water 43% / vegetation 21%` 와 같은 공간 정보를 제공할 수 있지만  
-사용자의 **감성적 선호**는 표현하지 못한다.
+PhotoTrip은 **Scene + Semantic + Visual + Style** 네 가지 정보를 통합하여 단일 모델이 표현할 수 없는 여행 취향을 분석한다.
 
-OpenCV는 색감을 정량화할 수 있지만 **장소 의미**를 이해하지 못한다.
+<br/>
 
-Preference MLP는 분위기를 추정할 수 있지만 **공간 구조**는 파악하지 못한다.
-
-| Module | 제공하는 정보 | 제공하지 못하는 정보 |
-|--------|------------|------------------|
-| CLIP | 장면 카테고리 (beach / city / ...) | 색감, 분위기, 공간 비율 |
-| OneFormer | 픽셀 단위 의미 구성 비율 | 감성적 선호, 분위기 |
-| OpenCV | 밝기 / 채도 / 색온도 | 장소 의미, 맥락 |
-| Preference MLP | 분위기 / 라이프스타일 벡터 | 공간 구조, 장소 범주 |
-
-PhotoTrip은 **Scene + Semantic + Visual + Style** 네 가지 정보를 통합하여  
-단일 모델이 표현할 수 없는 여행 취향을 분석한다.
-
-| Module | 추출 정보 | 성능 | 단독 사용 시 한계 |
-|--------|----------|------|----------------|
-| CLIP | Scene Category | 93.48% Accuracy | 발리 ≠ 제주 구분 불가 |
-| OneFormer | Semantic Composition | 45.6 mIoU | 감성적 선호 표현 불가 |
-| OpenCV | Brightness / Saturation / Color Temperature | 6 Visual Metrics | 장소 의미 이해 불가 |
-| Preference MLP | Mood / Lifestyle | Macro F1 0.9450 | 공간 구조 파악 불가 |
+<div align="center">
+<table width="92%" cellspacing="4" cellpadding="0">
+<tr>
+<td align="center" bgcolor="#0369A1" width="22%"><br/><b><font color="white">Module</font></b><br/><br/></td>
+<td align="center" bgcolor="#0369A1" width="26%"><br/><b><font color="white">추출 정보</font></b><br/><br/></td>
+<td align="center" bgcolor="#0369A1" width="22%"><br/><b><font color="white">성능</font></b><br/><br/></td>
+<td align="center" bgcolor="#0369A1" width="30%"><br/><b><font color="white">단독 사용 시 한계</font></b><br/><br/></td>
+</tr>
+<tr>
+<td align="center" bgcolor="#DBEAFE"><br/>🔵 CLIP<br/><br/></td>
+<td align="center" bgcolor="#EFF6FF"><br/>Scene Category<br/><br/></td>
+<td align="center" bgcolor="#EFF6FF"><br/>93.48% Acc<br/><br/></td>
+<td align="center" bgcolor="#EFF6FF"><br/>발리 ≠ 제주 구분 불가<br/><br/></td>
+</tr>
+<tr>
+<td align="center" bgcolor="#DBEAFE"><br/>🟢 OneFormer<br/><br/></td>
+<td align="center" bgcolor="#EFF6FF"><br/>Semantic Composition<br/><br/></td>
+<td align="center" bgcolor="#EFF6FF"><br/>45.6 mIoU<br/><br/></td>
+<td align="center" bgcolor="#EFF6FF"><br/>감성적 선호 표현 불가<br/><br/></td>
+</tr>
+<tr>
+<td align="center" bgcolor="#DBEAFE"><br/>🟡 OpenCV<br/><br/></td>
+<td align="center" bgcolor="#EFF6FF"><br/>Brightness / Saturation<br/><br/></td>
+<td align="center" bgcolor="#EFF6FF"><br/>6 Visual Metrics<br/><br/></td>
+<td align="center" bgcolor="#EFF6FF"><br/>장소 의미 이해 불가<br/><br/></td>
+</tr>
+<tr>
+<td align="center" bgcolor="#DBEAFE"><br/>🟣 Pref. MLP<br/><br/></td>
+<td align="center" bgcolor="#EFF6FF"><br/>Mood / Lifestyle<br/><br/></td>
+<td align="center" bgcolor="#EFF6FF"><br/>Macro F1 0.9450<br/><br/></td>
+<td align="center" bgcolor="#EFF6FF"><br/>공간 구조 파악 불가<br/><br/></td>
+</tr>
+</table>
+</div>
 
 ---
 
 ## 🧠 Preference Vector
 
-PhotoTrip의 핵심 기여는
+CLIP · OneFormer · OpenCV · Preference MLP의 출력을 하나의 **Preference Vector**로 통합한다.
 
-CLIP · OneFormer · OpenCV · Preference MLP의 출력을
+Preference Vector는 총 **44차원**으로 구성되며, 각 차원이 명확한 의미를 갖는 해석 가능한(interpretable) 표현 공간을 형성한다.
 
-하나의 **Preference Vector**로 통합하는 것이다.
+<br/>
 
-기존 연구가 장면 분류 결과를 제공하는 데 집중했다면,  
-PhotoTrip은 **사용자의 취향을 벡터 공간에 표현**한다.  
-Preference Vector는 총 **44차원**으로 구성되며, 각 차원이 명확한 의미를 갖는  
-해석 가능한(interpretable) 표현 공간을 형성한다.
+<div align="center">
+<table width="88%" cellspacing="4" cellpadding="0">
+<tr>
+<td align="center" bgcolor="#0369A1" width="20%"><br/><b><font color="white">그룹</font></b><br/><br/></td>
+<td align="center" bgcolor="#0369A1" width="65%"><br/><b><font color="white">구성 요소</font></b><br/><br/></td>
+<td align="center" bgcolor="#0369A1" width="15%"><br/><b><font color="white">차원</font></b><br/><br/></td>
+</tr>
+<tr>
+<td align="center" bgcolor="#BAE6FD"><br/>scene<br/><br/></td>
+<td align="left" bgcolor="#E0F2FE"><br/>&nbsp;&nbsp;beach / nature / city / culture / festival / food<br/><br/></td>
+<td align="center" bgcolor="#E0F2FE"><br/><b>6</b><br/><br/></td>
+</tr>
+<tr>
+<td align="center" bgcolor="#BAE6FD"><br/>visual<br/><br/></td>
+<td align="left" bgcolor="#E0F2FE"><br/>&nbsp;&nbsp;brightness / saturation / contrast / warm_tone / person_ratio / animal_ratio<br/><br/></td>
+<td align="center" bgcolor="#E0F2FE"><br/><b>6</b><br/><br/></td>
+</tr>
+<tr>
+<td align="center" bgcolor="#BAE6FD"><br/>semantic<br/><br/></td>
+<td align="left" bgcolor="#E0F2FE"><br/>&nbsp;&nbsp;water / sky / vegetation / building / food<br/><br/></td>
+<td align="center" bgcolor="#E0F2FE"><br/><b>5</b><br/><br/></td>
+</tr>
+<tr>
+<td align="center" bgcolor="#BAE6FD"><br/>style (MLP)<br/><br/></td>
+<td align="left" bgcolor="#E0F2FE"><br/>&nbsp;&nbsp;calm / cozy / romantic / energetic / local / aesthetic<br/><br/></td>
+<td align="center" bgcolor="#E0F2FE"><br/><b>6</b><br/><br/></td>
+</tr>
+<tr>
+<td align="center" bgcolor="#BAE6FD"><br/>place<br/><br/></td>
+<td align="left" bgcolor="#E0F2FE"><br/>&nbsp;&nbsp;beach / nature / city / food / festival / culture<br/><br/></td>
+<td align="center" bgcolor="#E0F2FE"><br/><b>6</b><br/><br/></td>
+</tr>
+<tr>
+<td align="center" bgcolor="#BAE6FD"><br/>mood<br/><br/></td>
+<td align="left" bgcolor="#E0F2FE"><br/>&nbsp;&nbsp;calm / cozy / romantic / energetic / local / aesthetic<br/><br/></td>
+<td align="center" bgcolor="#E0F2FE"><br/><b>6</b><br/><br/></td>
+</tr>
+<tr>
+<td align="center" bgcolor="#BAE6FD"><br/>interest<br/><br/></td>
+<td align="left" bgcolor="#E0F2FE"><br/>&nbsp;&nbsp;anime / disney / sports / cafe / shopping / nightlife / art / history / local_market<br/><br/></td>
+<td align="center" bgcolor="#E0F2FE"><br/><b>9</b><br/><br/></td>
+</tr>
+<tr>
+<td align="center" bgcolor="#0EA5E9"><br/><b><font color="white">합계</font></b><br/><br/></td>
+<td align="center" bgcolor="#0EA5E9"><br/></td>
+<td align="center" bgcolor="#0EA5E9"><br/><b><font color="white">44</font></b><br/><br/></td>
+</tr>
+</table>
+</div>
 
-| 그룹 | 구성 요소 | 차원 |
-|:----:|-----------|:----:|
-| scene | beach / nature / city / culture / festival / food | 6 |
-| visual | brightness / saturation / contrast / warm_tone / person_ratio / animal_ratio | 6 |
-| semantic | water / sky / vegetation / building / food | 5 |
-| style (MLP) | calm / cozy / romantic / energetic / local / aesthetic | 6 |
-| place (zero-shot) | beach / nature / city / food / festival / culture | 6 |
-| mood (zero-shot) | calm / cozy / romantic / energetic / local / aesthetic | 6 |
-| interest (zero-shot) | anime / disney / sports / cafe / shopping / nightlife / art / history / local_market | 9 |
-| **합계** | | **44** |
+<br/>
 
-여행지 프로필은 각 목적지의 특성을 동일한 44차원 축으로 수작업 정의한 벡터이며,  
-사용자 Preference Vector와 코사인 유사도로 매칭한다.
+여행지 프로필은 각 목적지의 특성을 동일한 44차원 축으로 수작업 정의한 벡터이며, 사용자 Preference Vector와 코사인 유사도로 매칭한다.
 
 ### Example
 
@@ -233,26 +393,26 @@ flowchart TD
         CLIP["CLIP Fine-tuned\n장면 분류 Acc 93.48% Conf 79~87%\noutput: scene scores"]
         ONE["OneFormer\n의미론적 분할 mIoU 45.6%\noutput: semantic ratio"]
         OCV["OpenCV\n밝기 채도 색온도 대비\noutput: visual metrics"]
-        SMLP["Preference MLP\n768->512->256->128->6 BCE Loss\noutput: mood place style"]
+        SMLP["Preference MLP\n768→512→256→128→6 BCE Loss\noutput: mood place style"]
     end
     CLIP --> PV
     ONE --> PV
     OCV --> PV
     SMLP --> PV
     subgraph VECTOR["Preference Vector Builder"]
-        PV["scene + visual + semantic + style + lifestyle\nN장 평균 앙상블 - top_category confidence is_uncertain"]
+        PV["scene + visual + semantic + style + lifestyle\nN장 평균 앙상블"]
     end
     PV --> REC
     PV --> GEM
     subgraph OUTPUT["Output"]
         REC["추천 엔진\n코사인 유사도 Top-3~5 여행지"]
-        GEM["Gemini LLM\n취향 자연어 설명 Flying 챗봇"]
+        GEM["Gemini LLM\n취향 자연어 설명"]
         REC --> FE
         GEM --> FE
         subgraph FE["Frontend"]
-            T1["가상 탑승권\nTop-3 여행지 Gemini 취향 설명"]
-            T2["Three.js 3D 씬\n6개 카테고리 인터랙티브"]
-            T3["CV Dashboard\n분석 결과 Photo별 상세"]
+            T1["가상 탑승권"]
+            T2["Three.js 3D 씬"]
+            T3["CV Dashboard"]
         end
     end
     style ANALYSIS fill:#e0f2fe,stroke:#38BDF8
@@ -263,82 +423,150 @@ flowchart TD
 
 ### 카테고리별 분석 예시
 
-| 입력 사진 특성 | 분류 결과 | 추천 여행지 예시 |
-|--------------|---------|----------------|
-| 해변, 바다, 모래 | 🏖️ beach | 발리, 몰디브, 제주 |
-| 산, 숲, 자연 | 🌲 nature | 퀸스타운, 파타고니아, 설악산 |
-| 도시, 야경, 빌딩 | 🌆 city | 도쿄, 홍콩, 파리 |
-| 사원, 박물관, 문화유산 | 🏛️ culture | 교토, 로마, 이스탄불 |
-| 공연, 축제, 음악 | 🎪 festival | 밀라노, 에든버러, 라스베가스 |
-| 음식, 카페, 길거리 음식 | 🍜 food | 나폴리, 방콕, 오사카 |
+<div align="center">
+<table width="88%" cellspacing="4" cellpadding="0">
+<tr>
+<td align="center" bgcolor="#0369A1"><br/><b><font color="white">입력 사진 특성</font></b><br/><br/></td>
+<td align="center" bgcolor="#0369A1"><br/><b><font color="white">분류 결과</font></b><br/><br/></td>
+<td align="center" bgcolor="#0369A1"><br/><b><font color="white">추천 여행지 예시</font></b><br/><br/></td>
+</tr>
+<tr>
+<td align="center" bgcolor="#E0F2FE"><br/>해변, 바다, 모래<br/><br/></td>
+<td align="center" bgcolor="#BAE6FD"><br/><b>🏖️ beach</b><br/><br/></td>
+<td align="center" bgcolor="#E0F2FE"><br/>발리, 몰디브, 제주<br/><br/></td>
+</tr>
+<tr>
+<td align="center" bgcolor="#E0F2FE"><br/>산, 숲, 자연<br/><br/></td>
+<td align="center" bgcolor="#BAE6FD"><br/><b>🌲 nature</b><br/><br/></td>
+<td align="center" bgcolor="#E0F2FE"><br/>퀸스타운, 파타고니아, 설악산<br/><br/></td>
+</tr>
+<tr>
+<td align="center" bgcolor="#E0F2FE"><br/>도시, 야경, 빌딩<br/><br/></td>
+<td align="center" bgcolor="#BAE6FD"><br/><b>🌆 city</b><br/><br/></td>
+<td align="center" bgcolor="#E0F2FE"><br/>도쿄, 홍콩, 파리<br/><br/></td>
+</tr>
+<tr>
+<td align="center" bgcolor="#E0F2FE"><br/>사원, 박물관, 문화유산<br/><br/></td>
+<td align="center" bgcolor="#BAE6FD"><br/><b>🏛️ culture</b><br/><br/></td>
+<td align="center" bgcolor="#E0F2FE"><br/>교토, 로마, 이스탄불<br/><br/></td>
+</tr>
+<tr>
+<td align="center" bgcolor="#E0F2FE"><br/>공연, 축제, 음악<br/><br/></td>
+<td align="center" bgcolor="#BAE6FD"><br/><b>🎪 festival</b><br/><br/></td>
+<td align="center" bgcolor="#E0F2FE"><br/>밀라노, 에든버러, 라스베가스<br/><br/></td>
+</tr>
+<tr>
+<td align="center" bgcolor="#E0F2FE"><br/>음식, 카페, 길거리 음식<br/><br/></td>
+<td align="center" bgcolor="#BAE6FD"><br/><b>🍜 food</b><br/><br/></td>
+<td align="center" bgcolor="#E0F2FE"><br/>나폴리, 방콕, 오사카<br/><br/></td>
+</tr>
+</table>
+</div>
 
 ---
 
 ## 🛠️ Tech Stack
 
+<br/>
+
 <div align="center">
-
-| 계층 | 기술 |
-|:----:|------|
-| ![](https://img.shields.io/badge/Backend-0369A1?style=flat-square) | FastAPI · PyTorch · HuggingFace Transformers |
-| ![](https://img.shields.io/badge/장면_분류-0EA5E9?style=flat-square) | CLIP ViT-B/32 fine-tuned |
-| ![](https://img.shields.io/badge/의미론적_분할-38BDF8?style=flat-square) | OneFormer (swin_large) |
-| ![](https://img.shields.io/badge/시각_분석-7DD3FC?style=flat-square) | OpenCV |
-| ![](https://img.shields.io/badge/분위기_취향-BAE6FD?style=flat-square&logoColor=black) | Preference MLP · BCE Loss · Pseudo Labeling |
-| ![](https://img.shields.io/badge/LLM-0C4A6E?style=flat-square) | Google Gemini API |
-| ![](https://img.shields.io/badge/Frontend-1E40AF?style=flat-square) | Three.js · HTML/CSS/JS |
-| ![](https://img.shields.io/badge/학습환경-075985?style=flat-square) | Google Colab · Kaggle (GPU) |
-
+<table width="82%" cellspacing="4" cellpadding="0">
+<tr>
+<td align="center" bgcolor="#0369A1" width="30%"><br/><b><font color="white">계층</font></b><br/><br/></td>
+<td align="center" bgcolor="#0369A1" width="70%"><br/><b><font color="white">기술</font></b><br/><br/></td>
+</tr>
+<tr>
+<td align="center" bgcolor="#BAE6FD"><br/>⚙️ &nbsp;<b>Backend</b><br/><br/></td>
+<td align="left" bgcolor="#E0F2FE"><br/>&nbsp;&nbsp;FastAPI &nbsp;·&nbsp; PyTorch &nbsp;·&nbsp; HuggingFace Transformers<br/><br/></td>
+</tr>
+<tr>
+<td align="center" bgcolor="#BAE6FD"><br/>🔵 &nbsp;<b>장면 분류</b><br/><br/></td>
+<td align="left" bgcolor="#E0F2FE"><br/>&nbsp;&nbsp;CLIP ViT-B/32 fine-tuned<br/><br/></td>
+</tr>
+<tr>
+<td align="center" bgcolor="#BAE6FD"><br/>🟢 &nbsp;<b>의미론적 분할</b><br/><br/></td>
+<td align="left" bgcolor="#E0F2FE"><br/>&nbsp;&nbsp;OneFormer (swin_large)<br/><br/></td>
+</tr>
+<tr>
+<td align="center" bgcolor="#BAE6FD"><br/>🟡 &nbsp;<b>시각 분석</b><br/><br/></td>
+<td align="left" bgcolor="#E0F2FE"><br/>&nbsp;&nbsp;OpenCV<br/><br/></td>
+</tr>
+<tr>
+<td align="center" bgcolor="#BAE6FD"><br/>🟣 &nbsp;<b>분위기·취향</b><br/><br/></td>
+<td align="left" bgcolor="#E0F2FE"><br/>&nbsp;&nbsp;Preference MLP &nbsp;·&nbsp; BCE Loss &nbsp;·&nbsp; Pseudo Labeling<br/><br/></td>
+</tr>
+<tr>
+<td align="center" bgcolor="#BAE6FD"><br/>💬 &nbsp;<b>LLM</b><br/><br/></td>
+<td align="left" bgcolor="#E0F2FE"><br/>&nbsp;&nbsp;Google Gemini API<br/><br/></td>
+</tr>
+<tr>
+<td align="center" bgcolor="#BAE6FD"><br/>🌐 &nbsp;<b>Frontend</b><br/><br/></td>
+<td align="left" bgcolor="#E0F2FE"><br/>&nbsp;&nbsp;Three.js &nbsp;·&nbsp; HTML / CSS / JS<br/><br/></td>
+</tr>
+<tr>
+<td align="center" bgcolor="#BAE6FD"><br/>☁️ &nbsp;<b>학습 환경</b><br/><br/></td>
+<td align="left" bgcolor="#E0F2FE"><br/>&nbsp;&nbsp;Google Colab &nbsp;·&nbsp; Kaggle (GPU)<br/><br/></td>
+</tr>
+</table>
 </div>
+
+<br/>
 
 ---
 
 ## 💡 Key Contributions
 
-1. **멀티모달 Preference Vector 설계 및 앙상블**
+<details>
+<summary>&nbsp;1️⃣ &nbsp;<b>멀티모달 Preference Vector 설계 및 앙상블</b></summary>
+<br/>
 
-   CLIP · OneFormer · OpenCV · Preference MLP 4개 이질적 모듈의 출력을  
-   단일 Preference Vector로 통합하는 구조를 직접 설계.  
-   scene(6차원) · visual(6차원) · semantic(5차원) · style · lifestyle을  
-   하나의 벡터로 표현하며, 5~7장 입력 시 per-image 벡터를  
-   평균 앙상블하여 노이즈에 robust한 취향 표현을 구축.
+CLIP · OneFormer · OpenCV · Preference MLP 4개 이질적 모듈의 출력을 단일 Preference Vector로 통합하는 구조를 직접 설계.
+scene(6) · visual(6) · semantic(5) · style · lifestyle을 하나의 벡터로 표현하며, 5~7장 입력 시 per-image 벡터를 평균 앙상블하여 노이즈에 robust한 취향 표현을 구축.
 
-   OpenCV 색감 분석(밝기·채도·색온도·대비)과 Preference MLP 출력을  
-   여행지 프로필과 코사인 유사도로 매칭함으로써,  
-   CV 분석 결과가 직접 추천에 반영되는 end-to-end 파이프라인 완성.  
-   *(예: 따뜻한 색감 + vibrant 스타일 → 발리·방콕 추천)*
+OpenCV 색감 분석(밝기·채도·색온도·대비)과 Preference MLP 출력을 여행지 프로필과 코사인 유사도로 매칭함으로써, CV 분석 결과가 직접 추천에 반영되는 end-to-end 파이프라인 완성.
+*(예: 따뜻한 색감 + vibrant 스타일 → 발리·방콕 추천)*
 
-   scene 분류는 여행 특화 카테고리 정확도가 중요하므로 CLIP fine-tuning을 적용하였으며,  
-   place · mood · interest 벡터는 CLIP의 강력한 zero-shot 전이 능력을 활용하였다.  
-   라이프스타일 개념은 CLIP 사전학습 분포와 충분히 겹치므로  
-   한정된 레이블 환경에서 zero-shot이 더 안정적인 선호 신호를 제공한다.
+scene 분류는 CLIP fine-tuning, place · mood · interest는 zero-shot 전이를 활용하였다.
 
-2. **Accuracy–Confidence 트레이드오프 실험 설계**
+</details>
 
-   SigLIP과 CLIP을 동일 데이터셋에서 fine-tuning 후  
-   val accuracy와 inference confidence를 직접 비교.  
-   SigLIP은 accuracy 93.56%에도 confidence가 33~37%에 머물러  
-   Preference Vector 품질을 저하시킴을 확인.  
-   CLIP fine-tuned는 93.48% accuracy + 79%에서 87% confidence로 최종 채택.  
-   총 5가지 실험 변형(Pseudo Labeling, large 데이터, festival 추가 등)을 직접 설계·수행.
+<details>
+<summary>&nbsp;2️⃣ &nbsp;<b>Accuracy–Confidence 트레이드오프 실험 설계</b></summary>
+<br/>
 
-3. **OneFormer 멀티데이터셋 학습 파이프라인 설계**
+SigLIP과 CLIP을 동일 데이터셋에서 fine-tuning 후 val accuracy와 inference confidence를 직접 비교.
+SigLIP은 accuracy 93.56%에도 confidence가 33~37%에 머물러 Preference Vector 품질을 저하시킴을 확인.
+CLIP fine-tuned는 93.48% accuracy + 79~87% confidence로 최종 채택.
+총 5가지 실험 변형(Pseudo Labeling, large 데이터, festival 추가 등)을 직접 설계·수행.
 
-   ADE20K · FoodSeg103 · Cityscapes를 단일 모델로 통합 학습하기 위해  
-   Mask2Former 대신 OneFormer를 직접 선택·적용.  
-   Travel-class mIoU 37.1% → 45.6% (+8.5%p) 달성.
+</details>
 
-4. **Pseudo Labeling 데이터 파이프라인 구축**
+<details>
+<summary>&nbsp;3️⃣ &nbsp;<b>OneFormer 멀티데이터셋 학습 파이프라인 설계</b></summary>
+<br/>
 
-   Pixabay API 수집 → SigLIP 자동 라벨링 →  
-   confidence 필터링 전 과정을 직접 설계 및 구현.
+ADE20K · FoodSeg103 · Cityscapes를 단일 모델로 통합 학습하기 위해 Mask2Former 대신 OneFormer를 직접 선택·적용.
+Travel-class mIoU 37.1% → 45.6% (+8.5%p) 달성.
 
-5. **Preference MLP 설계 및 실험**
+</details>
 
-   BCE Loss + class weights로 클래스 불균형을 처리하고,  
-   mood · place · style 3개 Preference MLP를 독립적으로 설계.  
-   CLIP 임베딩(768차원) → 6-class multilabel 분류.  
-   Place Preference MLP Macro F1 **0.9450** 달성.
+<details>
+<summary>&nbsp;4️⃣ &nbsp;<b>Pseudo Labeling 데이터 파이프라인 구축</b></summary>
+<br/>
+
+Pixabay API 수집 → SigLIP 자동 라벨링 → confidence 필터링 전 과정을 직접 설계 및 구현.
+
+</details>
+
+<details>
+<summary>&nbsp;5️⃣ &nbsp;<b>Preference MLP 설계 및 실험</b></summary>
+<br/>
+
+BCE Loss + class weights로 클래스 불균형을 처리하고, mood · place · style 3개 Preference MLP를 독립적으로 설계.
+CLIP 임베딩(768차원) → 6-class multilabel 분류.
+Place Preference MLP Macro F1 **0.9450** 달성.
+
+</details>
 
 ---
 
@@ -346,18 +574,41 @@ flowchart TD
 
 ### Semantic Segmentation 발전
 
-| 연도 | 모델 | 주요 기여 |
-|:----:|:----:|----------|
-| 2015 | FCN | 최초 end-to-end 픽셀 단위 분류 |
-| 2017 | DeepLab v3 | Atrous convolution, multi-scale context 도입 |
-| 2022 | Mask2Former | Universal segmentation 시도; 단, 태스크마다 개별 학습 필요 |
-| 2023 | OneFormer | Task-conditioned joint training으로 단일 모델 멀티 태스크 가능 |
+<div align="center">
+<table width="88%" cellspacing="4" cellpadding="0">
+<tr>
+<td align="center" bgcolor="#0369A1" width="12%"><br/><b><font color="white">연도</font></b><br/><br/></td>
+<td align="center" bgcolor="#0369A1" width="22%"><br/><b><font color="white">모델</font></b><br/><br/></td>
+<td align="center" bgcolor="#0369A1" width="66%"><br/><b><font color="white">주요 기여</font></b><br/><br/></td>
+</tr>
+<tr>
+<td align="center" bgcolor="#E0F2FE"><br/>2015<br/><br/></td>
+<td align="center" bgcolor="#BAE6FD"><br/><b>FCN</b><br/><br/></td>
+<td align="left" bgcolor="#E0F2FE"><br/>&nbsp;&nbsp;최초 end-to-end 픽셀 단위 분류<br/><br/></td>
+</tr>
+<tr>
+<td align="center" bgcolor="#E0F2FE"><br/>2017<br/><br/></td>
+<td align="center" bgcolor="#BAE6FD"><br/><b>DeepLab v3</b><br/><br/></td>
+<td align="left" bgcolor="#E0F2FE"><br/>&nbsp;&nbsp;Atrous convolution, multi-scale context 도입<br/><br/></td>
+</tr>
+<tr>
+<td align="center" bgcolor="#E0F2FE"><br/>2022<br/><br/></td>
+<td align="center" bgcolor="#BAE6FD"><br/><b>Mask2Former</b><br/><br/></td>
+<td align="left" bgcolor="#E0F2FE"><br/>&nbsp;&nbsp;Universal segmentation 시도; 단, 태스크마다 개별 학습 필요<br/><br/></td>
+</tr>
+<tr>
+<td align="center" bgcolor="#E0F2FE"><br/>2023<br/><br/></td>
+<td align="center" bgcolor="#7DD3FC"><br/><b>OneFormer ✅</b><br/><br/></td>
+<td align="left" bgcolor="#DBEAFE"><br/>&nbsp;&nbsp;Task-conditioned joint training으로 단일 모델 멀티 태스크 가능<br/><br/></td>
+</tr>
+</table>
+</div>
+
+<br/>
 
 ### OneFormer 채택 배경
 
-OneFormer(Jain et al., CVPR 2023)는 task-conditioned joint training으로  
-semantic · instance · panoptic segmentation을 단일 모델로 처리한다.  
-task token을 입력으로 받아 하나의 모델로 여러 데이터셋을 동시에 학습할 수 있다.
+OneFormer(Jain et al., CVPR 2023)는 task-conditioned joint training으로 semantic · instance · panoptic segmentation을 단일 모델로 처리한다.
 
 | 카테고리 | 학습 데이터셋 | 도메인 |
 |---------|------------|--------|
@@ -365,18 +616,13 @@ task token을 입력으로 받아 하나의 모델로 여러 데이터셋을 동
 | 음식 | FoodSeg103 | 음식 특화 |
 | 도시/도로 | Cityscapes | 도시 주행 장면 |
 
-Mask2Former는 태스크마다 별도 모델 학습이 필요하여  
-최소 3개 모델, 3배의 GPU 메모리·학습 시간이 요구된다.  
-OneFormer의 joint training으로 단일 모델 통합 학습이 가능하여 채택.
+Mask2Former는 태스크마다 별도 모델이 필요하여 최소 3배의 GPU 메모리·학습 시간이 요구된다.
 
 ### Vision-Language Models
 
-CLIP(Radford et al., 2021)은 4억 쌍의 이미지-텍스트 대조 학습으로  
-강력한 zero-shot 전이 성능을 제공하며, softmax 기반 confidence로  
-취향 신호를 명확하게 전달한다.
+CLIP(Radford et al., 2021)은 4억 쌍의 이미지-텍스트 대조 학습으로 강력한 zero-shot 전이 성능을 제공하며, softmax 기반 confidence로 취향 신호를 명확하게 전달한다.
 
-SigLIP(Zhai et al., 2023)은 sigmoid loss로 학습 안정성을 개선하였으나,  
-inference confidence가 33~37%에 머물러 Preference Vector 품질을 저하시킨다.
+SigLIP(Zhai et al., 2023)은 sigmoid loss로 학습 안정성을 개선하였으나, inference confidence가 33~37%에 머물러 Preference Vector 품질을 저하시킨다.
 
 ---
 
@@ -387,26 +633,20 @@ flowchart LR
     subgraph CLIP["🔵 CLIP 장면 분류"]
         A["Pixabay\n수집"] --> B["Pseudo\nLabeling"] --> C["CLIP\nFine-tuning"] --> R1(["Acc 93.48%\nConf 79~87%"])
     end
-
     subgraph ONE["🟢 OneFormer 분할"]
         D["ADE20K\nFoodSeg\nCityscapes"] --> E["통합 학습\njoint training"] --> R2(["mIoU\n37.1%→45.6%"])
     end
-
     subgraph MLP["🟣 Preference MLP"]
         F["CLIP 임베딩\n768차원"] --> G["MLP\n768→128→6"] --> R3(["mood\nplace\nstyle"])
     end
-
     subgraph OCV["🟡 OpenCV 시각 분석"]
         H["RGB\n이미지"] --> I["밝기 채도\n색온도"] --> R4(["6개\n메트릭"])
     end
-
     R1 --> PV
     R2 --> PV
     R3 --> PV
     R4 --> PV
-
     PV(["Preference Vector"])
-
     style CLIP fill:#e0f2fe,stroke:#38BDF8
     style ONE fill:#e1f5ee,stroke:#1d9e75
     style MLP fill:#eeedfe,stroke:#7f77dd
@@ -422,18 +662,49 @@ flowchart LR
 
 6-class 여행 장면 분류: beach · nature · city · culture · festival · food
 
-| 모델 | Val Accuracy | 비고 |
-|------|:-----------:|------|
-| CLIP Zero-shot | 64.27% | 프롬프트 기반, fine-tuning 없음 |
-| SigLIP 기본 | 90.91% | google/siglip-large-patch16-256 |
-| SigLIP + large 데이터 | 90.52% | 데이터 규모 확대 시 소폭 하락 |
-| SigLIP + festival 카테고리 | 93.56% | festival 클래스 추가 |
-| SigLIP + Pseudo Labeling | 93.14% | pseudo label 기반 semi-supervised |
-| **CLIP Fine-tuned** | **93.48%** | **openai/clip-vit-base-patch32 ✅** |
+<div align="center">
+<table width="88%" cellspacing="4" cellpadding="0">
+<tr>
+<td align="center" bgcolor="#0369A1" width="40%"><br/><b><font color="white">모델</font></b><br/><br/></td>
+<td align="center" bgcolor="#0369A1" width="25%"><br/><b><font color="white">Val Accuracy</font></b><br/><br/></td>
+<td align="center" bgcolor="#0369A1" width="35%"><br/><b><font color="white">비고</font></b><br/><br/></td>
+</tr>
+<tr>
+<td align="center" bgcolor="#F1F5F9"><br/>CLIP Zero-shot<br/><br/></td>
+<td align="center" bgcolor="#F1F5F9"><br/>64.27%<br/><br/></td>
+<td align="center" bgcolor="#F1F5F9"><br/>프롬프트 기반, fine-tuning 없음<br/><br/></td>
+</tr>
+<tr>
+<td align="center" bgcolor="#F1F5F9"><br/>SigLIP 기본<br/><br/></td>
+<td align="center" bgcolor="#F1F5F9"><br/>90.91%<br/><br/></td>
+<td align="center" bgcolor="#F1F5F9"><br/>google/siglip-large-patch16-256<br/><br/></td>
+</tr>
+<tr>
+<td align="center" bgcolor="#F1F5F9"><br/>SigLIP + large 데이터<br/><br/></td>
+<td align="center" bgcolor="#F1F5F9"><br/>90.52%<br/><br/></td>
+<td align="center" bgcolor="#F1F5F9"><br/>데이터 규모 확대 시 소폭 하락<br/><br/></td>
+</tr>
+<tr>
+<td align="center" bgcolor="#F1F5F9"><br/>SigLIP + festival 카테고리<br/><br/></td>
+<td align="center" bgcolor="#F1F5F9"><br/>93.56%<br/><br/></td>
+<td align="center" bgcolor="#F1F5F9"><br/>festival 클래스 추가<br/><br/></td>
+</tr>
+<tr>
+<td align="center" bgcolor="#F1F5F9"><br/>SigLIP + Pseudo Labeling<br/><br/></td>
+<td align="center" bgcolor="#F1F5F9"><br/>93.14%<br/><br/></td>
+<td align="center" bgcolor="#F1F5F9"><br/>pseudo label 기반 semi-supervised<br/><br/></td>
+</tr>
+<tr>
+<td align="center" bgcolor="#7DD3FC"><br/><b>CLIP Fine-tuned</b><br/><br/></td>
+<td align="center" bgcolor="#38BDF8"><br/><b><font color="white">93.48% ✅</font></b><br/><br/></td>
+<td align="center" bgcolor="#7DD3FC"><br/><b>openai/clip-vit-base-patch32</b><br/><br/></td>
+</tr>
+</table>
+</div>
 
-> **CLIP 채택 근거**: accuracy parity 조건 하에서  
-> SigLIP(33~37%) 대비 CLIP(79~87%)의 월등한 inference confidence가  
-> Preference Vector 품질에 직결됨.
+<br/>
+
+> **CLIP 채택 근거**: accuracy parity 조건 하에서 SigLIP(33~37%) 대비 CLIP(79~87%)의 월등한 inference confidence가 Preference Vector 품질에 직결됨.
 
 <p align="center">
   <img src="results/full_experiment_history.png.png" width="80%"/>
@@ -447,10 +718,30 @@ flowchart LR
 
 ### 2. 의미론적 분할 (Semantic Segmentation)
 
-| 모델 | mIoU | 학습 데이터 | 비고 |
-|------|:----:|-----------|------|
-| OneFormer pretrained | 37.1% | ADE20K | 기준선 |
-| **OneFormer fine-tuned** | **45.6%** | ADE20K + FoodSeg103 + Cityscapes | **최종 채택 ✅** |
+<div align="center">
+<table width="88%" cellspacing="4" cellpadding="0">
+<tr>
+<td align="center" bgcolor="#0369A1"><br/><b><font color="white">모델</font></b><br/><br/></td>
+<td align="center" bgcolor="#0369A1"><br/><b><font color="white">mIoU</font></b><br/><br/></td>
+<td align="center" bgcolor="#0369A1"><br/><b><font color="white">학습 데이터</font></b><br/><br/></td>
+<td align="center" bgcolor="#0369A1"><br/><b><font color="white">비고</font></b><br/><br/></td>
+</tr>
+<tr>
+<td align="center" bgcolor="#F1F5F9"><br/>OneFormer pretrained<br/><br/></td>
+<td align="center" bgcolor="#F1F5F9"><br/>37.1%<br/><br/></td>
+<td align="center" bgcolor="#F1F5F9"><br/>ADE20K<br/><br/></td>
+<td align="center" bgcolor="#F1F5F9"><br/>기준선<br/><br/></td>
+</tr>
+<tr>
+<td align="center" bgcolor="#7DD3FC"><br/><b>OneFormer fine-tuned</b><br/><br/></td>
+<td align="center" bgcolor="#38BDF8"><br/><b><font color="white">45.6% ✅</font></b><br/><br/></td>
+<td align="center" bgcolor="#7DD3FC"><br/>ADE20K + FoodSeg103 + Cityscapes<br/><br/></td>
+<td align="center" bgcolor="#7DD3FC"><br/><b>최종 채택</b><br/><br/></td>
+</tr>
+</table>
+</div>
+
+<br/>
 
 - **모델**: `shi-labs/oneformer_ade20k_swin_large`
 - **목적**: ADE20K 클래스를 travel-relevant semantic ratio (water, sky, vegetation, building, food)로 집계
@@ -475,51 +766,75 @@ flowchart LR
 | 데이터 | Pseudo Labeling pipeline (v3 generator) |
 | 샘플러 | Rare-class weighted sampler |
 
-### Preference MLP Results
+<br/>
 
 <div align="center">
-
-| Category | F1 Score |
-|:--------:|:--------:|
-| Nature | 0.97 |
-| Food | 0.97 |
-| Beach | 0.95 |
-| Festival | 0.95 |
-| Culture | 0.93 |
-| City | 0.91 |
-| **Macro F1** | **0.9450** |
-| **Micro F1** | **0.9457** |
-| **Weighted F1** | **0.9460** |
-
+<table width="52%" cellspacing="4" cellpadding="0">
+<tr>
+<td align="center" bgcolor="#0369A1" width="50%"><br/><b><font color="white">Category</font></b><br/><br/></td>
+<td align="center" bgcolor="#0369A1" width="50%"><br/><b><font color="white">F1 Score</font></b><br/><br/></td>
+</tr>
+<tr><td align="center" bgcolor="#E0F2FE"><br/>Nature<br/><br/></td><td align="center" bgcolor="#BAE6FD"><br/><b>0.97</b><br/><br/></td></tr>
+<tr><td align="center" bgcolor="#E0F2FE"><br/>Food<br/><br/></td><td align="center" bgcolor="#BAE6FD"><br/><b>0.97</b><br/><br/></td></tr>
+<tr><td align="center" bgcolor="#E0F2FE"><br/>Beach<br/><br/></td><td align="center" bgcolor="#BAE6FD"><br/><b>0.95</b><br/><br/></td></tr>
+<tr><td align="center" bgcolor="#E0F2FE"><br/>Festival<br/><br/></td><td align="center" bgcolor="#BAE6FD"><br/><b>0.95</b><br/><br/></td></tr>
+<tr><td align="center" bgcolor="#E0F2FE"><br/>Culture<br/><br/></td><td align="center" bgcolor="#BAE6FD"><br/><b>0.93</b><br/><br/></td></tr>
+<tr><td align="center" bgcolor="#E0F2FE"><br/>City<br/><br/></td><td align="center" bgcolor="#BAE6FD"><br/><b>0.91</b><br/><br/></td></tr>
+<tr><td align="center" bgcolor="#7DD3FC"><br/><b>Macro F1</b><br/><br/></td><td align="center" bgcolor="#38BDF8"><br/><b><font color="white">0.9450</font></b><br/><br/></td></tr>
+<tr><td align="center" bgcolor="#7DD3FC"><br/><b>Micro F1</b><br/><br/></td><td align="center" bgcolor="#7DD3FC"><br/><b>0.9457</b><br/><br/></td></tr>
+<tr><td align="center" bgcolor="#7DD3FC"><br/><b>Weighted F1</b><br/><br/></td><td align="center" bgcolor="#7DD3FC"><br/><b>0.9460</b><br/><br/></td></tr>
+</table>
 </div>
 
+<br/>
+
 <p align="center">
-  <img width="1200" height="750" alt="mlp_f1_score png" src="https://github.com/user-attachments/assets/23381cd7-015e-4116-ab70-eb62747b1bff" />
+  <img width="1200" height="750" alt="mlp_f1_score" src="https://github.com/user-attachments/assets/23381cd7-015e-4116-ab70-eb62747b1bff" />
 </p>
 
 ---
 
 ### 4. 종합 결과
 
-| 모듈 | 모델 | 성능 |
-|------|------|------|
-| 장면 분류 | CLIP ViT-B/32 fine-tuned | Val Acc 93.48% · Confidence 79~87% |
-| 의미론적 분할 | OneFormer swin-large | Travel-class mIoU 45.6% (+8.5%p) |
-| 분위기·취향 분류 | Preference MLP (768→512→256→128→6) | Macro F1 0.9450 · Weighted F1 0.9460 |
-| 시각 특성 | OpenCV | 밝기·채도·색온도·대비 6개 메트릭 |
-| 추천 엔진 | 코사인 유사도 | Top-3~5 여행지 선정 |
-| 앙상블 | per-image 평균 | 5~7장 입력 기준 |
-
----
-
-## 🌐 System Implementation
-
-| 계층 | 기술 |
-|------|------|
-| Backend | FastAPI · PyTorch |
-| Frontend | Three.js · HTML/CSS/JS |
-| LLM | Gemini API |
-| Visualization | CV Dashboard · Boarding Pass · Interactive 3D Scene |
+<div align="center">
+<table width="92%" cellspacing="4" cellpadding="0">
+<tr>
+<td align="center" bgcolor="#0369A1" width="22%"><br/><b><font color="white">모듈</font></b><br/><br/></td>
+<td align="center" bgcolor="#0369A1" width="38%"><br/><b><font color="white">모델</font></b><br/><br/></td>
+<td align="center" bgcolor="#0369A1" width="40%"><br/><b><font color="white">성능</font></b><br/><br/></td>
+</tr>
+<tr>
+<td align="center" bgcolor="#BAE6FD"><br/>🔵 장면 분류<br/><br/></td>
+<td align="center" bgcolor="#E0F2FE"><br/>CLIP ViT-B/32 fine-tuned<br/><br/></td>
+<td align="center" bgcolor="#E0F2FE"><br/>Val Acc 93.48% · Conf 79~87%<br/><br/></td>
+</tr>
+<tr>
+<td align="center" bgcolor="#BAE6FD"><br/>🟢 의미론적 분할<br/><br/></td>
+<td align="center" bgcolor="#E0F2FE"><br/>OneFormer swin-large<br/><br/></td>
+<td align="center" bgcolor="#E0F2FE"><br/>Travel-class mIoU 45.6% (+8.5%p)<br/><br/></td>
+</tr>
+<tr>
+<td align="center" bgcolor="#BAE6FD"><br/>🟣 분위기·취향<br/><br/></td>
+<td align="center" bgcolor="#E0F2FE"><br/>Preference MLP (768→6)<br/><br/></td>
+<td align="center" bgcolor="#E0F2FE"><br/>Macro F1 0.9450 · Weighted F1 0.9460<br/><br/></td>
+</tr>
+<tr>
+<td align="center" bgcolor="#BAE6FD"><br/>🟡 시각 특성<br/><br/></td>
+<td align="center" bgcolor="#E0F2FE"><br/>OpenCV<br/><br/></td>
+<td align="center" bgcolor="#E0F2FE"><br/>밝기·채도·색온도·대비 6개 메트릭<br/><br/></td>
+</tr>
+<tr>
+<td align="center" bgcolor="#BAE6FD"><br/>🎯 추천 엔진<br/><br/></td>
+<td align="center" bgcolor="#E0F2FE"><br/>코사인 유사도<br/><br/></td>
+<td align="center" bgcolor="#E0F2FE"><br/>Top-3~5 여행지 선정<br/><br/></td>
+</tr>
+<tr>
+<td align="center" bgcolor="#BAE6FD"><br/>🔁 앙상블<br/><br/></td>
+<td align="center" bgcolor="#E0F2FE"><br/>per-image 평균<br/><br/></td>
+<td align="center" bgcolor="#E0F2FE"><br/>5~7장 입력 기준<br/><br/></td>
+</tr>
+</table>
+</div>
 
 ---
 
@@ -527,88 +842,91 @@ flowchart LR
 
 ### Limitations
 
-**1. Coarse-Grained Travel Preference Representation**
+<details>
+<summary>&nbsp;<b>1. Coarse-Grained Travel Preference Representation</b></summary>
+<br/>
 
 본 시스템은 데이터 수집 가능성과 모델 복잡도를 고려하여 beach, nature, city, culture, festival, food의 6개 카테고리 기반 taxonomy를 사용한다.
 
-그러나 실제 여행 취향은 카테고리 간 경계가 명확하지 않으며, 동일한 카테고리 내에서도 다양한 세부 선호가 존재한다.
+그러나 실제 여행 취향은 카테고리 간 경계가 명확하지 않으며, 동일한 카테고리 내에서도 다양한 세부 선호가 존재한다. 예를 들어 beach 선호 사용자는 리조트 중심 휴양형, 자연 경관 중심 탐방형, 액티비티 중심 체험형 등 서로 다른 취향을 가질 수 있다.
 
-예를 들어 beach 선호 사용자는 리조트 중심 휴양형, 자연 경관 중심 탐방형, 액티비티 중심 체험형 등 서로 다른 취향을 가질 수 있다.
+</details>
 
-현재 시스템은 이러한 세부 취향을 충분히 구분하지 못한다.
+<details>
+<summary>&nbsp;<b>2. Multi-Domain Evaluation Limitation</b></summary>
+<br/>
 
----
+OneFormer는 ADE20K, FoodSeg103, Cityscapes를 통합하여 학습되었으나, 여행 취향 분석을 위한 통합 평가 벤치마크는 존재하지 않는다. 따라서 멀티 도메인 환경에서의 종합적인 성능을 정량적으로 평가하는 데 한계가 있다.
 
-**2. Multi-Domain Evaluation Limitation**
+</details>
 
-OneFormer는 ADE20K, FoodSeg103, Cityscapes를 통합하여 학습되었으나, 여행 취향 분석을 위한 통합 평가 벤치마크는 존재하지 않는다.
+<details>
+<summary>&nbsp;<b>3. Pseudo Labeling Noise</b></summary>
+<br/>
 
-따라서 각 데이터셋 기반 개별 성능 평가는 가능하지만, 멀티 도메인 환경에서의 종합적인 성능을 정량적으로 평가하는 데 한계가 있다.
+스타일 분류 학습 데이터는 Pixabay 이미지와 자동 라벨링 기반으로 구축되었다. Confidence 기반 필터링을 적용하였음에도 불구하고 데이터 편향 및 라벨 노이즈가 일부 잔존할 수 있다.
 
----
+</details>
 
-**3. Pseudo Labeling Noise**
+<details>
+<summary>&nbsp;<b>4. Limitation of Hand-Crafted Preference Vector</b></summary>
+<br/>
 
-스타일 분류 학습 데이터는 Pixabay 이미지와 자동 라벨링 기반으로 구축되었다.
+현재 Preference Vector는 사람이 직접 설계한 특징 공간을 사용한다. 해석 가능성이 높다는 장점이 있으나, 실제 사용자의 잠재적 취향을 완전히 표현하지 못할 가능성이 있다.
 
-Confidence 기반 필터링을 적용하였음에도 불구하고 데이터 편향 및 라벨 노이즈가 일부 잔존할 수 있다.
+</details>
 
-향후 Human-Annotated 데이터와의 혼합 학습을 통해 데이터 품질을 개선할 수 있다.
+<details>
+<summary>&nbsp;<b>5. Dependency on External APIs</b></summary>
+<br/>
 
----
+Gemini API 기반 자연어 설명 기능은 외부 서비스 의존성을 가진다. API 장애 또는 정책 변경 시 서비스 품질에 영향을 받을 수 있다.
 
-**4. Limitation of Hand-Crafted Preference Vector**
+</details>
 
-현재 Preference Vector는 Scene, Semantic, Visual, Style 정보를 기반으로 사람이 직접 설계한 특징 공간을 사용한다.
+<details>
+<summary>&nbsp;<b>6. Subjectivity of Style Labels</b></summary>
+<br/>
 
-이는 해석 가능성이 높다는 장점이 있으나, 실제 사용자의 잠재적 취향을 완전히 표현하지 못할 가능성이 있다.
+분위기(mood), 라이프스타일(style), 장소 감성(place)은 본질적으로 주관적인 개념이다. 현재의 자동 라벨링 기반 접근은 개인차를 충분히 반영하지 못한다.
 
-향후에는 사용자 이미지와 여행지 이미지를 동일한 임베딩 공간에 정렬하는 Learnable Preference Embedding을 통해 보다 일반화된 취향 표현을 학습할 수 있다.
+</details>
 
----
-
-**5. Dependency on External APIs**
-
-Gemini API 기반 자연어 설명 기능은 외부 서비스 의존성을 가진다.
-
-API 장애 또는 정책 변경 시 서비스 품질에 영향을 받을 수 있으며, 향후 경량 온디바이스 LLM을 활용한 독립적 추론 구조로 확장 가능하다.
-
----
-
-**6. Subjectivity of Style Labels**
-
-분위기(mood), 라이프스타일(style), 장소 감성(place)은 본질적으로 주관적인 개념이다.
-
-동일한 이미지에 대해서도 사용자마다 서로 다른 인식을 가질 수 있으며, 현재의 자동 라벨링 기반 접근은 이러한 개인차를 충분히 반영하지 못한다.
-
-향후 사용자 피드백 기반 개인화 루프를 통해 이 문제를 완화할 수 있다.
-
----
+<br/>
 
 ### Future Work
 
-**1. Learnable Preference Embedding**
+<details>
+<summary>&nbsp;<b>1. Learnable Preference Embedding</b></summary>
+<br/>
 
-현재 시스템은 사람이 설계한 Preference Vector를 사용한다.  
-향후에는 사용자 이미지와 여행지 이미지를 동일한 임베딩 공간으로 학습하여  
-수작업 특징 설계 없이 여행 취향을 직접 학습하는  
-Learnable Preference Embedding으로 확장할 수 있다.
+사용자 이미지와 여행지 이미지를 동일한 임베딩 공간으로 학습하여 수작업 특징 설계 없이 여행 취향을 직접 학습하는 Learnable Preference Embedding으로 확장할 수 있다.
 
-**2. Personalized Feedback Loop**
+</details>
 
-사용자 피드백을 통해 Preference Vector를 지속적으로 업데이트하여  
-개인화 성능을 향상할 수 있다.  
-스타일 라벨의 주관성 문제를 개인화로 점진적으로 해결 가능하다.
+<details>
+<summary>&nbsp;<b>2. Personalized Feedback Loop</b></summary>
+<br/>
 
-**3. Large-Scale Destination Retrieval**
+사용자 피드백을 통해 Preference Vector를 지속적으로 업데이트하여 개인화 성능을 향상할 수 있다. 스타일 라벨의 주관성 문제를 개인화로 점진적으로 해결 가능하다.
 
-사전 정의 여행지 대신 대규모 여행지 이미지 데이터베이스를 활용한  
-Retrieval 기반 추천으로 확장할 수 있다.
+</details>
 
-**4. 계층적 카테고리 확장**
+<details>
+<summary>&nbsp;<b>3. Large-Scale Destination Retrieval</b></summary>
+<br/>
 
-6개 → 세부 하위 테마로 확장  
-(예: beach → 리조트형 / 자연형 / 액티비티형)
+사전 정의 여행지 대신 대규모 여행지 이미지 데이터베이스를 활용한 Retrieval 기반 추천으로 확장할 수 있다.
+
+</details>
+
+<details>
+<summary>&nbsp;<b>4. 계층적 카테고리 확장</b></summary>
+<br/>
+
+6개 → 세부 하위 테마로 확장 (예: beach → 리조트형 / 자연형 / 액티비티형)
+
+</details>
 
 ---
 
@@ -751,9 +1069,14 @@ PhotoTrip은 사용자의 일상 사진으로부터 잠재적 시각 취향을 �
 
 <div align="center">
 
-<img width="100%" src="https://capsule-render.vercel.app/api?type=waving&color=0,7DD3FC,38BDF8,87CEEB&height=120&section=footer"/>
+<img width="100%" src="https://capsule-render.vercel.app/api?type=waving&color=0,0EA5E9,38BDF8,BAE6FD&height=130&section=footer&fontFamily=Noto+Sans+KR"/>
 
-*PhotoTrip — Computer Vision Course Project*  
-*사진 한 장이 여행의 시작이 됩니다* ✈️
+<br/>
+
+**PhotoTrip** — Computer Vision Course Project
+
+*사진 한 장이 여행의 시작이 됩니다* &nbsp;✈️
+
+<br/>
 
 </div>
