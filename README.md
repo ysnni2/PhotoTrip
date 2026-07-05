@@ -555,4 +555,266 @@ GPU Training
 <br/>
 
 ---
+---
 
+<br/>
+
+# 🚀 Key Contributions
+
+<div align="center">
+
+### What Makes PhotoTrip Different?
+
+PhotoTrip is not about proposing a new vision model.
+
+It is about **integrating heterogeneous AI models**
+into a single interpretable travel preference representation.
+
+</div>
+
+<br/>
+
+<div align="center">
+
+| ✨ Contribution | Description |
+|:----------------|:------------|
+| 🧠 Multimodal Preference Vector | Unified representation from CLIP, OneFormer, OpenCV and Preference MLP |
+| 🌎 Personalized Recommendation | Cosine similarity retrieval using handcrafted destination profiles |
+| 🎯 Accuracy–Confidence Analysis | Compared CLIP and SigLIP beyond accuracy |
+| 🌿 Multi-Dataset OneFormer Training | Unified semantic segmentation across travel domains |
+| 🤖 Explainable AI | Gemini generates human-readable travel explanations |
+
+</div>
+
+<br/>
+
+---
+
+<br/>
+
+## 🧠 1. Multimodal Preference Vector
+
+Unlike conventional recommendation systems,
+
+PhotoTrip does not rely on a single model.
+
+Instead,
+
+it combines
+
+- 🧠 Scene Category (CLIP)
+- 🌿 Semantic Composition (OneFormer)
+- 🎨 Visual Statistics (OpenCV)
+- 😊 Lifestyle Preference (Preference MLP)
+
+into one **44-dimensional Preference Vector**.
+
+This representation becomes the user's travel profile
+and is directly matched with destination profiles
+using cosine similarity.
+
+---
+
+<br/>
+
+## 🎯 2. Accuracy vs Confidence
+
+Most studies compare only **accuracy**.
+
+PhotoTrip additionally compares
+
+> **Inference Confidence**
+
+because confidence directly affects
+Preference Vector quality.
+
+<div align="center">
+
+| Model | Accuracy | Confidence |
+|:------:|:--------:|:----------:|
+| SigLIP | **93.56%** | **33–37%** |
+| CLIP Fine-tuned ✅ | **93.48%** | **79–87%** |
+
+</div>
+
+Although both models achieve similar accuracy,
+
+CLIP provides significantly higher confidence,
+resulting in more stable preference estimation.
+
+<br/>
+
+<p align="center">
+<img src="results/confidence_comparison.png.png" width="70%">
+</p>
+
+---
+
+<br/>
+
+## 🌿 3. OneFormer Multi-Dataset Training
+
+Instead of training multiple segmentation models,
+
+PhotoTrip trains **a single OneFormer**
+using three different datasets.
+
+<div align="center">
+
+| Dataset | Domain |
+|:--------:|:--------|
+| ADE20K | Indoor / Outdoor Scenes |
+| FoodSeg103 | Food Images |
+| Cityscapes | Urban Environment |
+
+</div>
+
+This unified training strategy improved
+
+**Travel-class mIoU**
+
+from
+
+> **37.1 → 45.6 (+8.5%p)**
+
+<br/>
+
+<p align="center">
+<img src="results/Oneformer_mIoU.png.png" width="65%">
+</p>
+
+---
+
+<br/>
+
+## 😊 4. Preference MLP
+
+A dedicated multilabel classifier predicts
+
+- Mood
+- Style
+- Lifestyle
+
+from CLIP image embeddings.
+
+<div align="center">
+
+| Input | Architecture | Output |
+|:------:|:------------:|:------:|
+| CLIP Embedding (768-dim) | 768 → 512 → 256 → 128 → 6 | Multilabel Preference |
+
+</div>
+
+Training Strategy
+
+- BCE Loss
+- Class Weight
+- Rare Class Sampler
+- Pseudo Labeling
+
+Final Performance
+
+<div align="center">
+
+# ⭐ Macro F1 = **0.9450**
+
+</div>
+
+<p align="center">
+<img src="results/mlp_f1_score.png" width="75%">
+</p>
+
+---
+
+<br/>
+
+# 📊 Experimental Results
+
+<div align="center">
+
+## Overall Performance
+
+</div>
+
+<div align="center">
+
+| Module | Performance |
+|:------:|:------------|
+| 🧠 CLIP Fine-tuned | **93.48% Accuracy** |
+| 🌿 OneFormer | **45.6 mIoU** |
+| 😊 Preference MLP | **Macro F1 0.9450** |
+| 🎨 OpenCV | 6 Visual Metrics |
+| 🌎 Recommendation | Top-3 Personalized Destinations |
+| 🎮 Three.js | Interactive Visualization |
+
+</div>
+
+<br/>
+
+---
+
+<br/>
+
+## 📈 Training Results
+
+<p align="center">
+
+<img src="results/full_experiment_history.png.png" width="80%">
+
+</p>
+
+<br/>
+
+<p align="center">
+
+<img src="results/confusion_matrix_clip.png.png" width="47%">
+
+<img src="results/confidence_comparison.png.png" width="47%">
+
+</p>
+
+<br/>
+
+<p align="center">
+
+<img src="results/Oneformer_results.png.png" width="80%">
+
+</p>
+
+<br/>
+
+---
+
+<br/>
+
+# 🖼️ User Experience
+
+<div align="center">
+
+The recommendation is presented as
+
+### ✈️ A Personalized Travel Journey
+
+instead of a conventional recommendation list.
+
+</div>
+
+<br/>
+
+<div align="center">
+
+| 📷 Upload | 🧠 AI Dashboard | 🎫 Boarding Pass |
+|:---------:|:--------------:|:----------------:|
+| Screenshot | Screenshot | Screenshot |
+
+| 🎮 3D Scene | 🤖 Gemini | 🌎 Recommendation |
+|:-----------:|:---------:|:----------------:|
+| Screenshot | Screenshot | Screenshot |
+
+</div>
+
+> Replace each **Screenshot** with your actual UI images.
+
+<br/>
+
+---
