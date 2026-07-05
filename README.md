@@ -315,61 +315,80 @@ PhotoTrip integrates these heterogeneous signals into one
 
 # 🧠 Why A Single Model Is Not Enough?
 
-Modern travel preference cannot be represented by a single computer vision model.
+Travel preference is far more complex than simple scene classification.
 
-Each model understands **only one aspect** of an image.
+A single computer vision model can understand **only one aspect** of an image.
 
-PhotoTrip combines multiple complementary models to capture a user's latent visual preference.
-
-<br/>
-
-<div align="center">
-
-| Model | ✅ What it Understands | ❌ What it Misses |
-|:------:|:----------------------|:------------------|
-| **CLIP** | Scene Category | Color, Mood, Spatial Composition |
-| **OneFormer** | Semantic Composition | User Preference |
-| **OpenCV** | Visual Statistics | Scene Meaning |
-| **Preference MLP** | Lifestyle & Mood | Spatial Structure |
-
-</div>
+PhotoTrip combines multiple complementary models to capture a user's **latent visual preference**.
 
 <br/>
 
 <div align="center">
 
-### 🌊 A Single Image Contains Multiple Signals
+| Model | ✅ Strength | ❌ Limitation |
+|:------:|:---------------------------|:-----------------------------|
+| **🧠 CLIP** | Scene Category Recognition | Cannot understand color, mood, or composition |
+| **🌿 OneFormer** | Semantic Scene Composition | Cannot infer user preference |
+| **🎨 OpenCV** | Color & Visual Statistics | Cannot understand scene semantics |
+| **😊 Preference MLP** | Lifestyle & Mood Prediction | Cannot capture spatial structure |
 
 </div>
-
-```text
-                  📷 Input Image
-                       │
-     ┌──────────┬──────────┬──────────┬──────────┐
-     │          │          │          │
-     ▼          ▼          ▼          ▼
-   CLIP    OneFormer    OpenCV      MLP
- Scene      Semantic     Color     Lifestyle
- Category   Structure   Statistics  Preference
-     │          │          │          │
-     └──────────┴──────────┴──────────┘
-                    │
-                    ▼
-          ✨ Preference Vector
-```
 
 <br/>
 
 Instead of relying on a single prediction,
 
-PhotoTrip combines
+PhotoTrip integrates
 
 - 🌄 Scene Information
 - 🌿 Semantic Composition
 - 🎨 Visual Characteristics
 - 😊 Lifestyle Preference
 
-into a unified representation.
+into a single **Preference Vector**.
+
+---
+
+<br/>
+
+# ☁️ AI Analysis Pipeline
+
+```mermaid
+flowchart TD
+
+    A["📷 Upload 5–7 Photos"]
+
+    A --> B1["🧠 CLIP"]
+    A --> B2["🌿 OneFormer"]
+    A --> B3["🎨 OpenCV"]
+    A --> B4["😊 Preference MLP"]
+
+    B1 --> C["✨ Preference Vector"]
+    B2 --> C
+    B3 --> C
+    B4 --> C
+
+    C --> D["🌎 Cosine Similarity"]
+
+    D --> E["🤖 Gemini"]
+
+    D --> F["🎮 Three.js"]
+
+    E --> G["🎫 Boarding Pass"]
+
+    F --> G
+
+    style A fill:#E0F2FE,stroke:#38BDF8
+    style B1 fill:#DBEAFE,stroke:#2563EB
+    style B2 fill:#DCFCE7,stroke:#16A34A
+    style B3 fill:#FEF3C7,stroke:#F59E0B
+    style B4 fill:#F3E8FF,stroke:#A855F7
+    style C fill:#DBEAFE,stroke:#2563EB,color:#111
+    style D fill:#DCFCE7,stroke:#22C55E
+    style E fill:#FEF3C7,stroke:#F59E0B
+    style F fill:#F3E8FF,stroke:#A855F7
+    style G fill:#DBEAFE,stroke:#0284C7
+```
 
 <br/>
 
@@ -383,28 +402,13 @@ into a unified representation.
 
 ### The Core Representation of PhotoTrip
 
-Rather than predicting only a travel category,
+PhotoTrip does not simply classify images.
 
-PhotoTrip represents each user as an
+Instead, it transforms multiple AI outputs into an
 
-# **44-Dimensional Preference Vector**
+# **44-Dimensional Interpretable Preference Vector**
 
-</div>
-
-<br/>
-
-<div align="center">
-
-| Category | Dimension |
-|:---------|:---------:|
-| 🌄 Scene | **6** |
-| 🎨 Visual Features | **6** |
-| 🌿 Semantic Composition | **5** |
-| 😊 Style Preference | **6** |
-| 📍 Place Preference | **6** |
-| 🌤 Mood Preference | **6** |
-| ⭐ Personal Interests | **9** |
-| **Total** | **44** |
+which represents the user's hidden travel preference.
 
 </div>
 
@@ -412,37 +416,22 @@ PhotoTrip represents each user as an
 
 <div align="center">
 
-### ✨ Preference Vector Pipeline
+| Feature Group | Dimension | Description |
+|:-------------|:---------:|:------------|
+| 🌄 Scene | **6** | beach, city, nature, culture, food, festival |
+| 🎨 Visual | **6** | brightness, saturation, contrast, warm tone ... |
+| 🌿 Semantic | **5** | water, vegetation, building, sky, food |
+| 😊 Style | **6** | cozy, energetic, romantic ... |
+| 📍 Place | **6** | preferred travel place |
+| 🌤 Mood | **6** | emotional tendency |
+| ⭐ Interest | **9** | shopping, anime, sports, café ... |
+| **Total** | **44** | Unified Preference Representation |
 
 </div>
 
-```text
-Everyday Photos
-        │
-        ▼
-Per-Image Analysis
-(CLIP + OneFormer + OpenCV + MLP)
-        │
-        ▼
-Feature Extraction
-        │
-        ▼
-44-D Preference Vector
-        │
-        ▼
-Average Ensemble
-(5~7 Photos)
-        │
-        ▼
-Cosine Similarity Matching
-        │
-        ▼
-Recommended Destinations
-```
-
 <br/>
 
-### Example
+### Example Preference Vector
 
 ```json
 {
@@ -459,19 +448,19 @@ Recommended Destinations
 
 ↓
 
-### 🌎 Recommended Destinations
+### 🌎 Recommendation
 
-🥇 Bali
-
-🥈 Phuket
-
-🥉 Cebu
+| Rank | Destination |
+|:---:|:-------------|
+| 🥇 | Bali |
+| 🥈 | Phuket |
+| 🥉 | Cebu |
 
 ↓
 
-### 🤖 Gemini Explanation
+### 🤖 AI Explanation
 
-> You prefer warm colors, vibrant environments, and destinations where beaches and local food coexist.
+> "You tend to prefer warm colors, vibrant environments, and destinations where beaches and local food coexist."
 
 <br/>
 
@@ -479,56 +468,15 @@ Recommended Destinations
 
 <br/>
 
-# 🏗️ System Architecture
+# 🏗️ System Overview
 
 <div align="center">
 
-### End-to-End AI Pipeline
+| 📷 Input | 🧠 AI Analysis | ✨ Preference Vector | 🌎 Recommendation | 🎮 Visualization |
+|:---------:|:-------------:|:--------------------:|:----------------:|:----------------:|
+| Daily Photos | CLIP + OneFormer + OpenCV + MLP | 44-D Representation | Cosine Similarity | Three.js + Gemini |
 
 </div>
-
-```text
-                    📷 Upload Photos
-                           │
-                           ▼
-                 ┌──────────────────┐
-                 │   CLIP Fine-tuned │
-                 │ Scene Classification │
-                 └──────────────────┘
-                           │
-                 ┌──────────────────┐
-                 │    OneFormer      │
-                 │ Semantic Parsing  │
-                 └──────────────────┘
-                           │
-                 ┌──────────────────┐
-                 │      OpenCV       │
-                 │ Visual Statistics │
-                 └──────────────────┘
-                           │
-                 ┌──────────────────┐
-                 │ Preference MLP    │
-                 │ Lifestyle Analysis│
-                 └──────────────────┘
-                           │
-                           ▼
-                ✨ Preference Vector
-                           │
-                           ▼
-              Cosine Similarity Retrieval
-                           │
-             ┌─────────────┴─────────────┐
-             ▼                           ▼
-      🌎 Destination               🤖 Gemini
-      Recommendation              Explanation
-             │                           │
-             └─────────────┬─────────────┘
-                           ▼
-                  🎮 Three.js Frontend
-                           │
-                           ▼
-          Dashboard · Boarding Pass · 3D Scene
-```
 
 <br/>
 
@@ -536,7 +484,7 @@ Recommended Destinations
 
 <br/>
 
-# 📦 Tech Stack
+# 🛠️ Tech Stack
 
 <div align="center">
 
@@ -576,9 +524,11 @@ Transformers
 
 Three.js
 
-JavaScript
+HTML
 
-HTML / CSS
+CSS
+
+JavaScript
 
 </td>
 
@@ -590,7 +540,9 @@ Gemini API
 
 Google Colab
 
-Kaggle GPU
+Kaggle
+
+GPU Training
 
 </td>
 
@@ -603,3 +555,4 @@ Kaggle GPU
 <br/>
 
 ---
+
