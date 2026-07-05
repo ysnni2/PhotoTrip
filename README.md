@@ -1090,3 +1090,216 @@ but also
 <br/>
 
 ---
+---
+
+<br/>
+
+# 🚀 Quick Start
+
+<div align="center">
+
+### Get PhotoTrip Running in Minutes
+
+</div>
+
+<br/>
+
+## ① Clone Repository
+
+```bash
+git clone https://github.com/your-username/PhotoTrip.git
+cd PhotoTrip
+```
+
+---
+
+## ② Create Virtual Environment
+
+```bash
+python -m venv venv
+
+# Windows
+venv\Scripts\activate
+
+# Linux / macOS
+source venv/bin/activate
+```
+
+---
+
+## ③ Install Dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+---
+
+## ④ Configure Environment
+
+Create a `.env` file in the project root.
+
+```env
+GOOGLE_API_KEY=your_gemini_api_key
+```
+
+---
+
+## ⑤ Prepare Model Weights
+
+Place the trained models inside
+
+```text
+models/
+
+├── best_clip.pth
+├── best_siglip.pth
+├── mlp_mood_best.pth
+├── mlp_place_best.pth
+├── mlp_style_best.pth
+└── oneformer_top/
+    ├── config.json
+    ├── model.safetensors
+    ├── processor_config.json
+    ├── tokenizer.json
+    └── tokenizer_config.json
+```
+
+---
+
+## ⑥ Run Server
+
+```bash
+python -m uvicorn backend.main:app --reload --port 8000
+```
+
+Open
+
+```text
+http://localhost:8000
+```
+
+---
+
+# ✈️ Usage
+
+<div align="center">
+
+### Your Travel Journey
+
+</div>
+
+<br/>
+
+```text
+📷 Upload 5–7 Photos
+        │
+        ▼
+🧠 AI Analysis
+        │
+        ▼
+✨ Preference Vector
+        │
+        ▼
+🌎 Personalized Recommendation
+        │
+        ▼
+🤖 Gemini Explanation
+        │
+        ▼
+🎮 Three.js Scene
+        │
+        ▼
+🎫 Boarding Pass
+```
+
+---
+
+# 📂 Project Structure
+
+```text
+PhotoTrip/
+
+├── backend/
+├── frontend/
+├── models/
+├── results/
+├── classification/
+├── segmentation/
+├── recommendation/
+├── utils/
+├── requirements.txt
+└── README.md
+```
+
+---
+
+# 📖 References
+
+## Vision-Language Models
+
+- Radford et al. (2021). **CLIP: Learning Transferable Visual Models From Natural Language Supervision**
+- Zhai et al. (2023). **SigLIP: Sigmoid Loss for Language Image Pre-Training**
+
+---
+
+## Semantic Segmentation
+
+- Jain et al. (2023). **OneFormer**
+- Cheng et al. (2022). **Mask2Former**
+
+---
+
+## Datasets
+
+- ADE20K
+- FoodSeg103
+- Cityscapes
+
+---
+
+## APIs & Frameworks
+
+- Google Gemini API
+- HuggingFace Transformers
+- FastAPI
+- PyTorch
+- Three.js
+
+---
+
+# 🙏 Acknowledgements
+
+This project was developed as a Computer Vision course project.
+
+Special thanks to
+
+- Google Colab
+- Kaggle GPU
+- Pixabay API
+- HuggingFace
+- Google Gemini API
+
+for supporting model training and deployment.
+
+---
+
+<br/>
+
+<div align="center">
+
+# ☁️ Thank You
+
+### 📸 PhotoTrip
+
+**Discover Your Travel Style From Everyday Photos**
+
+<br/>
+
+<img width="100%" src="https://capsule-render.vercel.app/api?type=waving&height=140&section=footer&color=0:E0F2FE,50:7DD3FC,100:38BDF8"/>
+
+Made with ❤️ using
+
+PyTorch • FastAPI • Three.js • Gemini
+
+</div>
