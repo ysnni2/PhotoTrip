@@ -787,15 +787,16 @@ Final Performance
 
 <br/>
 
-# 🖼️ User Experience
+---
+---
+
+<br/>
+
+# 🌐 System Implementation
 
 <div align="center">
 
-The recommendation is presented as
-
-### ✈️ A Personalized Travel Journey
-
-instead of a conventional recommendation list.
+### End-to-End AI Travel Recommendation Service
 
 </div>
 
@@ -803,17 +804,288 @@ instead of a conventional recommendation list.
 
 <div align="center">
 
-| 📷 Upload | 🧠 AI Dashboard | 🎫 Boarding Pass |
-|:---------:|:--------------:|:----------------:|
-| Screenshot | Screenshot | Screenshot |
-
-| 🎮 3D Scene | 🤖 Gemini | 🌎 Recommendation |
-|:-----------:|:---------:|:----------------:|
-| Screenshot | Screenshot | Screenshot |
+| Layer | Technology |
+|:------:|:-----------|
+| ⚙ Backend | FastAPI · PyTorch |
+| 🧠 AI Models | CLIP · OneFormer · OpenCV · Preference MLP |
+| 🤖 LLM | Google Gemini API |
+| 🎮 Frontend | Three.js · HTML · CSS · JavaScript |
+| ✈ Visualization | CV Dashboard · Boarding Pass · Interactive 3D Scene |
 
 </div>
 
-> Replace each **Screenshot** with your actual UI images.
+<br/>
+
+PhotoTrip connects multiple AI models into a single end-to-end pipeline.
+
+Instead of returning only classification results,
+
+the system visualizes the recommendation through
+
+- 📊 CV Dashboard
+- 🤖 Gemini Explanation
+- 🎫 Boarding Pass
+- 🎮 Interactive Three.js Scene
+
+to provide a complete travel recommendation experience.
+
+---
+
+<br/>
+
+# ⚠️ Limitations
+
+Although PhotoTrip demonstrates strong performance,
+
+several limitations remain.
+
+---
+
+### 1️⃣ Coarse-Grained Travel Categories
+
+The current taxonomy consists of
+
+- Beach
+- Nature
+- City
+- Culture
+- Festival
+- Food
+
+Although practical,
+
+real travel preference is much more diverse.
+
+For example,
+
+users who prefer beaches may actually prefer
+
+- Luxury Resorts
+- Natural Landscapes
+- Water Activities
+
+which cannot yet be distinguished.
+
+---
+
+### 2️⃣ Multi-Domain Evaluation
+
+OneFormer was trained using
+
+- ADE20K
+- FoodSeg103
+- Cityscapes
+
+However,
+
+there is currently no benchmark specifically designed for
+
+travel preference analysis across multiple domains.
+
+As a result,
+
+evaluation is performed independently on each dataset.
+
+---
+
+### 3️⃣ Pseudo Label Noise
+
+Preference MLP training data was generated
+
+using automatic pseudo labeling.
+
+Although confidence filtering was applied,
+
+label noise and dataset bias may still remain.
+
+Future versions may combine
+
+human annotated data
+
+with pseudo labeled data.
+
+---
+
+### 4️⃣ Handcrafted Preference Vector
+
+The current Preference Vector
+
+is manually designed using
+
+- Scene
+- Semantic
+- Visual
+- Style
+
+features.
+
+Although interpretable,
+
+it may not fully represent
+
+the user's latent preference.
+
+A learnable preference embedding
+
+would allow more generalized representation.
+
+---
+
+### 5️⃣ External API Dependency
+
+Natural language explanation
+
+depends on
+
+Google Gemini API.
+
+Future versions may adopt
+
+lightweight local language models
+
+to reduce external dependency.
+
+---
+
+### 6️⃣ Subjectivity of Style Labels
+
+Lifestyle
+
+Mood
+
+Style
+
+are inherently subjective.
+
+The same image
+
+may be interpreted differently
+
+by different users.
+
+Future work includes
+
+user feedback based personalization.
+
+---
+
+<br/>
+
+# 🚀 Future Work
+
+<div align="center">
+
+### Future Directions
+
+</div>
+
+<br/>
+
+<table>
+
+<tr>
+
+<td width="50%" valign="top">
+
+### 🧠 Learnable Preference Embedding
+
+Replace handcrafted features
+
+with
+
+end-to-end learned preference embeddings.
+
+</td>
+
+<td width="50%" valign="top">
+
+### 🔄 Personalized Feedback Loop
+
+Continuously improve
+
+Preference Vector
+
+using user feedback.
+
+</td>
+
+</tr>
+
+<tr>
+
+<td width="50%" valign="top">
+
+### 🌎 Large-scale Destination Retrieval
+
+Expand from
+
+predefined destinations
+
+to
+
+large-scale retrieval
+
+using destination image databases.
+
+</td>
+
+<td width="50%" valign="top">
+
+### 🏖 Fine-grained Travel Categories
+
+Expand
+
+Beach
+
+↓
+
+Luxury Resort
+
+Nature
+
+↓
+
+National Park
+
+City
+
+↓
+
+Night View
+
+Food
+
+↓
+
+Local Restaurant
+
+and other detailed travel themes.
+
+</td>
+
+</tr>
+
+</table>
+
+<br/>
+
+<div align="center">
+
+## ✨ Vision
+
+PhotoTrip aims to become
+
+an explainable AI travel recommendation system
+
+that understands
+
+not only **where people travel,**
+
+but also
+
+**why they are visually attracted to those places.**
+
+</div>
 
 <br/>
 
